@@ -56,7 +56,8 @@ func NewHTTPServer(
 		noAuthRouter := v1.Group("/")
 		{
 			noAuthRouter.POST("/register", userHandler.Register)
-			noAuthRouter.POST("/login", userHandler.Login)
+			noAuthRouter.POST("/passwordLogin", userHandler.PasswordLogin)
+			noAuthRouter.GET("/getCaptcha", userHandler.GetCaptcha)
 		}
 		// Non-strict permission routing group
 		noStrictAuthRouter := v1.Group("/").Use(middleware.NoStrictAuth(jwt, logger))

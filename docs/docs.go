@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/login": {
+        "/PasswordLogin": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -35,7 +35,7 @@ const docTemplate = `{
                 "tags": [
                     "用户模块"
                 ],
-                "summary": "账号登录",
+                "summary": "账号密码登录",
                 "parameters": [
                     {
                         "description": "params",
@@ -43,7 +43,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_go-nunu_nunu-layout-advanced_api_v1.LoginRequest"
+                            "$ref": "#/definitions/v1.PasswordLoginRequest"
                         }
                     }
                 ],
@@ -51,7 +51,30 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_go-nunu_nunu-layout-advanced_api_v1.LoginResponse"
+                            "$ref": "#/definitions/v1.LoginResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/getCaptcha": {
+            "get": {
+                "description": "获取验证码生成所需的ID和图片URL",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "获取验证码",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CaptchaResponse"
                         }
                     }
                 }
@@ -77,7 +100,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_go-nunu_nunu-layout-advanced_api_v1.RegisterRequest"
+                            "$ref": "#/definitions/v1.RegisterRequest"
                         }
                     }
                 ],
@@ -85,7 +108,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_go-nunu_nunu-layout-advanced_api_v1.Response"
+                            "$ref": "#/definitions/v1.Response"
                         }
                     }
                 }
@@ -112,7 +135,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_go-nunu_nunu-layout-advanced_api_v1.GetProfileResponse"
+                            "$ref": "#/definitions/v1.GetProfileResponse"
                         }
                     }
                 }
@@ -140,7 +163,7 @@ const docTemplate = `{
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/github_com_go-nunu_nunu-layout-advanced_api_v1.UpdateProfileRequest"
+                            "$ref": "#/definitions/v1.UpdateProfileRequest"
                         }
                     }
                 ],
@@ -148,7 +171,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/github_com_go-nunu_nunu-layout-advanced_api_v1.Response"
+                            "$ref": "#/definitions/v1.Response"
                         }
                     }
                 }
@@ -156,21 +179,46 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "github_com_go-nunu_nunu-layout-advanced_api_v1.GetProfileResponse": {
+        "v1.CaptchaResponse": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer"
                 },
                 "data": {
-                    "$ref": "#/definitions/github_com_go-nunu_nunu-layout-advanced_api_v1.GetProfileResponseData"
+                    "$ref": "#/definitions/v1.CaptchaResponseData"
                 },
                 "message": {
                     "type": "string"
                 }
             }
         },
-        "github_com_go-nunu_nunu-layout-advanced_api_v1.GetProfileResponseData": {
+        "v1.CaptchaResponseData": {
+            "type": "object",
+            "properties": {
+                "captchaId": {
+                    "type": "string"
+                },
+                "captchaImageUrl": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.GetProfileResponse": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "type": "integer"
+                },
+                "data": {
+                    "$ref": "#/definitions/v1.GetProfileResponseData"
+                },
+                "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.GetProfileResponseData": {
             "type": "object",
             "properties": {
                 "nickname": {
@@ -182,38 +230,21 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_go-nunu_nunu-layout-advanced_api_v1.LoginRequest": {
-            "type": "object",
-            "required": [
-                "email",
-                "password"
-            ],
-            "properties": {
-                "email": {
-                    "type": "string",
-                    "example": "1234@gmail.com"
-                },
-                "password": {
-                    "type": "string",
-                    "example": "123456"
-                }
-            }
-        },
-        "github_com_go-nunu_nunu-layout-advanced_api_v1.LoginResponse": {
+        "v1.LoginResponse": {
             "type": "object",
             "properties": {
                 "code": {
                     "type": "integer"
                 },
                 "data": {
-                    "$ref": "#/definitions/github_com_go-nunu_nunu-layout-advanced_api_v1.LoginResponseData"
+                    "$ref": "#/definitions/v1.LoginResponseData"
                 },
                 "message": {
                     "type": "string"
                 }
             }
         },
-        "github_com_go-nunu_nunu-layout-advanced_api_v1.LoginResponseData": {
+        "v1.LoginResponseData": {
             "type": "object",
             "properties": {
                 "accessToken": {
@@ -221,24 +252,57 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_go-nunu_nunu-layout-advanced_api_v1.RegisterRequest": {
+        "v1.PasswordLoginRequest": {
             "type": "object",
             "required": [
-                "email",
-                "password"
+                "password",
+                "phone"
             ],
             "properties": {
-                "email": {
-                    "type": "string",
-                    "example": "1234@gmail.com"
+                "captcha": {
+                    "description": "验证码字段",
+                    "type": "string"
+                },
+                "captchaId": {
+                    "description": "验证码ID字段",
+                    "type": "string"
                 },
                 "password": {
                     "type": "string",
                     "example": "123456"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "10012239028"
                 }
             }
         },
-        "github_com_go-nunu_nunu-layout-advanced_api_v1.Response": {
+        "v1.RegisterRequest": {
+            "type": "object",
+            "required": [
+                "password",
+                "phone"
+            ],
+            "properties": {
+                "captcha": {
+                    "description": "验证码字段",
+                    "type": "string"
+                },
+                "captchaId": {
+                    "description": "验证码ID字段",
+                    "type": "string"
+                },
+                "password": {
+                    "type": "string",
+                    "example": "123456"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "10012239028"
+                }
+            }
+        },
+        "v1.Response": {
             "type": "object",
             "properties": {
                 "code": {
@@ -250,7 +314,7 @@ const docTemplate = `{
                 }
             }
         },
-        "github_com_go-nunu_nunu-layout-advanced_api_v1.UpdateProfileRequest": {
+        "v1.UpdateProfileRequest": {
             "type": "object",
             "required": [
                 "email"

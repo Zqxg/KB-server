@@ -18,8 +18,8 @@ type SimpleCaptchaService struct {
 	captchaExpireDuration time.Duration // 验证码有效期
 }
 
-// NewSimpleCaptchaService 创建一个验证码服务实例
-func NewSimpleCaptchaService(expireDuration time.Duration) *SimpleCaptchaService {
+// NewCaptchaService 创建一个验证码服务实例，返回 CaptchaService 接口类型
+func NewCaptchaService(expireDuration time.Duration) CaptchaService {
 	return &SimpleCaptchaService{
 		captchaExpireDuration: expireDuration,
 	}

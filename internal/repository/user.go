@@ -6,14 +6,20 @@ import (
 	"gorm.io/gorm"
 	v1 "projectName/api/v1"
 	"projectName/internal/model"
+	"time"
 )
 
 type UserRepository interface {
+	// db
 	Create(ctx context.Context, user *model.User) error
 	Update(ctx context.Context, user *model.User) error
 	GetByID(ctx context.Context, id string) (*model.User, error)
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	GetByPhone(ctx context.Context, phone string) (*model.User, error)
+	// redis
+	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
+	Get(ctx context.Context, key string) (string, error)
+	Delete(ctx context.Context, key string) error
 }
 
 func NewUserRepository(
@@ -73,4 +79,16 @@ func (r *userRepository) GetByPhone(ctx context.Context, phone string) (*model.U
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *userRepository) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
+	return r.rdb.Set(ctx, key, value, expiration).Err()
+}
+
+func (r *userRepository) Get(ctx context.Context, key string) (string, error) {
+	return r.rdb.Get(ctx, key).Result()
+}
+
+func (r *userRepository) Delete(ctx context.Context, key string) error {
+	return r.rdb.Del(ctx, key).Err()
 }

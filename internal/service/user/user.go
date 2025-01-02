@@ -2,12 +2,14 @@ package user
 
 import (
 	"context"
+	"fmt"
 	"golang.org/x/crypto/bcrypt"
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
 	"projectName/internal/model"
 	"projectName/internal/repository"
 	"projectName/internal/service"
+	"strconv"
 	"time"
 
 	"github.com/DanPlayer/randomname"
@@ -15,7 +17,7 @@ import (
 
 type UserService interface {
 	Register(ctx context.Context, req *v1.RegisterRequest) error
-	Login(ctx context.Context, req *v1.LoginRequest) (string, error)
+	PasswordLogin(ctx context.Context, req *v1.PasswordLoginRequest) (string, error)
 	GetProfile(ctx context.Context, userId string) (*v1.GetProfileResponseData, error)
 	UpdateProfile(ctx context.Context, userId string, req *v1.UpdateProfileRequest) error
 }
@@ -39,6 +41,10 @@ type userService struct {
 }
 
 func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) error {
+	// 校验参数
+	if req.Phone == "" || req.Password == "" || req.CaptchaId == "" || req.Captcha == "" {
+		return v1.ErrParamEmpty
+	}
 	// 校验验证码
 	if err := s.captchaService.VerifyCaptcha(ctx, req.CaptchaId, req.Captcha); err != nil {
 		return v1.ErrInvalidCaptcha // 如果验证码验证失败，返回错误
@@ -80,20 +86,38 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 	return err
 }
 
-func (s *userService) Login(ctx context.Context, req *v1.LoginRequest) (string, error) {
-	user, err := s.userRepo.GetByEmail(ctx, req.Email)
+func (s *userService) PasswordLogin(ctx context.Context, req *v1.PasswordLoginRequest) (string, error) {
+	// 校验参数
+	if req.Phone == "" || req.Password == "" || req.CaptchaId == "" || req.Captcha == "" {
+		return "", v1.ErrParamEmpty
+	}
+	if err := s.captchaService.VerifyCaptcha(ctx, req.CaptchaId, req.Captcha); err != nil {
+		return "", v1.ErrInvalidCaptcha // 如果验证码验证失败，返回错误
+	}
+	user, err := s.userRepo.GetByPhone(ctx, req.Phone)
 	if err != nil || user == nil {
 		return "", v1.ErrUnauthorized
 	}
-
+	// 校验密码
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 	if err != nil {
-		return "", err
+		return "", v1.ErrDecryptPassword
 	}
-	token, err := s.Jwt.GenToken(user.UserId, time.Now().Add(time.Hour*24*7))
+	// 生成token 有效期7天
+	//todo: 后续可以改成后台可配置的天数
+	token, err := s.Jwt.GenToken(strconv.FormatInt(user.UserId, 10), user.RoleType, time.Now().Add(time.Hour*24*7))
 	if err != nil {
-		return "", err
+		return "", v1.ErrGetTokenFail
 	}
+	// token存redis，后续注销和退出时候删除
+	err = s.Tm.Transaction(ctx, func(ctx context.Context) error {
+		// 将 token 存储到 Redis，设置过期时间为 7 天
+		key := fmt.Sprintf("%d:%d", user.UserId, user.RoleType) // key="10012249028:0"
+		if err = s.userRepo.Set(ctx, token, key, time.Hour*24*7); err != nil {
+			return v1.ErrGetTokenFail // 存储失败
+		}
+		return nil
+	})
 
 	return token, nil
 }
@@ -105,7 +129,7 @@ func (s *userService) GetProfile(ctx context.Context, userId string) (*v1.GetPro
 	}
 
 	return &v1.GetProfileResponseData{
-		UserId:   user.UserId,
+		UserId:   strconv.FormatInt(user.UserId, 10),
 		Nickname: user.Nickname,
 	}, nil
 }

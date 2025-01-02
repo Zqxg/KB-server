@@ -1,5 +1,14 @@
 package v1
 
+type CaptchaResponse struct {
+	Response
+	Data CaptchaResponseData
+}
+type CaptchaResponseData struct {
+	CaptchaId       string `json:"captchaId"`
+	CaptchaImageUrl string `json:"captchaImageUrl"`
+}
+
 type RegisterRequest struct {
 	Phone     string `json:"phone" binding:"required,phone" example:"10012239028"`
 	Password  string `json:"password" binding:"required" example:"123456"`
@@ -7,10 +16,11 @@ type RegisterRequest struct {
 	Captcha   string `json:"captcha"`   // 验证码字段
 }
 
-type LoginRequest struct {
-	Phone    string `json:"phone" binding:"required,phone" example:"10012239028"`
-	Password string `json:"password" binding:"required" example:"123456"`
-	Captcha  string `json:"captcha"` // 验证码字段
+type PasswordLoginRequest struct {
+	Phone     string `json:"phone" binding:"required,phone" example:"10012239028"`
+	Password  string `json:"password" binding:"required" example:"123456"`
+	CaptchaId string `json:"captchaId"` // 验证码ID字段
+	Captcha   string `json:"captcha"`   // 验证码字段
 }
 type LoginResponseData struct {
 	AccessToken string `json:"accessToken"`

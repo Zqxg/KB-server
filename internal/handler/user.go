@@ -10,14 +10,38 @@ import (
 
 type UserHandler struct {
 	*Handler
-	userService user.UserService
+	captchaService user.CaptchaService
+	userService    user.UserService
 }
 
-func NewUserHandler(handler *Handler, userService user.UserService) *UserHandler {
+func NewUserHandler(handler *Handler, captchaService user.CaptchaService, userService user.UserService) *UserHandler {
 	return &UserHandler{
-		Handler:     handler,
-		userService: userService,
+		Handler:        handler,
+		captchaService: captchaService,
+		userService:    userService,
 	}
+}
+
+// GetCaptcha godoc
+// @Summary 获取验证码
+// @Schemes
+// @Description 获取验证码生成所需的ID和图片URL
+// @Tags 用户模块
+// @Accept json
+// @Produce json
+// @Success 200 {object} v1.CaptchaResponse
+// @Router /getCaptcha [get]
+func (h *UserHandler) GetCaptcha(ctx *gin.Context) {
+	captchaId, captchaImageUrl, err := h.captchaService.GenerateCaptcha()
+	if err != nil {
+		h.logger.WithContext(ctx).Error("userService.GetCaptcha error", zap.Error(err))
+		v1.HandleError(ctx, http.StatusInternalServerError, v1.ErrInternalServerError, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, v1.CaptchaResponseData{
+		CaptchaId:       captchaId,
+		CaptchaImageUrl: captchaImageUrl,
+	})
 }
 
 // Register godoc
@@ -46,24 +70,24 @@ func (h *UserHandler) Register(ctx *gin.Context) {
 	v1.HandleSuccess(ctx, nil)
 }
 
-// Login godoc
-// @Summary 账号登录
+// PasswordLogin godoc
+// @Summary 账号密码登录
 // @Schemes
 // @Description
 // @Tags 用户模块
 // @Accept json
 // @Produce json
-// @Param request body v1.LoginRequest true "params"
+// @Param request body v1.PasswordLoginRequest true "params"
 // @Success 200 {object} v1.LoginResponse
-// @Router /login [post]
-func (h *UserHandler) Login(ctx *gin.Context) {
-	var req v1.LoginRequest
+// @Router /PasswordLogin [post]
+func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
+	var req v1.PasswordLoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
 		return
 	}
 
-	token, err := h.userService.Login(ctx, &req)
+	token, err := h.userService.PasswordLogin(ctx, &req)
 	if err != nil {
 		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrUnauthorized, nil)
 		return

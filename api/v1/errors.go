@@ -11,6 +11,8 @@ var (
 	// more biz errors
 	ErrEmailAlreadyUse = newError(1001, "邮箱已存在")
 	ErrPoneAlreadyUse  = newError(1002, "手机号已存在")
+	ErrDecryptPassword = newError(1003, "错误解密密码")
+	ErrGetTokenFail    = newError(1004, "获取token失败")
 
 	// 2000 错误码
 	ErrInvalidCaptcha = newError(2000, "验证码错误")
@@ -19,4 +21,5 @@ var (
 	ErrDatabase = newError(3000, "数据库错误")
 
 	// 20000 业务逻辑错误
+	ErrParamEmpty = newError(20000, "参数为空")
 )

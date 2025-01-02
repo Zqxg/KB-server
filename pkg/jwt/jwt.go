@@ -2,6 +2,8 @@ package jwt
 
 import (
 	"errors"
+	"go.uber.org/zap"
+	"projectName/pkg/log"
 	"strings"
 	"time"
 
@@ -10,11 +12,13 @@ import (
 )
 
 type JWT struct {
-	key []byte
+	key    []byte
+	logger *log.Logger
 }
 
 type MyCustomClaims struct {
-	UserId string
+	UserId   string
+	RoleType int
 	jwt.RegisteredClaims
 }
 
@@ -22,9 +26,10 @@ func NewJwt(conf *viper.Viper) *JWT {
 	return &JWT{key: []byte(conf.GetString("security.jwt.key"))}
 }
 
-func (j *JWT) GenToken(userId string, expiresAt time.Time) (string, error) {
+func (j *JWT) GenToken(userId string, roleType int, expiresAt time.Time) (string, error) {
 	token := jwt.NewWithClaims(jwt.SigningMethodHS256, MyCustomClaims{
-		UserId: userId,
+		UserId:   userId,
+		RoleType: roleType, // 设置 roleType
 		RegisteredClaims: jwt.RegisteredClaims{
 			ExpiresAt: jwt.NewNumericDate(expiresAt),
 			IssuedAt:  jwt.NewNumericDate(time.Now()),
@@ -39,6 +44,7 @@ func (j *JWT) GenToken(userId string, expiresAt time.Time) (string, error) {
 	// Sign and get the complete encoded token as a string using the key
 	tokenString, err := token.SignedString(j.key)
 	if err != nil {
+		j.logger.Error("GenToken error", zap.Error(err))
 		return "", err
 	}
 	return tokenString, nil
@@ -53,6 +59,7 @@ func (j *JWT) ParseToken(tokenString string) (*MyCustomClaims, error) {
 		return j.key, nil
 	})
 	if err != nil {
+		j.logger.Error("ParseToken error", zap.Error(err))
 		return nil, err
 	}
 	if claims, ok := token.Claims.(*MyCustomClaims); ok && token.Valid {

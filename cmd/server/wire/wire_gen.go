@@ -20,21 +20,26 @@ import (
 	"projectName/pkg/log"
 	"projectName/pkg/server/http"
 	"projectName/pkg/sid"
+	"time"
 )
 
 // Injectors from wire.go:
 
+// NewWire 是 Wire 的生成函数，用于构建 App 实例及其依赖
 func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), error) {
 	jwtJWT := jwt.NewJwt(viperViper)
 	handlerHandler := handler.NewHandler(logger)
+	duration := ProvideCaptchaExpireDuration()
+	captchaService := user.NewCaptchaService(duration)
 	db := repository.NewDB(viperViper, logger)
-	repositoryRepository := repository.NewRepository(logger, db)
+	client := repository.NewRedis(viperViper)
+	repositoryRepository := repository.NewRepository(logger, db, client)
 	transaction := repository.NewTransaction(repositoryRepository)
 	sidSid := sid.NewSid()
 	serviceService := service.NewService(transaction, logger, sidSid, jwtJWT)
 	userRepository := repository.NewUserRepository(repositoryRepository)
-	userService := user.NewUserService(serviceService, userRepository)
-	userHandler := handler.NewUserHandler(handlerHandler, userService)
+	userService := user.NewUserService(serviceService, userRepository, captchaService)
+	userHandler := handler.NewUserHandler(handlerHandler, captchaService, userService)
 	httpServer := server.NewHTTPServer(logger, viperViper, jwtJWT, userHandler)
 	jobJob := job.NewJob(transaction, logger, sidSid)
 	userJob := job.NewUserJob(jobJob, userRepository)
@@ -46,21 +51,30 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 
 // wire.go:
 
-var repositorySet = wire.NewSet(repository.NewDB, repository.NewRepository, repository.NewTransaction, repository.NewUserRepository)
+// ProvideCaptchaExpireDuration 用于提供 time.Duration 类型的实例
+func ProvideCaptchaExpireDuration() time.Duration {
+	return 1 * time.Minute
+}
 
-var serviceSet = wire.NewSet(service.NewService, user.NewUserService)
+// 提供 repository 层的实例
+var repositorySet = wire.NewSet(repository.NewDB, repository.NewRedis, repository.NewRepository, repository.NewTransaction, repository.NewUserRepository)
 
+// 提供 service 层的实例
+var serviceSet = wire.NewSet(service.NewService, user.NewUserService, ProvideCaptchaExpireDuration, user.NewCaptchaService)
+
+// 提供 handler 层的实例
 var handlerSet = wire.NewSet(handler.NewHandler, handler.NewUserHandler)
 
+// 提供 job 层的实例
 var jobSet = wire.NewSet(job.NewJob, job.NewUserJob)
 
+// 提供 server 层的实例
 var serverSet = wire.NewSet(server.NewHTTPServer, server.NewJobServer)
 
-// build App
+// newApp 用于构建 App 实例
 func newApp(
 	httpServer *http.Server,
 	jobServer *server.JobServer,
-
 ) *app.App {
 	return app.NewApp(app.WithServer(httpServer, jobServer), app.WithName("demo-server"))
 }
