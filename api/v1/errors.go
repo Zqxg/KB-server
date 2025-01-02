@@ -10,7 +10,9 @@ var (
 
 	// more biz errors
 	ErrEmailAlreadyUse = newError(1001, "邮箱已存在")
-	ErrPoneAlreadyUse  = newError(1002, "手机号已存在")
+	ErrPhoneAlreadyUse = newError(1002, "手机号已存在")
+	ErrPhoneFormat     = newError(1003, "手机号格式错误")
+
 	ErrDecryptPassword = newError(1003, "错误解密密码")
 	ErrGetTokenFail    = newError(1004, "获取token失败")
 

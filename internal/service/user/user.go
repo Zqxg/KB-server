@@ -9,6 +9,7 @@ import (
 	"projectName/internal/model"
 	"projectName/internal/repository"
 	"projectName/internal/service"
+	"regexp"
 	"strconv"
 	"time"
 
@@ -41,9 +42,9 @@ type userService struct {
 }
 
 func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) error {
-	// 校验参数
-	if req.Phone == "" || req.Password == "" || req.CaptchaId == "" || req.Captcha == "" {
-		return v1.ErrParamEmpty
+	// 校验手机号格式
+	if !isValidPhone(req.Phone) {
+		return v1.ErrPhoneFormat
 	}
 	// 校验验证码
 	if err := s.captchaService.VerifyCaptcha(ctx, req.CaptchaId, req.Captcha); err != nil {
@@ -55,7 +56,7 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 		return v1.ErrInternalServerError
 	}
 	if err == nil && user != nil {
-		return v1.ErrEmailAlreadyUse
+		return v1.ErrPhoneAlreadyUse
 	}
 
 	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(req.Password), bcrypt.DefaultCost)
@@ -88,15 +89,15 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 
 func (s *userService) PasswordLogin(ctx context.Context, req *v1.PasswordLoginRequest) (string, error) {
 	// 校验参数
-	if req.Phone == "" || req.Password == "" || req.CaptchaId == "" || req.Captcha == "" {
-		return "", v1.ErrParamEmpty
+	if !isValidPhone(req.Phone) {
+		return "", v1.ErrPhoneFormat
 	}
 	if err := s.captchaService.VerifyCaptcha(ctx, req.CaptchaId, req.Captcha); err != nil {
 		return "", v1.ErrInvalidCaptcha // 如果验证码验证失败，返回错误
 	}
 	user, err := s.userRepo.GetByPhone(ctx, req.Phone)
 	if err != nil || user == nil {
-		return "", v1.ErrUnauthorized
+		return "", v1.ErrPhoneAlreadyUse
 	}
 	// 校验密码
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
@@ -148,4 +149,12 @@ func (s *userService) UpdateProfile(ctx context.Context, userId string, req *v1.
 	}
 
 	return nil
+}
+
+// 校验手机号
+func isValidPhone(phone string) bool {
+	// 中国手机号正则
+	phoneRegex := `^1[0-9]\d{9}$`
+	matched, _ := regexp.MatchString(phoneRegex, phone)
+	return matched
 }

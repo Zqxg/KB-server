@@ -12,15 +12,15 @@ type CaptchaResponseData struct {
 type RegisterRequest struct {
 	Phone     string `json:"phone" binding:"required,phone" example:"10012239028"`
 	Password  string `json:"password" binding:"required" example:"123456"`
-	CaptchaId string `json:"captchaId"` // 验证码ID字段
-	Captcha   string `json:"captcha"`   // 验证码字段
+	CaptchaId string `json:"captchaId" binding:"required"` // 验证码ID字段
+	Captcha   string `json:"captcha" binding:"required"`   // 验证码字段
 }
 
 type PasswordLoginRequest struct {
 	Phone     string `json:"phone" binding:"required,phone" example:"10012239028"`
 	Password  string `json:"password" binding:"required" example:"123456"`
-	CaptchaId string `json:"captchaId"` // 验证码ID字段
-	Captcha   string `json:"captcha"`   // 验证码字段
+	CaptchaId string `json:"captchaId" binding:"required"` // 验证码ID字段
+	Captcha   string `json:"captcha" binding:"required"`   // 验证码字段
 }
 type LoginResponseData struct {
 	AccessToken string `json:"accessToken"`
