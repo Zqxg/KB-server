@@ -1,12 +1,16 @@
-package service
+package user
 
 import (
 	"context"
 	"golang.org/x/crypto/bcrypt"
 	v1 "projectName/api/v1"
+	"projectName/internal/enums"
 	"projectName/internal/model"
 	"projectName/internal/repository"
+	"projectName/internal/service"
 	"time"
+
+	"github.com/DanPlayer/randomname"
 )
 
 type UserService interface {
@@ -17,23 +21,30 @@ type UserService interface {
 }
 
 func NewUserService(
-	service *Service,
+	service *service.Service,
 	userRepo repository.UserRepository,
+	captchaService CaptchaService, // 在构造函数中传入验证码服务
 ) UserService {
 	return &userService{
-		userRepo: userRepo,
-		Service:  service,
+		userRepo:       userRepo,
+		captchaService: captchaService, // 注入验证码服务
+		Service:        service,
 	}
 }
 
 type userService struct {
-	userRepo repository.UserRepository
-	*Service
+	userRepo       repository.UserRepository
+	captchaService CaptchaService // 新增验证码服务
+	*service.Service
 }
 
 func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) error {
-	// check username
-	user, err := s.userRepo.GetByEmail(ctx, req.Email)
+	// 校验验证码
+	if err := s.captchaService.VerifyCaptcha(ctx, req.CaptchaId, req.Captcha); err != nil {
+		return v1.ErrInvalidCaptcha // 如果验证码验证失败，返回错误
+	}
+	// 校验用户手机号是否已注册
+	user, err := s.userRepo.GetByPhone(ctx, req.Phone)
 	if err != nil {
 		return v1.ErrInternalServerError
 	}
@@ -45,18 +56,20 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 	if err != nil {
 		return err
 	}
-	// Generate user ID
-	userId, err := s.sid.GenString()
+	// 生成user_id
+	userId, err := s.Sid.Gen25PrefixUID()
 	if err != nil {
 		return err
 	}
 	user = &model.User{
 		UserId:   userId,
-		Email:    req.Email,
+		Phone:    req.Phone,
 		Password: string(hashedPassword),
+		Nickname: randomname.GenerateName(), //随机生成用户昵称
+		RoleType: enums.COMMON_USER,         // 未认证前为普通用户
 	}
 	// Transaction demo
-	err = s.tm.Transaction(ctx, func(ctx context.Context) error {
+	err = s.Tm.Transaction(ctx, func(ctx context.Context) error {
 		// Create a user
 		if err = s.userRepo.Create(ctx, user); err != nil {
 			return err
@@ -77,7 +90,7 @@ func (s *userService) Login(ctx context.Context, req *v1.LoginRequest) (string, 
 	if err != nil {
 		return "", err
 	}
-	token, err := s.jwt.GenToken(user.UserId, time.Now().Add(time.Hour*24*90))
+	token, err := s.Jwt.GenToken(user.UserId, time.Now().Add(time.Hour*24*7))
 	if err != nil {
 		return "", err
 	}

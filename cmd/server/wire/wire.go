@@ -11,6 +11,7 @@ import (
 	"projectName/internal/repository"
 	"projectName/internal/server"
 	"projectName/internal/service"
+	"projectName/internal/service/user"
 	"projectName/pkg/app"
 	"projectName/pkg/jwt"
 	"projectName/pkg/log"
@@ -28,7 +29,7 @@ var repositorySet = wire.NewSet(
 
 var serviceSet = wire.NewSet(
 	service.NewService,
-	service.NewUserService,
+	user.NewUserService,
 )
 
 var handlerSet = wire.NewSet(

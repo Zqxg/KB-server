@@ -8,10 +8,10 @@ import (
 )
 
 type Service struct {
-	logger *log.Logger
-	sid    *sid.Sid
-	jwt    *jwt.JWT
-	tm     repository.Transaction
+	Logger *log.Logger
+	Sid    *sid.Sid
+	Jwt    *jwt.JWT
+	Tm     repository.Transaction
 }
 
 func NewService(
@@ -21,9 +21,9 @@ func NewService(
 	jwt *jwt.JWT,
 ) *Service {
 	return &Service{
-		logger: logger,
-		sid:    sid,
-		jwt:    jwt,
-		tm:     tm,
+		Logger: logger,
+		Sid:    sid,
+		Jwt:    jwt,
+		Tm:     tm,
 	}
 }

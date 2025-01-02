@@ -5,15 +5,15 @@ import (
 	"go.uber.org/zap"
 	"net/http"
 	"projectName/api/v1"
-	"projectName/internal/service"
+	"projectName/internal/service/user"
 )
 
 type UserHandler struct {
 	*Handler
-	userService service.UserService
+	userService user.UserService
 }
 
-func NewUserHandler(handler *Handler, userService service.UserService) *UserHandler {
+func NewUserHandler(handler *Handler, userService user.UserService) *UserHandler {
 	return &UserHandler{
 		Handler:     handler,
 		userService: userService,

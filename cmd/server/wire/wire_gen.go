@@ -14,6 +14,7 @@ import (
 	"projectName/internal/repository"
 	"projectName/internal/server"
 	"projectName/internal/service"
+	"projectName/internal/service/user"
 	"projectName/pkg/app"
 	"projectName/pkg/jwt"
 	"projectName/pkg/log"
@@ -32,7 +33,7 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 	sidSid := sid.NewSid()
 	serviceService := service.NewService(transaction, logger, sidSid, jwtJWT)
 	userRepository := repository.NewUserRepository(repositoryRepository)
-	userService := service.NewUserService(serviceService, userRepository)
+	userService := user.NewUserService(serviceService, userRepository)
 	userHandler := handler.NewUserHandler(handlerHandler, userService)
 	httpServer := server.NewHTTPServer(logger, viperViper, jwtJWT, userHandler)
 	jobJob := job.NewJob(transaction, logger, sidSid)
@@ -47,7 +48,7 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 
 var repositorySet = wire.NewSet(repository.NewDB, repository.NewRepository, repository.NewTransaction, repository.NewUserRepository)
 
-var serviceSet = wire.NewSet(service.NewService, service.NewUserService)
+var serviceSet = wire.NewSet(service.NewService, user.NewUserService)
 
 var handlerSet = wire.NewSet(handler.NewHandler, handler.NewUserHandler)
 

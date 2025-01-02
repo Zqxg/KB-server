@@ -7,6 +7,7 @@ import (
 	"fmt"
 	"os"
 	v1 "projectName/api/v1"
+	"projectName/internal/service/user"
 	"projectName/pkg/jwt"
 	"projectName/test/mocks/repository"
 	"testing"
@@ -57,7 +58,7 @@ func TestUserService_Register(t *testing.T) {
 	mockTm := mock_repository.NewMockTransaction(ctrl)
 	srv := service.NewService(mockTm, logger, sf, j)
 
-	userService := service.NewUserService(srv, mockUserRepo)
+	userService := user.NewUserService(srv, mockUserRepo)
 
 	ctx := context.Background()
 	req := &v1.RegisterRequest{
@@ -80,7 +81,7 @@ func TestUserService_Register_UsernameExists(t *testing.T) {
 	mockUserRepo := mock_repository.NewMockUserRepository(ctrl)
 	mockTm := mock_repository.NewMockTransaction(ctrl)
 	srv := service.NewService(mockTm, logger, sf, j)
-	userService := service.NewUserService(srv, mockUserRepo)
+	userService := user.NewUserService(srv, mockUserRepo)
 
 	ctx := context.Background()
 	req := &v1.RegisterRequest{
@@ -102,7 +103,7 @@ func TestUserService_Login(t *testing.T) {
 	mockUserRepo := mock_repository.NewMockUserRepository(ctrl)
 	mockTm := mock_repository.NewMockTransaction(ctrl)
 	srv := service.NewService(mockTm, logger, sf, j)
-	userService := service.NewUserService(srv, mockUserRepo)
+	userService := user.NewUserService(srv, mockUserRepo)
 
 	ctx := context.Background()
 	req := &v1.LoginRequest{
@@ -131,7 +132,7 @@ func TestUserService_Login_UserNotFound(t *testing.T) {
 	mockUserRepo := mock_repository.NewMockUserRepository(ctrl)
 	mockTm := mock_repository.NewMockTransaction(ctrl)
 	srv := service.NewService(mockTm, logger, sf, j)
-	userService := service.NewUserService(srv, mockUserRepo)
+	userService := user.NewUserService(srv, mockUserRepo)
 
 	ctx := context.Background()
 	req := &v1.LoginRequest{
@@ -153,7 +154,7 @@ func TestUserService_GetProfile(t *testing.T) {
 	mockUserRepo := mock_repository.NewMockUserRepository(ctrl)
 	mockTm := mock_repository.NewMockTransaction(ctrl)
 	srv := service.NewService(mockTm, logger, sf, j)
-	userService := service.NewUserService(srv, mockUserRepo)
+	userService := user.NewUserService(srv, mockUserRepo)
 
 	ctx := context.Background()
 	userId := "123"
@@ -176,7 +177,7 @@ func TestUserService_UpdateProfile(t *testing.T) {
 	mockUserRepo := mock_repository.NewMockUserRepository(ctrl)
 	mockTm := mock_repository.NewMockTransaction(ctrl)
 	srv := service.NewService(mockTm, logger, sf, j)
-	userService := service.NewUserService(srv, mockUserRepo)
+	userService := user.NewUserService(srv, mockUserRepo)
 
 	ctx := context.Background()
 	userId := "123"
@@ -203,7 +204,7 @@ func TestUserService_UpdateProfile_UserNotFound(t *testing.T) {
 	mockUserRepo := mock_repository.NewMockUserRepository(ctrl)
 	mockTm := mock_repository.NewMockTransaction(ctrl)
 	srv := service.NewService(mockTm, logger, sf, j)
-	userService := service.NewUserService(srv, mockUserRepo)
+	userService := user.NewUserService(srv, mockUserRepo)
 
 	ctx := context.Background()
 	userId := "123"

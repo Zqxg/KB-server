@@ -7,15 +7,15 @@ import (
 
 type User struct {
 	Id        uint   `gorm:"primarykey"`
-	UserId    string `gorm:"unique;not null"`
+	UserId    int64  `gorm:"unique;not null"`
+	Phone     string `gorm:"not null"`
 	Nickname  string `gorm:"not null"`
 	Password  string `gorm:"not null"`
+	RoleType  int    `gorm:"not null"` // 0: 普通用户，1: 学校用户，2: 学校管理员 3: 超级管理员
 	Email     string
-	Phone     string `gorm:"not null"`
-	CollegeId uint   `gorm:"not null"`
-	StudentId string `gorm:"not null"`
-	RoleType  int    `gorm:"not null"`
-	IsDeleted int    `gorm:"not null"`
+	CollegeId uint
+	StudentId string
+	IsDeleted int
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`

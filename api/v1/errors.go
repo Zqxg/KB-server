@@ -9,5 +9,14 @@ var (
 	ErrInternalServerError = newError(500, "Internal Server Error")
 
 	// more biz errors
-	ErrEmailAlreadyUse = newError(1001, "The email is already in use.")
+	ErrEmailAlreadyUse = newError(1001, "邮箱已存在")
+	ErrPoneAlreadyUse  = newError(1002, "手机号已存在")
+
+	// 2000 错误码
+	ErrInvalidCaptcha = newError(2000, "验证码错误")
+
+	// 3000 数据库
+	ErrDatabase = newError(3000, "数据库错误")
+
+	// 20000 业务逻辑错误
 )

@@ -1,13 +1,16 @@
 package v1
 
 type RegisterRequest struct {
-	Email    string `json:"email" binding:"required,email" example:"1234@gmail.com"`
-	Password string `json:"password" binding:"required" example:"123456"`
+	Phone     string `json:"phone" binding:"required,phone" example:"10012239028"`
+	Password  string `json:"password" binding:"required" example:"123456"`
+	CaptchaId string `json:"captchaId"` // 验证码ID字段
+	Captcha   string `json:"captcha"`   // 验证码字段
 }
 
 type LoginRequest struct {
-	Email    string `json:"email" binding:"required,email" example:"1234@gmail.com"`
+	Phone    string `json:"phone" binding:"required,phone" example:"10012239028"`
 	Password string `json:"password" binding:"required" example:"123456"`
+	Captcha  string `json:"captcha"` // 验证码字段
 }
 type LoginResponseData struct {
 	AccessToken string `json:"accessToken"`
