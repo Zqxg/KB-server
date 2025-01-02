@@ -255,6 +255,8 @@ const docTemplate = `{
         "v1.PasswordLoginRequest": {
             "type": "object",
             "required": [
+                "captcha",
+                "captchaId",
                 "password",
                 "phone"
             ],
@@ -280,6 +282,8 @@ const docTemplate = `{
         "v1.RegisterRequest": {
             "type": "object",
             "required": [
+                "captcha",
+                "captchaId",
                 "password",
                 "phone"
             ],

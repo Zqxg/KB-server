@@ -61,6 +61,8 @@ definitions:
         example: "10012239028"
         type: string
     required:
+    - captcha
+    - captchaId
     - password
     - phone
     type: object
@@ -79,6 +81,8 @@ definitions:
         example: "10012239028"
         type: string
     required:
+    - captcha
+    - captchaId
     - password
     - phone
     type: object

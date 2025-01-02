@@ -64,7 +64,7 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 		return err
 	}
 	// 生成user_id
-	userId, err := s.Sid.Gen25PrefixUID()
+	userId, err := s.Sid.GenSonyflakeID()
 	if err != nil {
 		return err
 	}
