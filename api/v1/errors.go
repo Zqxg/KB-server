@@ -2,19 +2,19 @@ package v1
 
 var (
 	// common errors
-	ErrSuccess             = newError(0, "ok")
-	ErrBadRequest          = newError(400, "Bad Request")
-	ErrUnauthorized        = newError(401, "Unauthorized")
-	ErrNotFound            = newError(404, "Not Found")
-	ErrInternalServerError = newError(500, "Internal Server Error")
+	ErrSuccess             = newError(0, "操作成功")
+	ErrBadRequest          = newError(400, "请求错误")
+	ErrUnauthorized        = newError(401, "未授权")
+	ErrPermissionDenied    = newError(403, "权限不足")
+	ErrNotFound            = newError(404, "未找到")
+	ErrInternalServerError = newError(500, "内部服务器错误")
 
 	// more biz errors
 	ErrEmailAlreadyUse = newError(1001, "邮箱已存在")
 	ErrPhoneAlreadyUse = newError(1002, "手机号已存在")
 	ErrPhoneFormat     = newError(1003, "手机号格式错误")
-
-	ErrDecryptPassword = newError(1003, "错误解密密码")
-	ErrGetTokenFail    = newError(1004, "获取token失败")
+	ErrDecryptPassword = newError(1004, "错误解密密码")
+	ErrGetTokenFail    = newError(1005, "获取token失败")
 
 	// 2000 错误码
 	ErrInvalidCaptcha = newError(2000, "验证码错误")

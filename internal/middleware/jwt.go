@@ -9,7 +9,7 @@ import (
 	"projectName/pkg/log"
 )
 
-func StrictAuth(j *jwt.JWT, logger *log.Logger) gin.HandlerFunc {
+func StrictAuth(j *jwt.JWT, logger *log.Logger, requiredRole int) gin.HandlerFunc {
 	return func(ctx *gin.Context) {
 		tokenString := ctx.Request.Header.Get("Authorization")
 		if tokenString == "" {
@@ -22,6 +22,7 @@ func StrictAuth(j *jwt.JWT, logger *log.Logger) gin.HandlerFunc {
 			return
 		}
 
+		// 解析 token
 		claims, err := j.ParseToken(tokenString)
 		if err != nil {
 			logger.WithContext(ctx).Error("token error", zap.Any("data", map[string]interface{}{
@@ -33,6 +34,14 @@ func StrictAuth(j *jwt.JWT, logger *log.Logger) gin.HandlerFunc {
 			return
 		}
 
+		// 根据 RoleType 校验权限
+		if claims.RoleType < requiredRole {
+			v1.HandleError(ctx, http.StatusForbidden, v1.ErrPermissionDenied, nil)
+			ctx.Abort()
+			return
+		}
+
+		// 如果权限足够，继续处理请求
 		ctx.Set("claims", claims)
 		recoveryLoggerFunc(ctx, logger)
 		ctx.Next()
@@ -67,6 +76,10 @@ func NoStrictAuth(j *jwt.JWT, logger *log.Logger) gin.HandlerFunc {
 
 func recoveryLoggerFunc(ctx *gin.Context, logger *log.Logger) {
 	if userInfo, ok := ctx.MustGet("claims").(*jwt.MyCustomClaims); ok {
-		logger.WithValue(ctx, zap.String("UserId", userInfo.UserId))
+		// 记录用户 ID 和 RoleType
+		logger.WithContext(ctx).With(
+			zap.String("UserId", userInfo.UserId),
+			zap.Int("RoleType", userInfo.RoleType),
+		)
 	}
 }
