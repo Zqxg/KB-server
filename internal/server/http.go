@@ -66,7 +66,7 @@ func NewHTTPServer(
 		}
 
 		// Strict permission routing group
-		strictAuthRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger))
+		strictAuthRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, 3))
 		{
 			strictAuthRouter.PUT("/user", userHandler.UpdateProfile)
 		}

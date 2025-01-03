@@ -1,17 +1,14 @@
 package user
 
 import (
-	"context"
-	"errors"
-	"fmt"
+	"github.com/mojocn/base64Captcha"
+	v1 "projectName/api/v1"
 	"time"
-
-	"github.com/dchest/captcha"
 )
 
 type CaptchaService interface {
-	GenerateCaptcha() (string, string, error)                                // 生成验证码
-	VerifyCaptcha(ctx context.Context, captchaId, inputCaptcha string) error // 验证验证码
+	GenerateCaptcha() (v1.CaptchaData, error)                  // 生成验证码
+	VerifyCaptcha(captchaId string, captchaAnswer string) bool // 验证验证码
 }
 
 type SimpleCaptchaService struct {
@@ -25,26 +22,36 @@ func NewCaptchaService(expireDuration time.Duration) CaptchaService {
 	}
 }
 
+// 数字驱动生成验证码的配置
+var digitDriver = base64Captcha.DriverDigit{
+	Height:   50,
+	Width:    200,
+	Length:   4,   //验证码长度
+	MaxSkew:  0.7, //倾斜
+	DotCount: 1,   //背景的点数，越大，字体越模糊
+}
+
+// 设置自带的store
+var store = base64Captcha.DefaultMemStore
+
 // GenerateCaptcha 生成验证码
-func (s *SimpleCaptchaService) GenerateCaptcha() (captchaId string, captchaImageUrl string, err error) {
-	// 生成一个新的验证码ID
-	captchaId = captcha.New()
+func (s *SimpleCaptchaService) GenerateCaptcha() (v1.CaptchaData, error) {
+	var Data v1.CaptchaData
+	// 创建一个新的验证码对象
+	captcha := base64Captcha.NewCaptcha(&digitDriver, store)
 
-	// 生成验证码图片URL
-	captchaImageUrl = fmt.Sprintf("/captcha/%s.png", captchaId)
-
-	// 返回验证码ID和图片的URL
-	return captchaId, captchaImageUrl, nil
+	// 生成验证码ID、base64图片和答案
+	id, b64s, answer, err := captcha.Generate()
+	if err != nil {
+		return Data, err
+	}
+	Data.CaptchaId = id
+	Data.CaptchaBase64 = b64s
+	Data.CaptchaAnswer = answer
+	return Data, nil
 }
 
 // VerifyCaptcha 验证验证码
-func (s *SimpleCaptchaService) VerifyCaptcha(ctx context.Context, captchaId, inputCaptcha string) error {
-	// 验证用户输入的验证码是否正确
-	if captcha.VerifyString(captchaId, inputCaptcha) {
-		// 验证成功
-		return nil
-	}
-
-	// 验证失败，返回错误
-	return errors.New("invalid captcha")
+func (s *SimpleCaptchaService) VerifyCaptcha(captchaId string, captchaAnswer string) bool {
+	return store.Verify(captchaId, captchaAnswer, true)
 }

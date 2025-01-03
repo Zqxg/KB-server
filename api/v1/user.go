@@ -2,25 +2,26 @@ package v1
 
 type CaptchaResponse struct {
 	Response
-	Data CaptchaResponseData
+	Data CaptchaData
 }
-type CaptchaResponseData struct {
-	CaptchaId       string `json:"captchaId"`
-	CaptchaImageUrl string `json:"captchaImageUrl"`
+type CaptchaData struct {
+	CaptchaId     string `json:"captchaId"`
+	CaptchaBase64 string `json:"CaptchaBase64"`
+	CaptchaAnswer string `json:"captchaAnswer"`
 }
 
 type RegisterRequest struct {
-	Phone     string `json:"phone" binding:"required,phone" example:"10012239028"`
-	Password  string `json:"password" binding:"required" example:"123456"`
-	CaptchaId string `json:"captchaId" binding:"required"` // 验证码ID字段
-	Captcha   string `json:"captcha" binding:"required"`   // 验证码字段
+	Phone         string `json:"phone" binding:"required" example:"10012239028"`
+	Password      string `json:"password" binding:"required" example:"123456"`
+	CaptchaId     string `json:"captchaId" binding:"required"`     // 验证码ID字段
+	CaptchaAnswer string `json:"captchaAnswer" binding:"required"` // 验证码字段
 }
 
 type PasswordLoginRequest struct {
-	Phone     string `json:"phone" binding:"required,phone" example:"10012239028"`
-	Password  string `json:"password" binding:"required" example:"123456"`
-	CaptchaId string `json:"captchaId" binding:"required"` // 验证码ID字段
-	Captcha   string `json:"captcha" binding:"required"`   // 验证码字段
+	Phone         string `json:"phone" binding:"required" example:"10012239028"`
+	Password      string `json:"password" binding:"required" example:"123456"`
+	CaptchaId     string `json:"captchaId" binding:"required"`     // 验证码ID字段
+	CaptchaAnswer string `json:"captchaAnswer" binding:"required"` // 验证码字段
 }
 type LoginResponseData struct {
 	AccessToken string `json:"accessToken"`

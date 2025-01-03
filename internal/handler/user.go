@@ -32,16 +32,13 @@ func NewUserHandler(handler *Handler, captchaService user.CaptchaService, userSe
 // @Success 200 {object} v1.CaptchaResponse
 // @Router /getCaptcha [get]
 func (h *UserHandler) GetCaptcha(ctx *gin.Context) {
-	captchaId, captchaImageUrl, err := h.captchaService.GenerateCaptcha()
+	captchaData, err := h.captchaService.GenerateCaptcha()
 	if err != nil {
 		h.logger.WithContext(ctx).Error("userService.GetCaptcha error", zap.Error(err))
 		v1.HandleError(ctx, http.StatusInternalServerError, v1.ErrInternalServerError, nil)
 		return
 	}
-	v1.HandleSuccess(ctx, v1.CaptchaResponseData{
-		CaptchaId:       captchaId,
-		CaptchaImageUrl: captchaImageUrl,
-	})
+	v1.HandleSuccess(ctx, captchaData)
 }
 
 // Register godoc
@@ -79,7 +76,7 @@ func (h *UserHandler) Register(ctx *gin.Context) {
 // @Produce json
 // @Param request body v1.PasswordLoginRequest true "params"
 // @Success 200 {object} v1.LoginResponse
-// @Router /PasswordLogin [post]
+// @Router /passwordLogin [post]
 func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
 	var req v1.PasswordLoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -89,7 +86,7 @@ func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
 
 	token, err := h.userService.PasswordLogin(ctx, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrUnauthorized, nil)
+		v1.HandleError(ctx, http.StatusUnauthorized, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, v1.LoginResponseData{

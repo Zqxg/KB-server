@@ -1,18 +1,20 @@
 definitions:
+  v1.CaptchaData:
+    properties:
+      CaptchaBase64:
+        type: string
+      captchaAnswer:
+        type: string
+      captchaId:
+        type: string
+    type: object
   v1.CaptchaResponse:
     properties:
       code:
         type: integer
       data:
-        $ref: '#/definitions/v1.CaptchaResponseData'
+        $ref: '#/definitions/v1.CaptchaData'
       message:
-        type: string
-    type: object
-  v1.CaptchaResponseData:
-    properties:
-      captchaId:
-        type: string
-      captchaImageUrl:
         type: string
     type: object
   v1.GetProfileResponse:
@@ -48,7 +50,7 @@ definitions:
     type: object
   v1.PasswordLoginRequest:
     properties:
-      captcha:
+      captchaAnswer:
         description: 验证码字段
         type: string
       captchaId:
@@ -61,14 +63,14 @@ definitions:
         example: "10012239028"
         type: string
     required:
-    - captcha
+    - captchaAnswer
     - captchaId
     - password
     - phone
     type: object
   v1.RegisterRequest:
     properties:
-      captcha:
+      captchaAnswer:
         description: 验证码字段
         type: string
       captchaId:
@@ -81,7 +83,7 @@ definitions:
         example: "10012239028"
         type: string
     required:
-    - captcha
+    - captchaAnswer
     - captchaId
     - password
     - phone

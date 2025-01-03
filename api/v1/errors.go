@@ -13,8 +13,10 @@ var (
 	ErrEmailAlreadyUse = newError(1001, "邮箱已存在")
 	ErrPhoneAlreadyUse = newError(1002, "手机号已存在")
 	ErrPhoneFormat     = newError(1003, "手机号格式错误")
-	ErrDecryptPassword = newError(1004, "错误解密密码")
-	ErrGetTokenFail    = newError(1005, "获取token失败")
+	ErrPasswordFormat  = newError(1004, "密码格式错误")
+	ErrDecryptPassword = newError(1005, "错误解密密码")
+	ErrGetTokenFail    = newError(1006, "获取token失败")
+	ErrUserNotExist    = newError(1007, "用户不存在")
 
 	// 2000 错误码
 	ErrInvalidCaptcha = newError(2000, "验证码错误")

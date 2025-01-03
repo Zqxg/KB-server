@@ -179,6 +179,20 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "v1.CaptchaData": {
+            "type": "object",
+            "properties": {
+                "CaptchaBase64": {
+                    "type": "string"
+                },
+                "captchaAnswer": {
+                    "type": "string"
+                },
+                "captchaId": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.CaptchaResponse": {
             "type": "object",
             "properties": {
@@ -186,20 +200,9 @@ const docTemplate = `{
                     "type": "integer"
                 },
                 "data": {
-                    "$ref": "#/definitions/v1.CaptchaResponseData"
+                    "$ref": "#/definitions/v1.CaptchaData"
                 },
                 "message": {
-                    "type": "string"
-                }
-            }
-        },
-        "v1.CaptchaResponseData": {
-            "type": "object",
-            "properties": {
-                "captchaId": {
-                    "type": "string"
-                },
-                "captchaImageUrl": {
                     "type": "string"
                 }
             }
@@ -255,13 +258,13 @@ const docTemplate = `{
         "v1.PasswordLoginRequest": {
             "type": "object",
             "required": [
-                "captcha",
+                "captchaAnswer",
                 "captchaId",
                 "password",
                 "phone"
             ],
             "properties": {
-                "captcha": {
+                "captchaAnswer": {
                     "description": "验证码字段",
                     "type": "string"
                 },
@@ -282,13 +285,13 @@ const docTemplate = `{
         "v1.RegisterRequest": {
             "type": "object",
             "required": [
-                "captcha",
+                "captchaAnswer",
                 "captchaId",
                 "password",
                 "phone"
             ],
             "properties": {
-                "captcha": {
+                "captchaAnswer": {
                     "description": "验证码字段",
                     "type": "string"
                 },

@@ -5,7 +5,6 @@ go 1.19
 require (
 	github.com/DATA-DOG/go-sqlmock v1.5.0
 	github.com/DanPlayer/randomname v1.0.1
-	github.com/dchest/captcha v1.1.0
 	github.com/duke-git/lancet/v2 v2.3.0
 	github.com/gavv/httpexpect/v2 v2.16.0
 	github.com/gin-gonic/gin v1.9.1
@@ -14,6 +13,7 @@ require (
 	github.com/golang-jwt/jwt/v5 v5.0.0
 	github.com/golang/mock v1.6.0
 	github.com/google/wire v0.5.0
+	github.com/mojocn/base64Captcha v1.3.6
 	github.com/redis/go-redis/v9 v9.0.5
 	github.com/sony/sonyflake v1.1.0
 	github.com/spf13/viper v1.16.0
@@ -57,6 +57,7 @@ require (
 	github.com/go-sql-driver/mysql v1.7.0 // indirect
 	github.com/gobwas/glob v0.2.3 // indirect
 	github.com/goccy/go-json v0.10.2 // indirect
+	github.com/golang/freetype v0.0.0-20170609003504-e2365dfdc4a0 // indirect
 	github.com/golang/protobuf v1.5.3 // indirect
 	github.com/google/go-querystring v1.1.0 // indirect
 	github.com/google/uuid v1.3.0 // indirect
@@ -107,6 +108,7 @@ require (
 	go.uber.org/multierr v1.11.0 // indirect
 	golang.org/x/arch v0.3.0 // indirect
 	golang.org/x/exp v0.0.0-20221208152030-732eee02a75a // indirect
+	golang.org/x/image v0.13.0 // indirect
 	golang.org/x/net v0.14.0 // indirect
 	golang.org/x/sys v0.13.0 // indirect
 	golang.org/x/text v0.13.0 // indirect

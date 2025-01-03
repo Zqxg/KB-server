@@ -46,8 +46,12 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 	if !isValidPhone(req.Phone) {
 		return v1.ErrPhoneFormat
 	}
+	// 校验密码格式
+	if !isValidPassword(req.Password) {
+		return v1.ErrPasswordFormat
+	}
 	// 校验验证码
-	if err := s.captchaService.VerifyCaptcha(ctx, req.CaptchaId, req.Captcha); err != nil {
+	if !s.captchaService.VerifyCaptcha(req.CaptchaId, req.CaptchaAnswer) {
 		return v1.ErrInvalidCaptcha // 如果验证码验证失败，返回错误
 	}
 	// 校验用户手机号是否已注册
@@ -92,12 +96,12 @@ func (s *userService) PasswordLogin(ctx context.Context, req *v1.PasswordLoginRe
 	if !isValidPhone(req.Phone) {
 		return "", v1.ErrPhoneFormat
 	}
-	if err := s.captchaService.VerifyCaptcha(ctx, req.CaptchaId, req.Captcha); err != nil {
+	if !s.captchaService.VerifyCaptcha(req.CaptchaId, req.CaptchaAnswer) {
 		return "", v1.ErrInvalidCaptcha // 如果验证码验证失败，返回错误
 	}
 	user, err := s.userRepo.GetByPhone(ctx, req.Phone)
 	if err != nil || user == nil {
-		return "", v1.ErrPhoneAlreadyUse
+		return "", v1.ErrUserNotExist
 	}
 	// 校验密码
 	err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
@@ -114,7 +118,7 @@ func (s *userService) PasswordLogin(ctx context.Context, req *v1.PasswordLoginRe
 	err = s.Tm.Transaction(ctx, func(ctx context.Context) error {
 		// 将 token 存储到 Redis，设置过期时间为 7 天
 		key := fmt.Sprintf("%d:%d", user.UserId, user.RoleType) // key="10012249028:0"
-		if err = s.userRepo.Set(ctx, token, key, time.Hour*24*7); err != nil {
+		if err = s.userRepo.Set(ctx, key, token, time.Hour*24*7); err != nil {
 			return v1.ErrGetTokenFail // 存储失败
 		}
 		return nil
@@ -155,6 +159,22 @@ func (s *userService) UpdateProfile(ctx context.Context, userId string, req *v1.
 func isValidPhone(phone string) bool {
 	// 中国手机号正则
 	phoneRegex := `^1[0-9]\d{9}$`
-	matched, _ := regexp.MatchString(phoneRegex, phone)
+	matched, err := regexp.MatchString(phoneRegex, phone)
+	if err != nil {
+		// 如果正则匹配出错，返回 false
+		return false
+	}
+	return matched
+}
+
+// 校验密码长度
+func isValidPassword(password string) bool {
+	// 密码长度正则：长度必须在8到16之间
+	passwordRegex := `^.{8,16}$`
+	matched, err := regexp.MatchString(passwordRegex, password)
+	if err != nil {
+		// 如果正则匹配出错，返回 false
+		return false
+	}
 	return matched
 }
