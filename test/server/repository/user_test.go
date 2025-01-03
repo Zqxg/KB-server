@@ -53,7 +53,7 @@ func TestUserRepository_Create(t *testing.T) {
 	}
 
 	mock.ExpectBegin()
-	mock.ExpectExec("INSERT INTO `users`").
+	mock.ExpectExec("INSERT INTO `sys_users`").
 		WithArgs(user.UserId, user.Nickname, user.Password, user.Email, user.CreatedAt, user.UpdatedAt, user.DeletedAt, user.Id).
 		WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
@@ -79,7 +79,7 @@ func TestUserRepository_Update(t *testing.T) {
 	}
 
 	mock.ExpectBegin()
-	mock.ExpectExec("UPDATE `users`").WillReturnResult(sqlmock.NewResult(1, 1))
+	mock.ExpectExec("UPDATE `sys_users`").WillReturnResult(sqlmock.NewResult(1, 1))
 	mock.ExpectCommit()
 
 	err := userRepo.Update(ctx, user)
@@ -88,7 +88,7 @@ func TestUserRepository_Update(t *testing.T) {
 	assert.NoError(t, mock.ExpectationsWereMet())
 }
 
-func TestUserRepository_GetById(t *testing.T) {
+func TestUserRepository_GetByUserId(t *testing.T) {
 	userRepo, mock := setupRepository(t)
 
 	ctx := context.Background()
@@ -96,9 +96,9 @@ func TestUserRepository_GetById(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"id", "user_id", "username", "nickname", "password", "email", "created_at", "updated_at"}).
 		AddRow(1, "123", "test", "Test", "password", "test@example.com", time.Now(), time.Now())
-	mock.ExpectQuery("SELECT \\* FROM `users`").WillReturnRows(rows)
+	mock.ExpectQuery("SELECT \\* FROM `sys_users`").WillReturnRows(rows)
 
-	user, err := userRepo.GetByID(ctx, userId)
+	user, err := userRepo.GetByUserId(ctx, userId)
 	assert.NoError(t, err)
 	assert.NotNil(t, user)
 	assert.Equal(t, "123", user.UserId)
@@ -114,7 +114,7 @@ func TestUserRepository_GetByUsername(t *testing.T) {
 
 	rows := sqlmock.NewRows([]string{"id", "user_id", "username", "nickname", "password", "email", "created_at", "updated_at"}).
 		AddRow(1, "123", "test", "Test", "password", "test@example.com", time.Now(), time.Now())
-	mock.ExpectQuery("SELECT \\* FROM `users`").WillReturnRows(rows)
+	mock.ExpectQuery("SELECT \\* FROM `sys_users`").WillReturnRows(rows)
 
 	user, err := userRepo.GetByEmail(ctx, email)
 	assert.NoError(t, err)

@@ -10,6 +10,7 @@ import (
 	"projectName/internal/model"
 	"projectName/internal/repository"
 	"projectName/internal/service"
+	"projectName/pkg/utils"
 	"regexp"
 	"strconv"
 	"time"
@@ -46,7 +47,7 @@ type userService struct {
 
 func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) error {
 	// 校验手机号格式
-	if !isValidPhone(req.Phone) {
+	if !utils.IsPhoneNumber(req.Phone) {
 		return v1.ErrPhoneFormat
 	}
 	// 校验密码格式
@@ -60,7 +61,7 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 	// 校验用户手机号是否已注册
 	user, err := s.userRepo.GetByPhone(ctx, req.Phone)
 	if err != nil {
-		return v1.ErrInternalServerError
+		return v1.ErrDatabase
 	}
 	if err == nil && user != nil {
 		return v1.ErrPhoneAlreadyUse
@@ -96,7 +97,7 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 
 func (s *userService) PasswordLogin(ctx context.Context, req *v1.PasswordLoginRequest) (string, error) {
 	// 校验参数
-	if !isValidPhone(req.Phone) {
+	if !utils.IsPhoneNumber(req.Phone) {
 		return "", v1.ErrPhoneFormat
 	}
 	if !s.captchaService.VerifyCaptcha(req.CaptchaId, req.CaptchaAnswer) {
@@ -120,7 +121,7 @@ func (s *userService) PasswordLogin(ctx context.Context, req *v1.PasswordLoginRe
 	// token存redis，后续注销和退出时候删除
 	err = s.Tm.Transaction(ctx, func(ctx context.Context) error {
 		// 将 token 存储到 Redis，设置过期时间为 7 天
-		key := fmt.Sprintf("%s:%d", user.UserId, user.RoleType) // key="10012249028:0"
+		key := fmt.Sprintf("%s%s:%d", enums.LOGIN_TOKEN_KEY, user.UserId, user.RoleType) // key="loginTokenKey:547519779070593342:0"
 		if err = s.userRepo.Set(ctx, key, token, time.Hour*24*7); err != nil {
 			return v1.ErrGetTokenFail // 存储失败
 		}
@@ -131,43 +132,38 @@ func (s *userService) PasswordLogin(ctx context.Context, req *v1.PasswordLoginRe
 }
 
 func (s *userService) GetProfile(ctx context.Context, userId string) (*v1.GetProfileResponseData, error) {
-	user, err := s.userRepo.GetByID(ctx, userId)
+	user, err := s.userRepo.GetByUserId(ctx, userId)
 	if err != nil {
-		return nil, err
+		return nil, v1.ErrUserNotExist
 	}
 
 	return &v1.GetProfileResponseData{
-		UserId:   user.UserId,
-		Nickname: user.Nickname,
+		UserId:    user.UserId,
+		Nickname:  user.Nickname,
+		Phone:     user.Phone,
+		RoleType:  user.RoleType,
+		Email:     user.Email,
+		CollegeId: user.CollegeId,
+		StudentId: user.StudentId,
 	}, nil
 }
 
 func (s *userService) UpdateProfile(ctx context.Context, userId string, req *v1.UpdateProfileRequest) error {
-	user, err := s.userRepo.GetByID(ctx, userId)
+	user, err := s.userRepo.GetByUserId(ctx, userId)
 	if err != nil {
-		return err
+		return v1.ErrUserNotExist
 	}
-
-	user.Email = req.Email
-	user.Nickname = req.Nickname
-
+	if utils.IsEmpty(req.Email) && utils.IsEmpty(req.Nickname) {
+		return v1.ErrParamEmpty
+	} else if utils.IsNotEmpty(req.Email) {
+		req.Email = user.Email
+	} else if utils.IsNotEmpty(req.Nickname) {
+		req.Nickname = user.Nickname
+	}
 	if err = s.userRepo.Update(ctx, user); err != nil {
-		return err
+		return v1.ErrDatabase
 	}
-
 	return nil
-}
-
-// 校验手机号
-func isValidPhone(phone string) bool {
-	// 中国手机号正则
-	phoneRegex := `^1[0-9]\d{9}$`
-	matched, err := regexp.MatchString(phoneRegex, phone)
-	if err != nil {
-		// 如果正则匹配出错，返回 false
-		return false
-	}
-	return matched
 }
 
 // 校验密码长度
@@ -184,7 +180,7 @@ func isValidPassword(password string) bool {
 
 func (s *userService) Logout(ctx context.Context, userId string, roleType int) error {
 	// 从 Redis 中删除 token
-	key := fmt.Sprintf("%s:%d", userId, roleType)
+	key := fmt.Sprintf("%s%s:%d", enums.LOGIN_TOKEN_KEY, userId, roleType)
 	if err := s.userRepo.Delete(ctx, key); err != nil {
 		s.Logger.Error("userService.Logout error", zap.Error(err))
 		return v1.ErrLogoutFail

@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"errors"
+	"go.uber.org/zap"
 	"gorm.io/gorm"
 	v1 "projectName/api/v1"
 	"projectName/internal/model"
@@ -13,7 +14,7 @@ type UserRepository interface {
 	// db
 	Create(ctx context.Context, user *model.User) error
 	Update(ctx context.Context, user *model.User) error
-	GetByID(ctx context.Context, id string) (*model.User, error)
+	GetByUserId(ctx context.Context, id string) (*model.User, error)
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	GetByPhone(ctx context.Context, phone string) (*model.User, error)
 	DeleteByUserId(ctx context.Context, userId string) error
@@ -37,6 +38,7 @@ type userRepository struct {
 
 func (r *userRepository) Create(ctx context.Context, user *model.User) error {
 	if err := r.DB(ctx).Table("sys_users").Create(user).Error; err != nil {
+		r.logger.WithContext(ctx).Error("userRepository.Create error", zap.Error(err))
 		return err
 	}
 	return nil
@@ -44,17 +46,19 @@ func (r *userRepository) Create(ctx context.Context, user *model.User) error {
 
 func (r *userRepository) Update(ctx context.Context, user *model.User) error {
 	if err := r.DB(ctx).Table("sys_users").Save(user).Error; err != nil {
+		r.logger.WithContext(ctx).Error("userRepository.Update error", zap.Error(err))
 		return err
 	}
 	return nil
 }
 
-func (r *userRepository) GetByID(ctx context.Context, userId string) (*model.User, error) {
+func (r *userRepository) GetByUserId(ctx context.Context, userId string) (*model.User, error) {
 	var user model.User
 	if err := r.DB(ctx).Table("sys_users").Where("user_id = ?", userId).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, v1.ErrNotFound
 		}
+		r.logger.WithContext(ctx).Error("userRepository.GetByUserId error", zap.Error(err))
 		return nil, err
 	}
 	return &user, nil
@@ -66,6 +70,7 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.U
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
+		r.logger.WithContext(ctx).Error("userRepository.GetByEmail error", zap.Error(err))
 		return nil, err
 	}
 	return &user, nil
@@ -77,6 +82,7 @@ func (r *userRepository) GetByPhone(ctx context.Context, phone string) (*model.U
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
+		r.logger.WithContext(ctx).Error("userRepository.GetByPhone error", zap.Error(err))
 		return nil, err
 	}
 	return &user, nil
@@ -89,19 +95,32 @@ func (r *userRepository) DeleteByUserId(ctx context.Context, userId string) erro
 		Where("user_id = ?", userId).
 		Update("is_deleted", 1).
 		Update("deleted_at", now).Error; err != nil {
+		r.logger.WithContext(ctx).Error("userRepository.DeleteByUserId error", zap.Error(err))
 		return err
 	}
 	return nil
 }
 
 func (r *userRepository) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error {
-	return r.rdb.Set(ctx, key, value, expiration).Err()
+	if err := r.rdb.Set(ctx, key, value, expiration).Err(); err != nil {
+		r.logger.WithContext(ctx).Error("userRepository.Set error", zap.Error(err))
+		return err
+	}
+	return nil
 }
 
 func (r *userRepository) Get(ctx context.Context, key string) (string, error) {
+	if err := r.rdb.Get(ctx, key).Err(); err != nil {
+		r.logger.WithContext(ctx).Error("userRepository.Get error", zap.Error(err))
+		return "", err
+	}
 	return r.rdb.Get(ctx, key).Result()
 }
 
 func (r *userRepository) Delete(ctx context.Context, key string) error {
-	return r.rdb.Del(ctx, key).Err()
+	if err := r.rdb.Del(ctx, key).Err(); err != nil {
+		r.logger.WithContext(ctx).Error("userRepository.Delete error", zap.Error(err))
+		return err
+	}
+	return nil
 }
