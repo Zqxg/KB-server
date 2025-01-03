@@ -84,10 +84,10 @@ func (r *userRepository) GetByPhone(ctx context.Context, phone string) (*model.U
 func (r *userRepository) DeleteByUserId(ctx context.Context, userId string) error {
 	// 获取当前时间
 	now := time.Now()
-	// 更新 is_deleted 字段为 0，并设置 deleted_at 为当前时间
+	// 更新 is_deleted 字段为 1，并设置 deleted_at 为当前时间
 	if err := r.DB(ctx).Table("sys_users").
 		Where("user_id = ?", userId).
-		Update("is_deleted", 0).
+		Update("is_deleted", 1).
 		Update("deleted_at", now).Error; err != nil {
 		return err
 	}

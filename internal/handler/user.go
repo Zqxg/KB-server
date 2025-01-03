@@ -187,5 +187,7 @@ func (h *UserHandler) Cancel(ctx *gin.Context) {
 	// 注销
 	if err := h.userService.Cancel(ctx, userId); err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
 	}
+	v1.HandleSuccess(ctx, nil)
 }
