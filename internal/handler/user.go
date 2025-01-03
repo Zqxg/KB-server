@@ -111,13 +111,13 @@ func (h *UserHandler) GetProfile(ctx *gin.Context) {
 		return
 	}
 
-	user, err := h.userService.GetProfile(ctx, userId)
+	userData, err := h.userService.GetProfile(ctx, userId)
 	if err != nil {
 		v1.HandleError(ctx, http.StatusBadRequest, err, nil)
 		return
 	}
 
-	v1.HandleSuccess(ctx, user)
+	v1.HandleSuccess(ctx, userData)
 }
 
 // UpdateProfile godoc

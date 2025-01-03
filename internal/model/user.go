@@ -15,12 +15,12 @@ type User struct {
 	Email     string
 	CollegeId uint
 	StudentId string
-	IsDeleted int
+	IsDeleted int `gorm:"default:0"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
 	DeletedAt gorm.DeletedAt `gorm:"index"`
 }
 
 func (u *User) TableName() string {
-	return "users"
+	return "sys_users"
 }
