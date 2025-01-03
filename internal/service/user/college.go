@@ -1,9 +1,10 @@
-package service
+package user
 
 import (
 	"context"
 	"projectName/internal/model"
 	"projectName/internal/repository"
+	"projectName/internal/service"
 )
 
 type CollegeService interface {
@@ -12,7 +13,7 @@ type CollegeService interface {
 }
 
 func NewCollegeService(
-	service *Service,
+	service *service.Service,
 	collegeRepository repository.CollegeRepository,
 ) CollegeService {
 	return &collegeService{
@@ -22,7 +23,7 @@ func NewCollegeService(
 }
 
 type collegeService struct {
-	*Service
+	*service.Service
 	collegeRepository repository.CollegeRepository
 }
 

@@ -40,7 +40,10 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 	userRepository := repository.NewUserRepository(repositoryRepository)
 	userService := user.NewUserService(serviceService, userRepository, captchaService)
 	userHandler := handler.NewUserHandler(handlerHandler, captchaService, userService)
-	httpServer := server.NewHTTPServer(logger, viperViper, jwtJWT, userHandler)
+	collegeRepository := repository.NewCollegeRepository(repositoryRepository)
+	collegeService := user.NewCollegeService(serviceService, collegeRepository)
+	collegeHandler := handler.NewCollegeHandler(handlerHandler, collegeService)
+	httpServer := server.NewHTTPServer(logger, viperViper, jwtJWT, userHandler, collegeHandler)
 	jobJob := job.NewJob(transaction, logger, sidSid)
 	userJob := job.NewUserJob(jobJob, userRepository)
 	jobServer := server.NewJobServer(logger, userJob)
@@ -57,13 +60,13 @@ func ProvideCaptchaExpireDuration() time.Duration {
 }
 
 // 提供 repository 层的实例
-var repositorySet = wire.NewSet(repository.NewDB, repository.NewRedis, repository.NewRepository, repository.NewTransaction, repository.NewUserRepository)
+var repositorySet = wire.NewSet(repository.NewDB, repository.NewRedis, repository.NewRepository, repository.NewTransaction, repository.NewUserRepository, repository.NewCollegeRepository)
 
 // 提供 service 层的实例
-var serviceSet = wire.NewSet(service.NewService, user.NewUserService, ProvideCaptchaExpireDuration, user.NewCaptchaService)
+var serviceSet = wire.NewSet(service.NewService, user.NewUserService, ProvideCaptchaExpireDuration, user.NewCaptchaService, user.NewCollegeService)
 
 // 提供 handler 层的实例
-var handlerSet = wire.NewSet(handler.NewHandler, handler.NewUserHandler)
+var handlerSet = wire.NewSet(handler.NewHandler, handler.NewUserHandler, handler.NewCollegeHandler)
 
 // 提供 job 层的实例
 var jobSet = wire.NewSet(job.NewJob, job.NewUserJob)

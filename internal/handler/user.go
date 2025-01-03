@@ -29,7 +29,7 @@ func NewUserHandler(handler *Handler, captchaService user.CaptchaService, userSe
 // @Tags 用户模块
 // @Accept json
 // @Produce json
-// @Success 200 {object} v1.CaptchaResponse
+// @Success 200 {object} v1.CaptchaResponseData
 // @Router /getCaptcha [get]
 func (h *UserHandler) GetCaptcha(ctx *gin.Context) {
 	captchaData, err := h.captchaService.GenerateCaptcha()
@@ -38,6 +38,7 @@ func (h *UserHandler) GetCaptcha(ctx *gin.Context) {
 		v1.HandleError(ctx, http.StatusInternalServerError, v1.ErrInternalServerError, nil)
 		return
 	}
+	// todo：不返回验证码答案 CaptchaResponseData
 	v1.HandleSuccess(ctx, captchaData)
 }
 
@@ -75,7 +76,7 @@ func (h *UserHandler) Register(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Param request body v1.PasswordLoginRequest true "params"
-// @Success 200 {object} v1.LoginResponse
+// @Success 200 {object} v1.LoginResponseData
 // @Router /passwordLogin [post]
 func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
 	var req v1.PasswordLoginRequest
@@ -102,8 +103,8 @@ func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} v1.GetProfileResponse
-// @Router /user [get]
+// @Success 200 {object} v1.GetProfileResponseData
+// @Router /user/getProfile [get]
 func (h *UserHandler) GetProfile(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 	if userId == "" {
@@ -117,7 +118,15 @@ func (h *UserHandler) GetProfile(ctx *gin.Context) {
 		return
 	}
 
-	v1.HandleSuccess(ctx, userData)
+	v1.HandleSuccess(ctx, v1.GetProfileResponseData{
+		UserId:    userData.UserId,
+		Phone:     userData.Phone,
+		Nickname:  userData.Nickname,
+		RoleType:  userData.RoleType,
+		Email:     userData.Email,
+		CollegeId: userData.CollegeId,
+		StudentId: userData.StudentId,
+	})
 }
 
 // UpdateProfile godoc
@@ -130,7 +139,7 @@ func (h *UserHandler) GetProfile(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.UpdateProfileRequest true "params"
 // @Success 200 {object} v1.Response
-// @Router /user [put]
+// @Router /user/updateProfile [post]
 func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 
@@ -139,7 +148,7 @@ func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
 		return
 	}
-
+	// todo:需要回调
 	if err := h.userService.UpdateProfile(ctx, userId, &req); err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, v1.ErrInternalServerError, nil)
 		return
@@ -157,7 +166,7 @@ func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Success 200 {object} v1.Response
-// @Router /logout [get]
+// @Router /user/logout [get]
 func (h *UserHandler) Logout(ctx *gin.Context) {
 	userId, roleTpye := GetUserIdAndRoleTypeFromCtx(ctx)
 	if err := h.userService.Logout(ctx, userId, roleTpye); err != nil {

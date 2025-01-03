@@ -32,6 +32,7 @@ var repositorySet = wire.NewSet(
 	repository.NewRepository,
 	repository.NewTransaction,
 	repository.NewUserRepository,
+	repository.NewCollegeRepository,
 )
 
 // 提供 service 层的实例
@@ -40,12 +41,14 @@ var serviceSet = wire.NewSet(
 	user.NewUserService,
 	ProvideCaptchaExpireDuration, // 提供 time.Duration 类型实例
 	user.NewCaptchaService,       // 使用 ProvideCaptchaExpireDuration 提供的 time.Duration 类型实例
+	user.NewCollegeService,
 )
 
 // 提供 handler 层的实例
 var handlerSet = wire.NewSet(
 	handler.NewHandler,
 	handler.NewUserHandler,
+	handler.NewCollegeHandler,
 )
 
 // 提供 job 层的实例

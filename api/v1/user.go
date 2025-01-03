@@ -1,13 +1,13 @@
 package v1
 
-type CaptchaResponse struct {
-	Response
-	Data CaptchaData
-}
 type CaptchaData struct {
 	CaptchaId     string `json:"captchaId"`
 	CaptchaBase64 string `json:"CaptchaBase64"`
 	CaptchaAnswer string `json:"captchaAnswer"`
+}
+type CaptchaResponseData struct {
+	CaptchaId     string `json:"captchaId"`
+	CaptchaBase64 string `json:"CaptchaBase64"`
 }
 
 type RegisterRequest struct {
@@ -26,10 +26,6 @@ type PasswordLoginRequest struct {
 type LoginResponseData struct {
 	AccessToken string `json:"accessToken"`
 }
-type LoginResponse struct {
-	Response
-	Data LoginResponseData
-}
 
 type UpdateProfileRequest struct {
 	Nickname string `json:"nickname" example:"alan"`
@@ -43,8 +39,4 @@ type GetProfileResponseData struct {
 	Email     string `json:"email"`
 	CollegeId uint   `json:"collegeId"`
 	StudentId string `json:"studentId"`
-}
-type GetProfileResponse struct {
-	Response
-	Data GetProfileResponseData
 }

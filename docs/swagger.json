@@ -61,34 +61,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.CaptchaResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/logout": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "用户模块"
-                ],
-                "summary": "退出用户",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Response"
+                            "$ref": "#/definitions/v1.CaptchaResponseData"
                         }
                     }
                 }
@@ -121,7 +94,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.LoginResponse"
+                            "$ref": "#/definitions/v1.LoginResponseData"
                         }
                     }
                 }
@@ -161,7 +134,72 @@
                 }
             }
         },
-        "/user": {
+        "/user/getCollege": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "获取学院信息",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetCollegeRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CollegeResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/getCollegeList": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "获取学院列表",
+                "responses": {
+                    "200": {
+                        "description": "返回学院信息列表",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetCollegeListDataResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/getProfile": {
             "get": {
                 "security": [
                     {
@@ -182,12 +220,41 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.GetProfileResponse"
+                            "$ref": "#/definitions/v1.GetProfileResponseData"
                         }
                     }
                 }
-            },
-            "put": {
+            }
+        },
+        "/user/logout": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "退出用户",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/user/updateProfile": {
+            "post": {
                 "security": [
                     {
                         "Bearer": []
@@ -226,13 +293,10 @@
         }
     },
     "definitions": {
-        "v1.CaptchaData": {
+        "v1.CaptchaResponseData": {
             "type": "object",
             "properties": {
                 "CaptchaBase64": {
-                    "type": "string"
-                },
-                "captchaAnswer": {
                     "type": "string"
                 },
                 "captchaId": {
@@ -240,56 +304,64 @@
                 }
             }
         },
-        "v1.CaptchaResponse": {
+        "v1.CollegeResponseData": {
             "type": "object",
             "properties": {
-                "code": {
+                "collegeId": {
                     "type": "integer"
                 },
-                "data": {
-                    "$ref": "#/definitions/v1.CaptchaData"
+                "collegeName": {
+                    "type": "string"
                 },
-                "message": {
+                "description": {
                     "type": "string"
                 }
             }
         },
-        "v1.GetProfileResponse": {
+        "v1.GetCollegeListDataResponse": {
             "type": "object",
             "properties": {
-                "code": {
+                "collegeList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.CollegeResponseData"
+                    }
+                }
+            }
+        },
+        "v1.GetCollegeRequest": {
+            "type": "object",
+            "properties": {
+                "collegeId": {
                     "type": "integer"
-                },
-                "data": {
-                    "$ref": "#/definitions/v1.GetProfileResponseData"
-                },
-                "message": {
-                    "type": "string"
                 }
             }
         },
         "v1.GetProfileResponseData": {
             "type": "object",
             "properties": {
+                "collegeId": {
+                    "type": "integer"
+                },
+                "email": {
+                    "type": "string"
+                },
                 "nickname": {
                     "type": "string",
                     "example": "alan"
                 },
-                "userId": {
+                "phone": {
+                    "type": "string",
+                    "example": "10012239028"
+                },
+                "roleType": {
+                    "type": "integer",
+                    "example": 0
+                },
+                "studentId": {
                     "type": "string"
-                }
-            }
-        },
-        "v1.LoginResponse": {
-            "type": "object",
-            "properties": {
-                "code": {
-                    "type": "integer"
                 },
-                "data": {
-                    "$ref": "#/definitions/v1.LoginResponseData"
-                },
-                "message": {
+                "userId": {
                     "type": "string"
                 }
             }

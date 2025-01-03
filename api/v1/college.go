@@ -9,3 +9,7 @@ type CollegeResponseData struct {
 	CollegeName string `json:"collegeName"`
 	Description string `json:"description"`
 }
+
+type GetCollegeListDataResponse struct {
+	CollegeList []*CollegeResponseData `json:"collegeList"`
+}

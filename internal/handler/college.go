@@ -4,17 +4,17 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	v1 "projectName/api/v1"
-	"projectName/internal/service"
+	"projectName/internal/service/user"
 )
 
 type CollegeHandler struct {
 	*Handler
-	collegeService service.CollegeService
+	collegeService user.CollegeService
 }
 
 func NewCollegeHandler(
 	handler *Handler,
-	collegeService service.CollegeService,
+	collegeService user.CollegeService,
 ) *CollegeHandler {
 	return &CollegeHandler{
 		Handler:        handler,
@@ -22,7 +22,17 @@ func NewCollegeHandler(
 	}
 }
 
-// GetCollege 处理单个学院信息
+// GetCollege godoc
+// @Summary 获取学院信息
+// @Schemes
+// @Description
+// @Tags 用户模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.GetCollegeRequest true "params"
+// @Success 200 {object} v1.CollegeResponseData
+// @Router /user/getCollege [get]
 func (h *CollegeHandler) GetCollege(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 	if userId == "" {
@@ -47,7 +57,16 @@ func (h *CollegeHandler) GetCollege(ctx *gin.Context) {
 	})
 }
 
-// GetCollegeList 获取所有学院信息
+// GetCollegeList godoc
+// @Summary 获取学院列表
+// @Schemes
+// @Description
+// @Tags 用户模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} v1.GetCollegeListDataResponse "返回学院信息列表"
+// @Router /user/getCollegeList [get]
 func (h *CollegeHandler) GetCollegeList(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 	if userId == "" {
@@ -69,7 +88,7 @@ func (h *CollegeHandler) GetCollegeList(ctx *gin.Context) {
 		})
 	}
 	// 返回多个学院信息
-	v1.HandleSuccess(ctx, map[string]interface{}{
-		"collegeList": responseCollegeList,
+	v1.HandleSuccess(ctx, v1.GetCollegeListDataResponse{
+		CollegeList: responseCollegeList,
 	})
 }

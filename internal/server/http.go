@@ -20,6 +20,8 @@ func NewHTTPServer(
 	conf *viper.Viper,
 	jwt *jwt.JWT,
 	userHandler *handler.UserHandler,
+	collegeHandler *handler.CollegeHandler,
+
 ) *http.Server {
 	gin.SetMode(gin.DebugMode)
 	s := http.NewServer(
@@ -70,10 +72,14 @@ func NewHTTPServer(
 		commonUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.COMMON_USER))
 		{
 			// 用户模块
-			commonUserRouter.GET(enums.USER+"/logout", userHandler.Logout)          // 退出
-			commonUserRouter.GET(enums.USER+"/cancel", userHandler.Cancel)          // 注销
-			commonUserRouter.GET(enums.USER+"/profile", userHandler.GetProfile)     // 获取用户信息
-			commonUserRouter.POST(enums.USER+"/profile", userHandler.UpdateProfile) // 修改用户信息
+			commonUserRouter.GET(enums.USER+"/logout", userHandler.Logout)                    // 退出
+			commonUserRouter.GET(enums.USER+"/cancel", userHandler.Cancel)                    // 注销
+			commonUserRouter.GET(enums.USER+"/getProfile", userHandler.GetProfile)            // 获取用户信息
+			commonUserRouter.POST(enums.USER+"/updateProfile", userHandler.UpdateProfile)     // 修改用户信息
+			commonUserRouter.GET(enums.USER+"/getCollege", collegeHandler.GetCollege)         // 获取学院信息
+			commonUserRouter.GET(enums.USER+"/getCollegeList", collegeHandler.GetCollegeList) // 获取学院信息列表
+			// 无模块
+
 		}
 		// 学生用户路由组
 		//studentUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUTDENT_USER))
