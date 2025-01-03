@@ -16,6 +16,7 @@ type UserRepository interface {
 	GetByID(ctx context.Context, id string) (*model.User, error)
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	GetByPhone(ctx context.Context, phone string) (*model.User, error)
+	DeleteByUserId(ctx context.Context, userId string) error
 	// redis
 	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
 	Get(ctx context.Context, key string) (string, error)
@@ -79,6 +80,18 @@ func (r *userRepository) GetByPhone(ctx context.Context, phone string) (*model.U
 		return nil, err
 	}
 	return &user, nil
+}
+func (r *userRepository) DeleteByUserId(ctx context.Context, userId string) error {
+	// 获取当前时间
+	now := time.Now()
+	// 更新 is_deleted 字段为 0，并设置 deleted_at 为当前时间
+	if err := r.DB(ctx).Table("sys_users").
+		Where("user_id = ?", userId).
+		Update("is_deleted", 0).
+		Update("deleted_at", now).Error; err != nil {
+		return err
+	}
+	return nil
 }
 
 func (r *userRepository) Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error {

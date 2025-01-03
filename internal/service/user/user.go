@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+	"go.uber.org/zap"
 	"golang.org/x/crypto/bcrypt"
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
@@ -21,6 +22,8 @@ type UserService interface {
 	PasswordLogin(ctx context.Context, req *v1.PasswordLoginRequest) (string, error)
 	GetProfile(ctx context.Context, userId string) (*v1.GetProfileResponseData, error)
 	UpdateProfile(ctx context.Context, userId string, req *v1.UpdateProfileRequest) error
+	Logout(ctx context.Context, userId string, roleType int) error
+	Cancel(ctx context.Context, userId string) error
 }
 
 func NewUserService(
@@ -73,7 +76,7 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 		return err
 	}
 	user = &model.User{
-		UserId:   userId,
+		UserId:   strconv.FormatInt(userId, 10),
 		Phone:    req.Phone,
 		Password: string(hashedPassword),
 		Nickname: randomname.GenerateName(), //随机生成用户昵称
@@ -110,14 +113,14 @@ func (s *userService) PasswordLogin(ctx context.Context, req *v1.PasswordLoginRe
 	}
 	// 生成token 有效期7天
 	//todo: 后续可以改成后台可配置的天数
-	token, err := s.Jwt.GenToken(strconv.FormatInt(user.UserId, 10), user.RoleType, time.Now().Add(time.Hour*24*7))
+	token, err := s.Jwt.GenToken(user.UserId, user.RoleType, time.Now().Add(time.Hour*24*7))
 	if err != nil {
 		return "", v1.ErrGetTokenFail
 	}
 	// token存redis，后续注销和退出时候删除
 	err = s.Tm.Transaction(ctx, func(ctx context.Context) error {
 		// 将 token 存储到 Redis，设置过期时间为 7 天
-		key := fmt.Sprintf("%d:%d", user.UserId, user.RoleType) // key="10012249028:0"
+		key := fmt.Sprintf("%s:%d", user.UserId, user.RoleType) // key="10012249028:0"
 		if err = s.userRepo.Set(ctx, key, token, time.Hour*24*7); err != nil {
 			return v1.ErrGetTokenFail // 存储失败
 		}
@@ -134,7 +137,7 @@ func (s *userService) GetProfile(ctx context.Context, userId string) (*v1.GetPro
 	}
 
 	return &v1.GetProfileResponseData{
-		UserId:   strconv.FormatInt(user.UserId, 10),
+		UserId:   user.UserId,
 		Nickname: user.Nickname,
 	}, nil
 }
@@ -177,4 +180,22 @@ func isValidPassword(password string) bool {
 		return false
 	}
 	return matched
+}
+
+func (s *userService) Logout(ctx context.Context, userId string, roleType int) error {
+	// 从 Redis 中删除 token
+	key := fmt.Sprintf("%s:%d", userId, roleType)
+	if err := s.userRepo.Delete(ctx, key); err != nil {
+		s.Logger.Error("userService.Logout error", zap.Error(err))
+		return v1.ErrLogoutFail
+	}
+	return nil
+}
+
+func (s *userService) Cancel(ctx context.Context, userId string) error {
+	if err := s.userRepo.DeleteByUserId(ctx, userId); err != nil {
+		s.Logger.Error("userService.Cancel error", zap.Error(err))
+		return v1.ErrCancelFail
+	}
+	return nil
 }

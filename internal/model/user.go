@@ -7,7 +7,7 @@ import (
 
 type User struct {
 	Id        uint   `gorm:"primarykey"`
-	UserId    int64  `gorm:"unique;not null"`
+	UserId    string `gorm:"unique;not null"`
 	Phone     string `gorm:"not null"`
 	Nickname  string `gorm:"not null"`
 	Password  string `gorm:"not null"`

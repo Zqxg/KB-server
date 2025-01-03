@@ -17,6 +17,8 @@ var (
 	ErrDecryptPassword = newError(1005, "错误解密密码")
 	ErrGetTokenFail    = newError(1006, "获取token失败")
 	ErrUserNotExist    = newError(1007, "用户不存在")
+	ErrLogoutFail      = newError(1008, "用户退出失败")
+	ErrCancelFail      = newError(1009, "用户注销失败")
 
 	// 2000 错误码
 	ErrInvalidCaptcha = newError(2000, "验证码错误")

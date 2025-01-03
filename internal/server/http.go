@@ -7,6 +7,7 @@ import (
 	ginSwagger "github.com/swaggo/gin-swagger"
 	apiV1 "projectName/api/v1"
 	"projectName/docs"
+	"projectName/internal/enums"
 	"projectName/internal/handler"
 	"projectName/internal/middleware"
 	"projectName/pkg/jwt"
@@ -52,7 +53,7 @@ func NewHTTPServer(
 
 	v1 := s.Group("/v1")
 	{
-		// No route group has permission
+		// 无需权限路由组
 		noAuthRouter := v1.Group("/")
 		{
 			noAuthRouter.POST("/register", userHandler.Register)
@@ -64,12 +65,27 @@ func NewHTTPServer(
 		{
 			noStrictAuthRouter.GET("/user", userHandler.GetProfile)
 		}
-
-		// Strict permission routing group
-		strictAuthRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, 3))
+		// 权限包含关系：超级管理员 > 学校管理员 > 学生用户 > 普通用户
+		// 普通用户路由组
+		commonUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.COMMON_USER))
 		{
-			strictAuthRouter.PUT("/user", userHandler.UpdateProfile)
+			// 用户模块
+			commonUserRouter.GET(enums.USER+"/logout", userHandler.Logout) // 退出
+			commonUserRouter.GET(enums.USER+"/cancel", userHandler.Cancel) // 注销
+
 		}
+		// 学生用户路由组
+		//studentUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUTDENT_USER))
+		//{
+		//}
+		// 学校管理员路由组
+		//schoolAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SCHOOL_ADMIN))
+		//{
+		//}
+		// 超级管理员路由组
+		//superAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUPER_ADMIN))
+		//{
+		//}
 	}
 
 	return s

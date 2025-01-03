@@ -147,3 +147,45 @@ func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 
 	v1.HandleSuccess(ctx, nil)
 }
+
+// Logout godoc
+// @Summary 退出用户
+// @Schemes
+// @Description
+// @Tags 用户模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} v1.Response
+// @Router /logout [get]
+func (h *UserHandler) Logout(ctx *gin.Context) {
+	userId, roleTpye := GetUserIdAndRoleTypeFromCtx(ctx)
+	if err := h.userService.Logout(ctx, userId, roleTpye); err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, nil)
+}
+
+// Cancel godoc
+// @Summary 注销用户
+// @Schemes
+// @Description
+// @Tags 用户模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Success 200 {object} v1.Response
+// @Router /cancel [get]
+func (h *UserHandler) Cancel(ctx *gin.Context) {
+	userId, roleTpye := GetUserIdAndRoleTypeFromCtx(ctx)
+	// 退出
+	if err := h.userService.Logout(ctx, userId, roleTpye); err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	// 注销
+	if err := h.userService.Cancel(ctx, userId); err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+	}
+}
