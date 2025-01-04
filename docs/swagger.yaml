@@ -108,8 +108,15 @@ definitions:
       nickname:
         example: alan
         type: string
-    required:
-    - email
+    type: object
+  v1.UserAuthRequest:
+    properties:
+      collegeId:
+        type: integer
+      remarks:
+        type: string
+      studentId:
+        type: string
     type: object
 host: localhost:8000
 info:
@@ -291,6 +298,29 @@ paths:
       security:
       - Bearer: []
       summary: 修改用户信息
+      tags:
+      - 用户模块
+  /user/userAuth:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UserAuthRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 用户认证
       tags:
       - 用户模块
 securityDefinitions:

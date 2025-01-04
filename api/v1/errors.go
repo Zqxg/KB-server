@@ -25,8 +25,15 @@ var (
 	ErrInvalidCaptcha = newError(2000, "验证码错误")
 
 	// 3000 数据库
-	ErrDatabase = newError(3000, "数据库错误")
+	ErrDatabase     = newError(3000, "数据库错误")
+	ErrInsertFailed = newError(3001, "插入失败")
+	ErrUpdateFailed = newError(3002, "更新失败")
+	ErrDeleteFailed = newError(3003, "删除失败")
+	ErrQueryFailed  = newError(3004, "查询失败")
 
 	// 20000 业务逻辑错误
-	ErrParamEmpty = newError(20000, "参数为空")
+	ErrParamEmpty      = newError(20000, "参数为空")
+	ErrUserAlreadyAuth = newError(20001, "用户已认证")
+	ErrUserAuthPending = newError(20002, "用户认证待处理")
+	ErrUserAuthFailed  = newError(20003, "用户认证失败")
 )

@@ -297,6 +297,44 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/user/userAuth": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "用户认证",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UserAuthRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
@@ -449,9 +487,6 @@ const docTemplate = `{
         },
         "v1.UpdateProfileRequest": {
             "type": "object",
-            "required": [
-                "email"
-            ],
             "properties": {
                 "email": {
                     "type": "string",
@@ -460,6 +495,20 @@ const docTemplate = `{
                 "nickname": {
                     "type": "string",
                     "example": "alan"
+                }
+            }
+        },
+        "v1.UserAuthRequest": {
+            "type": "object",
+            "properties": {
+                "collegeId": {
+                    "type": "integer"
+                },
+                "remarks": {
+                    "type": "string"
+                },
+                "studentId": {
+                    "type": "string"
                 }
             }
         }

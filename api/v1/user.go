@@ -40,3 +40,8 @@ type GetProfileResponseData struct {
 	CollegeId uint   `json:"collegeId"`
 	StudentId string `json:"studentId"`
 }
+type UserAuthRequest struct {
+	CollegeId uint   `json:"collegeId"`
+	StudentId string `json:"studentId"`
+	Remarks   string `json:"remarks"`
+}

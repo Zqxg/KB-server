@@ -200,3 +200,28 @@ func (h *UserHandler) Cancel(ctx *gin.Context) {
 	}
 	v1.HandleSuccess(ctx, nil)
 }
+
+// UserAuth godoc
+// @Summary 用户认证
+// @Schemes
+// @Description
+// @Tags 用户模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.UserAuthRequest true "params"
+// @Success 200 {object} v1.Response
+// @Router /user/userAuth [post]
+func (h *UserHandler) UserAuth(ctx *gin.Context) {
+	userId, roleTpye := GetUserIdAndRoleTypeFromCtx(ctx)
+	var req v1.UserAuthRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	if err := h.userService.UserAuth(ctx, &req, userId, roleTpye); err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, nil)
+}

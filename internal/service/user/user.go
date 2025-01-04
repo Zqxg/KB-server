@@ -25,6 +25,7 @@ type UserService interface {
 	UpdateProfile(ctx context.Context, userId string, req *v1.UpdateProfileRequest) error
 	Logout(ctx context.Context, userId string, roleType int) error
 	Cancel(ctx context.Context, userId string) error
+	UserAuth(ctx context.Context, req *v1.UserAuthRequest, userId string, roleType int) error
 }
 
 func NewUserService(
@@ -163,7 +164,7 @@ func (s *userService) UpdateProfile(ctx context.Context, userId string, req *v1.
 		user.Nickname = req.Nickname
 	}
 	if err = s.userRepo.Update(ctx, user); err != nil {
-		return v1.ErrDatabase
+		return v1.ErrUpdateFailed
 	}
 	return nil
 }
@@ -194,6 +195,45 @@ func (s *userService) Cancel(ctx context.Context, userId string) error {
 	if err := s.userRepo.DeleteByUserId(ctx, userId); err != nil {
 		s.Logger.Error("userService.Cancel error", zap.Error(err))
 		return v1.ErrCancelFail
+	}
+	return nil
+}
+
+func (s *userService) UserAuth(ctx context.Context, req *v1.UserAuthRequest, userId string, roleType int) error {
+	// 校验参数，确保是普通用户
+	if roleType != enums.COMMON_USER {
+		return v1.ErrUserAlreadyAuth
+	}
+	// 查询是否已有待处理认证请求
+	existingAuthRequest, err := s.userRepo.GetUserAuthByUserId(ctx, userId)
+	if err != nil {
+		return v1.ErrDatabase
+	}
+	// 如果有待处理的认证请求，阻止重新发起认证
+	if existingAuthRequest != nil && existingAuthRequest.Status == enums.WAITING {
+		return v1.ErrUserAuthPending
+	}
+	// 认证请求
+	userAuth := &model.UserAuth{
+		UserId:      userId,
+		RequestType: enums.SUTDENT_USER,
+		Status:      enums.WAITING,
+		ApplyTime:   time.Now(),
+		CollegeId:   &req.CollegeId,
+		StudentId:   &req.StudentId,
+		Remarks:     &req.Remarks,
+	}
+	// 判断是否是第一次认证，或者认证请求状态是已拒绝或认证失败
+	if existingAuthRequest == nil {
+		// 第一次认证，存储认证请求信息到数据库
+		if err = s.userRepo.CreateUserAuth(ctx, userAuth); err != nil {
+			return v1.ErrUserAuthFailed
+		}
+	} else if existingAuthRequest.Status == enums.REJECTED || existingAuthRequest.Status == enums.FAILED {
+		// 认证请求状态是已拒绝或认证失败，更新认证请求信息到数据库
+		if err = s.userRepo.UpdateUserAuth(ctx, userAuth); err != nil {
+			return v1.ErrUserAuthFailed
+		}
 	}
 	return nil
 }

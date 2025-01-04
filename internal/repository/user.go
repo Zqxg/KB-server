@@ -11,13 +11,17 @@ import (
 )
 
 type UserRepository interface {
-	// db
+	// 表：sys_users
 	Create(ctx context.Context, user *model.User) error
 	Update(ctx context.Context, user *model.User) error
 	GetByUserId(ctx context.Context, id string) (*model.User, error)
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	GetByPhone(ctx context.Context, phone string) (*model.User, error)
 	DeleteByUserId(ctx context.Context, userId string) error
+	// 表：sys_user_auths
+	CreateUserAuth(ctx context.Context, userAuth *model.UserAuth) error
+	GetUserAuthByUserId(ctx context.Context, userId string) (*model.UserAuth, error)
+	UpdateUserAuth(ctx context.Context, userAuth *model.UserAuth) error
 	// redis
 	Set(ctx context.Context, key string, value interface{}, expiration time.Duration) error
 	Get(ctx context.Context, key string) (string, error)
@@ -120,6 +124,33 @@ func (r *userRepository) Get(ctx context.Context, key string) (string, error) {
 func (r *userRepository) Delete(ctx context.Context, key string) error {
 	if err := r.rdb.Del(ctx, key).Err(); err != nil {
 		r.logger.WithContext(ctx).Error("userRepository.Delete error", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+func (r *userRepository) CreateUserAuth(ctx context.Context, userAuth *model.UserAuth) error {
+	if err := r.DB(ctx).Table("sys_user_auths").Create(userAuth).Error; err != nil {
+		r.logger.WithContext(ctx).Error("userRepository.CreateUserAuth error", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+func (r *userRepository) GetUserAuthByUserId(ctx context.Context, userId string) (*model.UserAuth, error) {
+	var userAuth model.UserAuth
+	if err := r.DB(ctx).Table("sys_user_auths").Where("user_id =?", userId).First(&userAuth).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			r.logger.WithContext(ctx).Error("userRepository.GetUserAuthByUserId error", zap.Error(err))
+			return nil, nil
+		}
+	}
+	return &userAuth, nil
+}
+
+func (r *userRepository) UpdateUserAuth(ctx context.Context, userAuth *model.UserAuth) error {
+	if err := r.DB(ctx).Table("sys_user_auths").Save(userAuth).Error; err != nil {
+		r.logger.WithContext(ctx).Error("userRepository.UpdateUserAuth error", zap.Error(err))
 		return err
 	}
 	return nil
