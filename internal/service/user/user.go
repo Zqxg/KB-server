@@ -155,10 +155,12 @@ func (s *userService) UpdateProfile(ctx context.Context, userId string, req *v1.
 	}
 	if utils.IsEmpty(req.Email) && utils.IsEmpty(req.Nickname) {
 		return v1.ErrParamEmpty
-	} else if utils.IsNotEmpty(req.Email) {
-		req.Email = user.Email
-	} else if utils.IsNotEmpty(req.Nickname) {
-		req.Nickname = user.Nickname
+	}
+	if utils.IsNotEmpty(req.Email) && utils.IsEmail(req.Email) {
+		user.Email = req.Email
+	}
+	if utils.IsNotEmpty(req.Nickname) {
+		user.Nickname = req.Nickname
 	}
 	if err = s.userRepo.Update(ctx, user); err != nil {
 		return v1.ErrDatabase

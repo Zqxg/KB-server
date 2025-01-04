@@ -78,7 +78,7 @@ func (r *userRepository) GetByEmail(ctx context.Context, email string) (*model.U
 
 func (r *userRepository) GetByPhone(ctx context.Context, phone string) (*model.User, error) {
 	var user model.User
-	if err := r.DB(ctx).Table("sys_users").Where("phone = ?", phone).First(&user).Error; err != nil {
+	if err := r.DB(ctx).Table("sys_users").Where("is_deleted = 0 and phone = ? ", phone).First(&user).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}

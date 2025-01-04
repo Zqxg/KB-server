@@ -148,7 +148,7 @@ func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
 		return
 	}
-	// todo:需要回调
+
 	if err := h.userService.UpdateProfile(ctx, userId, &req); err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, v1.ErrInternalServerError, nil)
 		return
