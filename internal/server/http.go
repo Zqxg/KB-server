@@ -62,11 +62,6 @@ func NewHTTPServer(
 			noAuthRouter.POST("/passwordLogin", userHandler.PasswordLogin)
 			noAuthRouter.GET("/getCaptcha", userHandler.GetCaptcha)
 		}
-		// Non-strict permission routing group
-		noStrictAuthRouter := v1.Group("/").Use(middleware.NoStrictAuth(jwt, logger))
-		{
-			noStrictAuthRouter.GET("/user", userHandler.GetProfile)
-		}
 		// 权限包含关系：超级管理员 > 学校管理员 > 学生用户 > 普通用户
 		// 普通用户路由组
 		commonUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.COMMON_USER))
@@ -74,7 +69,7 @@ func NewHTTPServer(
 			// 用户模块
 			commonUserRouter.GET(enums.USER+"/logout", userHandler.Logout)                    // 退出
 			commonUserRouter.GET(enums.USER+"/cancel", userHandler.Cancel)                    // 注销
-			commonUserRouter.GET(enums.USER+"/getProfile", userHandler.GetProfile)            // 获取用户信息
+			commonUserRouter.GET(enums.USER+"/getUserInfo", userHandler.GetUserInfo)          // 获取用户信息
 			commonUserRouter.POST(enums.USER+"/updateProfile", userHandler.UpdateProfile)     // 修改用户信息
 			commonUserRouter.GET(enums.USER+"/getCollege", collegeHandler.GetCollege)         // 获取学院信息
 			commonUserRouter.GET(enums.USER+"/getCollegeList", collegeHandler.GetCollegeList) // 获取学院信息列表

@@ -27,7 +27,7 @@ definitions:
       collegeId:
         type: integer
     type: object
-  v1.GetProfileResponseData:
+  v1.GetUserInfoResponseData:
     properties:
       collegeId:
         type: integer
@@ -245,7 +245,7 @@ paths:
       summary: 获取学院列表
       tags:
       - 用户模块
-  /user/getProfile:
+  /user/getUserInfo:
     get:
       consumes:
       - application/json
@@ -255,7 +255,7 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.GetProfileResponseData'
+            $ref: '#/definitions/v1.GetUserInfoResponseData'
       security:
       - Bearer: []
       summary: 获取用户信息

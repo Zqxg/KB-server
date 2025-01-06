@@ -31,7 +31,7 @@ type UpdateProfileRequest struct {
 	Nickname string `json:"nickname" example:"alan"`
 	Email    string `json:"email" binding:"email" example:"1234@gmail.com"`
 }
-type GetProfileResponseData struct {
+type GetUserInfoResponseData struct {
 	UserId    string `json:"userId"`
 	Phone     string `json:"phone" example:"10012239028"`
 	Nickname  string `json:"nickname" example:"alan"`

@@ -206,7 +206,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/getProfile": {
+        "/user/getUserInfo": {
             "get": {
                 "security": [
                     {
@@ -227,7 +227,7 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.GetProfileResponseData"
+                            "$ref": "#/definitions/v1.GetUserInfoResponseData"
                         }
                     }
                 }
@@ -382,7 +382,7 @@ const docTemplate = `{
                 }
             }
         },
-        "v1.GetProfileResponseData": {
+        "v1.GetUserInfoResponseData": {
             "type": "object",
             "properties": {
                 "collegeId": {

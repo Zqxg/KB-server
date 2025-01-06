@@ -95,7 +95,7 @@ func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
 	})
 }
 
-// GetProfile godoc
+// GetUserInfo godoc
 // @Summary 获取用户信息
 // @Schemes
 // @Description
@@ -103,22 +103,22 @@ func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Success 200 {object} v1.GetProfileResponseData
-// @Router /user/getProfile [get]
-func (h *UserHandler) GetProfile(ctx *gin.Context) {
+// @Success 200 {object} v1.GetUserInfoResponseData
+// @Router /user/getUserInfo [get]
+func (h *UserHandler) GetUserInfo(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 	if userId == "" {
 		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrUnauthorized, nil)
 		return
 	}
 
-	userData, err := h.userService.GetProfile(ctx, userId)
+	userData, err := h.userService.GetUserInfo(ctx, userId)
 	if err != nil {
 		v1.HandleError(ctx, http.StatusBadRequest, err, nil)
 		return
 	}
 
-	v1.HandleSuccess(ctx, v1.GetProfileResponseData{
+	v1.HandleSuccess(ctx, v1.GetUserInfoResponseData{
 		UserId:    userData.UserId,
 		Phone:     userData.Phone,
 		Nickname:  userData.Nickname,

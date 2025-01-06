@@ -21,7 +21,7 @@ import (
 type UserService interface {
 	Register(ctx context.Context, req *v1.RegisterRequest) error
 	PasswordLogin(ctx context.Context, req *v1.PasswordLoginRequest) (string, error)
-	GetProfile(ctx context.Context, userId string) (*v1.GetProfileResponseData, error)
+	GetUserInfo(ctx context.Context, userId string) (*v1.GetUserInfoResponseData, error)
 	UpdateProfile(ctx context.Context, userId string, req *v1.UpdateProfileRequest) error
 	Logout(ctx context.Context, userId string, roleType int) error
 	Cancel(ctx context.Context, userId string) error
@@ -132,13 +132,13 @@ func (s *userService) PasswordLogin(ctx context.Context, req *v1.PasswordLoginRe
 	return token, nil
 }
 
-func (s *userService) GetProfile(ctx context.Context, userId string) (*v1.GetProfileResponseData, error) {
+func (s *userService) GetUserInfo(ctx context.Context, userId string) (*v1.GetUserInfoResponseData, error) {
 	user, err := s.userRepo.GetByUserId(ctx, userId)
 	if err != nil {
 		return nil, v1.ErrUserNotExist
 	}
 
-	return &v1.GetProfileResponseData{
+	return &v1.GetUserInfoResponseData{
 		UserId:    user.UserId,
 		Nickname:  user.Nickname,
 		Phone:     user.Phone,

@@ -199,7 +199,7 @@
                 }
             }
         },
-        "/user/getProfile": {
+        "/user/getUserInfo": {
             "get": {
                 "security": [
                     {
@@ -220,7 +220,7 @@
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.GetProfileResponseData"
+                            "$ref": "#/definitions/v1.GetUserInfoResponseData"
                         }
                     }
                 }
@@ -375,7 +375,7 @@
                 }
             }
         },
-        "v1.GetProfileResponseData": {
+        "v1.GetUserInfoResponseData": {
             "type": "object",
             "properties": {
                 "collegeId": {
