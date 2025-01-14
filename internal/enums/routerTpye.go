@@ -1,5 +1,6 @@
 package enums
 
 const (
-	USER = "/user"
+	USER    = "/user"
+	ARTICLE = "/article"
 )

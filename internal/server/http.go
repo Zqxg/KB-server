@@ -21,6 +21,7 @@ func NewHTTPServer(
 	jwt *jwt.JWT,
 	userHandler *handler.UserHandler,
 	collegeHandler *handler.CollegeHandler,
+	articleHandler *handler.ArticleHandler,
 
 ) *http.Server {
 	gin.SetMode(gin.DebugMode)
@@ -79,9 +80,11 @@ func NewHTTPServer(
 
 		}
 		// 学生用户路由组
-		//studentUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUTDENT_USER))
-		//{
-		//}
+		studentUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUTDENT_USER))
+		{
+			// 文章模块
+			studentUserRouter.GET(enums.ARTICLE+"/create", articleHandler.CreateArticle) // 退出
+		}
 		// 学校管理员路由组
 		//schoolAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SCHOOL_ADMIN))
 		//{

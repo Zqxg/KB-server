@@ -32,8 +32,10 @@ var (
 	ErrQueryFailed  = newError(3004, "查询失败")
 
 	// 20000 业务逻辑错误
-	ErrParamEmpty      = newError(20000, "参数为空")
-	ErrUserAlreadyAuth = newError(20001, "用户已认证")
-	ErrUserAuthPending = newError(20002, "用户认证待处理")
-	ErrUserAuthFailed  = newError(20003, "用户认证失败")
+	ErrParamEmpty          = newError(20000, "参数为空")
+	ErrUserAlreadyAuth     = newError(20001, "用户已认证")
+	ErrUserAuthPending     = newError(20002, "用户认证待处理")
+	ErrUserAuthFailed      = newError(20003, "用户认证失败")
+	ErrArticleAlreadyExist = newError(20004, "文章已存在")
+	ErrCreateArticleFailed = newError(20005, "创建文章失败")
 )
