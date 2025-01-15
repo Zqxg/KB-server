@@ -22,26 +22,43 @@ func NewArticleHandler(
 	}
 }
 
-// GetArticle godoc
-// @Summary 获取文章
+// CreateArticle godoc
+// @Summary 新建文章
 // @Schemes
 // @Description
 // @Tags 文章模块
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param request body v1.GetArticleRequest true "params"
-// @Success 200 {object} v1.ArticleResponseData
+// @Param request body v1.CreateArticleRequest true "params"
+// @Success 200 {object} v1.CreateArticleResponseData
 func (h *ArticleHandler) CreateArticle(ctx *gin.Context) {
-	var req v1.GetArticleRequest
+	var req v1.CreateArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
 		return
 	}
-	if err := h.articleService.CreateArticle(ctx, &req); err != nil {
+	articleId, err := h.articleService.CreateArticle(ctx, &req)
+	if articleId == -1 || err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
 		return
 	}
-	v1.HandleSuccess(ctx, nil)
+	v1.HandleSuccess(ctx, v1.CreateArticleResponseData{
+		ArticleID: articleId,
+	})
 
 }
+
+// GetArticleGroup godoc
+// @Summary 获取文章分组
+// @Schemes
+// @Description
+// @Tags 文章模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1. true "params"
+// @Success 200 {object} v1.
+//func (h *ArticleHandler) GetArticleGroup(ctx *gin.Context) {
+//
+//}

@@ -83,7 +83,9 @@ func NewHTTPServer(
 		studentUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUTDENT_USER))
 		{
 			// 文章模块
-			studentUserRouter.GET(enums.ARTICLE+"/create", articleHandler.CreateArticle) // 退出
+			studentUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)   // 新建文章
+			studentUserRouter.POST(enums.ARTICLE+"/getGroup", articleHandler.CreateArticle) // 新建文章
+
 		}
 		// 学校管理员路由组
 		//schoolAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SCHOOL_ADMIN))

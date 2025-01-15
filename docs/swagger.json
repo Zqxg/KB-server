@@ -356,6 +356,86 @@
                 }
             }
         },
+        "v1.CreateArticleRequest": {
+            "type": "object",
+            "required": [
+                "authorId",
+                "content",
+                "title",
+                "visibleRange"
+            ],
+            "properties": {
+                "authorId": {
+                    "description": "作者ID",
+                    "type": "string"
+                },
+                "categoryId": {
+                    "description": "文章分类ID",
+                    "type": "integer"
+                },
+                "commentDisabled": {
+                    "description": "是否禁用评论",
+                    "type": "boolean"
+                },
+                "content": {
+                    "description": "文章内容",
+                    "type": "string"
+                },
+                "contentShort": {
+                    "description": "文章摘要",
+                    "type": "string"
+                },
+                "importance": {
+                    "description": "文章重要性",
+                    "type": "integer"
+                },
+                "sourceUri": {
+                    "description": "文章外链",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "文章标题",
+                    "type": "string"
+                },
+                "uploadedFiles": {
+                    "description": "上传的文件列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.FileUpload"
+                    }
+                },
+                "visibleRange": {
+                    "description": "可见范围",
+                    "type": "string"
+                }
+            }
+        },
+        "v1.CreateArticleResponseData": {
+            "type": "object",
+            "properties": {
+                "articleId": {
+                    "description": "文章ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.FileUpload": {
+            "type": "object",
+            "required": [
+                "fileName",
+                "fileUrl"
+            ],
+            "properties": {
+                "fileName": {
+                    "description": "文件名",
+                    "type": "string"
+                },
+                "fileUrl": {
+                    "description": "文件URL",
+                    "type": "string"
+                }
+            }
+        },
         "v1.GetCollegeListDataResponse": {
             "type": "object",
             "properties": {
