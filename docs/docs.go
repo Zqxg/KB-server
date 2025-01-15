@@ -24,6 +24,71 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/article/createArticle": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "新建文章",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateArticleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateArticleResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/article/getArticleCategory": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "获取文章分组",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CategoryData"
+                        }
+                    }
+                }
+            }
+        },
         "/cancel": {
             "get": {
                 "security": [
@@ -349,6 +414,17 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.CategoryData": {
+            "type": "object",
+            "properties": {
+                "CategoryList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/vo.CategoryView"
+                    }
+                }
+            }
+        },
         "v1.CollegeResponseData": {
             "type": "object",
             "properties": {
@@ -589,6 +665,29 @@ const docTemplate = `{
                 },
                 "studentId": {
                     "type": "string"
+                }
+            }
+        },
+        "vo.CategoryView": {
+            "type": "object",
+            "properties": {
+                "categoryName": {
+                    "type": "string"
+                },
+                "children": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/vo.CategoryView"
+                    }
+                },
+                "cid": {
+                    "type": "integer"
+                },
+                "level": {
+                    "type": "integer"
+                },
+                "parentId": {
+                    "type": "integer"
                 }
             }
         }

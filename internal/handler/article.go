@@ -32,6 +32,7 @@ func NewArticleHandler(
 // @Security Bearer
 // @Param request body v1.CreateArticleRequest true "params"
 // @Success 200 {object} v1.CreateArticleResponseData
+// @Router /article/createArticle [post]
 func (h *ArticleHandler) CreateArticle(ctx *gin.Context) {
 	var req v1.CreateArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -49,7 +50,7 @@ func (h *ArticleHandler) CreateArticle(ctx *gin.Context) {
 
 }
 
-// GetArticleGroup godoc
+// GetArticleCategory godoc
 // @Summary 获取文章分组
 // @Schemes
 // @Description
@@ -57,8 +58,15 @@ func (h *ArticleHandler) CreateArticle(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param request body v1. true "params"
-// @Success 200 {object} v1.
-//func (h *ArticleHandler) GetArticleGroup(ctx *gin.Context) {
-//
-//}
+// @Success 200 {object} v1.CategoryData
+// @Router /article/getArticleCategory [get]
+func (h *ArticleHandler) GetArticleCategory(ctx *gin.Context) {
+	categories, err := h.articleService.GetArticleCategory(ctx)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, v1.CategoryData{
+		CategoryList: categories,
+	})
+}

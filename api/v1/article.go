@@ -1,5 +1,9 @@
 package v1
 
+import (
+	"projectName/internal/model/vo"
+)
+
 // CreateArticleRequest 用于接收创建文章请求的数据
 type CreateArticleRequest struct {
 	Title           string       `json:"title" binding:"required"`        // 文章标题
@@ -21,7 +25,7 @@ type FileUpload struct {
 }
 
 type CreateArticleResponseData struct {
-	ArticleID uint `json:"articleId"` // 文章ID
+	ArticleID int `json:"articleId"` // 文章ID
 }
 
 type ArticleResponseData struct {
@@ -37,4 +41,9 @@ type ArticleResponseData struct {
 	SourceURI       string       `json:"sourceUri"`       // 文章外链
 	UploadedFiles   []FileUpload `json:"uploadedFiles"`   // 上传的文件列表
 	//Tags            []Tags       `json:"tags"`            //todo：文章标签
+}
+
+type CategoryList []vo.CategoryView
+type CategoryData struct {
+	CategoryList
 }

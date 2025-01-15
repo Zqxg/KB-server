@@ -5,13 +5,15 @@ import (
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
 	"projectName/internal/model"
+	"projectName/internal/model/vo"
 	"projectName/internal/repository"
 	"projectName/internal/service"
 )
 
 type ArticleService interface {
 	GetArticle(ctx context.Context, id int64) (*model.Article, error)
-	CreateArticle(ctx context.Context, req *v1.CreateArticleRequest) (uint, error)
+	CreateArticle(ctx context.Context, req *v1.CreateArticleRequest) (int, error)
+	GetArticleCategory(ctx context.Context) ([]vo.CategoryView, error)
 }
 
 func NewArticleService(
@@ -33,7 +35,7 @@ func (s *articleService) GetArticle(ctx context.Context, id int64) (*model.Artic
 	return s.articleRepository.GetArticle(ctx, id)
 }
 
-func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticleRequest) (uint, error) {
+func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticleRequest) (int, error) {
 	// 判断是否有重复的文章标题&userId
 	article, _ := s.articleRepository.GetArticleByTitleAndUserId(ctx, req.Title, req.AuthorID)
 	if article != nil {
@@ -57,4 +59,12 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 		return -1, v1.ErrCreateArticleFailed
 	}
 	return articleId, nil
+}
+
+func (s *articleService) GetArticleCategory(ctx context.Context) ([]vo.CategoryView, error) {
+	categories, err := s.articleRepository.FetchAllCategoriesAndBuildTree(ctx)
+	if err != nil {
+		return nil, v1.ErrQueryFailed
+	}
+	return categories, err
 }

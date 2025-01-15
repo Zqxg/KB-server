@@ -6,6 +6,13 @@ definitions:
       captchaId:
         type: string
     type: object
+  v1.CategoryData:
+    properties:
+      CategoryList:
+        items:
+          $ref: '#/definitions/vo.CategoryView'
+        type: array
+    type: object
   v1.CollegeResponseData:
     properties:
       collegeId:
@@ -176,6 +183,21 @@ definitions:
       studentId:
         type: string
     type: object
+  vo.CategoryView:
+    properties:
+      categoryName:
+        type: string
+      children:
+        items:
+          $ref: '#/definitions/vo.CategoryView'
+        type: array
+      cid:
+        type: integer
+      level:
+        type: integer
+      parentId:
+        type: integer
+    type: object
 host: localhost:8000
 info:
   contact:
@@ -190,6 +212,45 @@ info:
   title: Nunu Example API
   version: 1.0.0
 paths:
+  /article/createArticle:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateArticleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.CreateArticleResponseData'
+      security:
+      - Bearer: []
+      summary: 新建文章
+      tags:
+      - 文章模块
+  /article/getArticleCategory:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.CategoryData'
+      security:
+      - Bearer: []
+      summary: 获取文章分组
+      tags:
+      - 文章模块
   /cancel:
     get:
       consumes:
