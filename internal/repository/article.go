@@ -5,15 +5,17 @@ import (
 	"errors"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	v1 "projectName/api/v1"
 	"projectName/internal/model"
 	"projectName/internal/model/vo"
 )
 
 type ArticleRepository interface {
-	GetArticle(ctx context.Context, id int64) (*model.Article, error)
+	GetArticle(ctx context.Context, id int) (*model.Article, error)
 	CreateArticle(ctx context.Context, article *model.Article) (int, error)
 	GetArticleByTitleAndUserId(ctx context.Context, title string, authorID string) (*model.Article, error)
 	FetchAllCategoriesAndBuildTree(ctx context.Context) ([]vo.CategoryView, error)
+	GetCategory(ctx context.Context, id uint) (*vo.CategoryView, error)
 }
 
 func NewArticleRepository(
@@ -28,8 +30,15 @@ type articleRepository struct {
 	*Repository
 }
 
-func (r *articleRepository) GetArticle(ctx context.Context, id int64) (*model.Article, error) {
+func (r *articleRepository) GetArticle(ctx context.Context, id int) (*model.Article, error) {
 	var article model.Article
+	if err := r.DB(ctx).Table("kb_article").Where("article_id = ?", id).First(&article).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, v1.ErrNotFound
+		}
+		r.logger.WithContext(ctx).Error("ArticleRepository.GetArticle error", zap.Error(err))
+		return nil, err
+	}
 
 	return &article, nil
 }
@@ -82,4 +91,21 @@ func (r *articleRepository) FetchAllCategoriesAndBuildTree(ctx context.Context) 
 	tree := BuildCategoryTree(categories, 0)
 	r.logger.WithContext(ctx).Info("Successfully built category tree", zap.Int("rootCount", len(tree)))
 	return tree, nil
+}
+
+func (r *articleRepository) GetCategory(ctx context.Context, id uint) (*vo.CategoryView, error) {
+	var categoryView vo.CategoryView
+
+	// 查询视图中的单个分类，使用传入的 id
+	if err := r.DB(ctx).Table("view_category_tree").Where("cid = ?", id).First(&categoryView).Error; err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			// 如果没有找到记录，返回自定义的错误
+			return nil, v1.ErrNotFound
+		}
+		r.logger.WithContext(ctx).Error("Failed to fetch category from view_category_tree", zap.Uint("categoryId", id), zap.Error(err))
+		return nil, err
+	}
+
+	// 返回查询到的分类信息
+	return &categoryView, nil
 }

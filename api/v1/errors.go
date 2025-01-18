@@ -21,6 +21,8 @@ var (
 	ErrCancelFail      = newError(1009, "用户注销失败")
 	ErrEmailFormat     = newError(1010, "邮箱格式错误")
 
+	ErrArticleNotExist = newError(1101, "文章不存在")
+
 	// 2000 错误码
 	ErrInvalidCaptcha = newError(2000, "验证码错误")
 

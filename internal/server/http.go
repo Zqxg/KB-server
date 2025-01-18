@@ -85,6 +85,7 @@ func NewHTTPServer(
 			// 文章模块
 			studentUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                 // 新建文章
 			studentUserRouter.GET(enums.ARTICLE+"/getArticleCategory", articleHandler.GetArticleCategory) // 获取文章分组
+			studentUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle)                 // 获取文章详细
 
 		}
 		// 学校管理员路由组

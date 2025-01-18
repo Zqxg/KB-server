@@ -8,10 +8,11 @@ import (
 	"projectName/internal/model/vo"
 	"projectName/internal/repository"
 	"projectName/internal/service"
+	"projectName/pkg/utils"
 )
 
 type ArticleService interface {
-	GetArticle(ctx context.Context, id int64) (*model.Article, error)
+	GetArticle(ctx context.Context, userId string, id int) (*v1.ArticleResponseData, error)
 	CreateArticle(ctx context.Context, req *v1.CreateArticleRequest) (int, error)
 	GetArticleCategory(ctx context.Context) ([]vo.CategoryView, error)
 }
@@ -19,20 +20,49 @@ type ArticleService interface {
 func NewArticleService(
 	service *service.Service,
 	articleRepository repository.ArticleRepository,
+	userRepo repository.UserRepository,
 ) ArticleService {
 	return &articleService{
 		Service:           service,
 		articleRepository: articleRepository,
+		userRepo:          userRepo,
 	}
 }
 
 type articleService struct {
 	*service.Service
 	articleRepository repository.ArticleRepository
+	userRepo          repository.UserRepository
 }
 
-func (s *articleService) GetArticle(ctx context.Context, id int64) (*model.Article, error) {
-	return s.articleRepository.GetArticle(ctx, id)
+func (s *articleService) GetArticle(ctx context.Context, userId string, id int) (*v1.ArticleResponseData, error) {
+	// 获取文章
+	article, err := s.articleRepository.GetArticle(ctx, id)
+	if err != nil {
+		return nil, v1.ErrArticleNotExist
+	}
+	// 私有 判断是否为本人
+	if !(utils.Contains(article.VisibleRange, "private") && userId == article.UserID) {
+		return nil, v1.ErrPermissionDenied
+	}
+	Author, _ := s.userRepo.GetByUserId(ctx, article.UserID)
+	category, _ := s.articleRepository.GetCategory(ctx, article.CategoryID)
+
+	// 映射
+	articleData := &v1.ArticleResponseData{
+		ArticleID:       article.ArticleID,
+		Title:           article.Title,
+		Content:         article.Content,
+		ContentShort:    article.ContentShort,
+		Author:          Author.Nickname,
+		Category:        category.CategoryName,
+		Importance:      article.Importance,
+		VisibleRange:    article.VisibleRange,
+		CommentDisabled: article.CommentDisabled,
+		SourceURI:       article.SourceURI,
+		UploadedFiles:   article.UploadedFiles,
+	}
+	return articleData, nil
 }
 
 func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticleRequest) (int, error) {

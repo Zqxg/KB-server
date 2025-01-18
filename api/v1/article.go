@@ -20,8 +20,8 @@ type CreateArticleRequest struct {
 
 // FileUpload 用于接收上传文件的信息
 type FileUpload struct {
-	FileName string `json:"fileName" binding:"required"` // 文件名
-	FileURL  string `json:"fileUrl" binding:"required"`  // 文件URL
+	FileName string `json:"fileName" ` // 文件名
+	FileURL  string `json:"fileUrl" `  // 文件URL
 }
 
 type CreateArticleResponseData struct {
@@ -46,4 +46,8 @@ type ArticleResponseData struct {
 type CategoryList []vo.CategoryView
 type CategoryData struct {
 	CategoryList
+}
+
+type GetArticleRequest struct {
+	ArticleID int `json:"articleId"` // 文章ID
 }

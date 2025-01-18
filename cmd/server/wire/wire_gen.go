@@ -45,7 +45,7 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 	collegeService := user.NewCollegeService(serviceService, collegeRepository)
 	collegeHandler := handler.NewCollegeHandler(handlerHandler, collegeService)
 	articleRepository := repository.NewArticleRepository(repositoryRepository)
-	articleService := article.NewArticleService(serviceService, articleRepository)
+	articleService := article.NewArticleService(serviceService, articleRepository, userRepository)
 	articleHandler := handler.NewArticleHandler(handlerHandler, articleService)
 	httpServer := server.NewHTTPServer(logger, viperViper, jwtJWT, userHandler, collegeHandler, articleHandler)
 	jobJob := job.NewJob(transaction, logger, sidSid)

@@ -24,6 +24,44 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/article/GetArticle": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "获取文章详细",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetArticleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.ArticleResponseData"
+                        }
+                    }
+                }
+            }
+        },
         "/article/createArticle": {
             "post": {
                 "security": [
@@ -403,6 +441,58 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "v1.ArticleResponseData": {
+            "type": "object",
+            "properties": {
+                "articleId": {
+                    "description": "文章id",
+                    "type": "integer"
+                },
+                "author": {
+                    "description": "作者",
+                    "type": "string"
+                },
+                "category": {
+                    "description": "文章分类",
+                    "type": "string"
+                },
+                "commentDisabled": {
+                    "description": "是否禁用评论",
+                    "type": "boolean"
+                },
+                "content": {
+                    "description": "文章内容",
+                    "type": "string"
+                },
+                "contentShort": {
+                    "description": "文章摘要",
+                    "type": "string"
+                },
+                "importance": {
+                    "description": "文章重要性",
+                    "type": "integer"
+                },
+                "sourceUri": {
+                    "description": "文章外链",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "文章标题",
+                    "type": "string"
+                },
+                "uploadedFiles": {
+                    "description": "上传的文件列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.FileUpload"
+                    }
+                },
+                "visibleRange": {
+                    "description": "可见范围",
+                    "type": "string"
+                }
+            }
+        },
         "v1.CaptchaResponseData": {
             "type": "object",
             "properties": {
@@ -504,10 +594,6 @@ const docTemplate = `{
         },
         "v1.FileUpload": {
             "type": "object",
-            "required": [
-                "fileName",
-                "fileUrl"
-            ],
             "properties": {
                 "fileName": {
                     "description": "文件名",
@@ -516,6 +602,15 @@ const docTemplate = `{
                 "fileUrl": {
                     "description": "文件URL",
                     "type": "string"
+                }
+            }
+        },
+        "v1.GetArticleRequest": {
+            "type": "object",
+            "properties": {
+                "articleId": {
+                    "description": "文章ID",
+                    "type": "integer"
                 }
             }
         },

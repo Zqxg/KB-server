@@ -1,4 +1,42 @@
 definitions:
+  v1.ArticleResponseData:
+    properties:
+      articleId:
+        description: 文章id
+        type: integer
+      author:
+        description: 作者
+        type: string
+      category:
+        description: 文章分类
+        type: string
+      commentDisabled:
+        description: 是否禁用评论
+        type: boolean
+      content:
+        description: 文章内容
+        type: string
+      contentShort:
+        description: 文章摘要
+        type: string
+      importance:
+        description: 文章重要性
+        type: integer
+      sourceUri:
+        description: 文章外链
+        type: string
+      title:
+        description: 文章标题
+        type: string
+      uploadedFiles:
+        description: 上传的文件列表
+        items:
+          $ref: '#/definitions/v1.FileUpload'
+        type: array
+      visibleRange:
+        description: 可见范围
+        type: string
+    type: object
   v1.CaptchaResponseData:
     properties:
       CaptchaBase64:
@@ -76,9 +114,12 @@ definitions:
       fileUrl:
         description: 文件URL
         type: string
-    required:
-    - fileName
-    - fileUrl
+    type: object
+  v1.GetArticleRequest:
+    properties:
+      articleId:
+        description: 文章ID
+        type: integer
     type: object
   v1.GetCollegeListDataResponse:
     properties:
@@ -212,6 +253,29 @@ info:
   title: Nunu Example API
   version: 1.0.0
 paths:
+  /article/GetArticle:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetArticleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleResponseData'
+      security:
+      - Bearer: []
+      summary: 获取文章详细
+      tags:
+      - 文章模块
   /article/createArticle:
     post:
       consumes:
