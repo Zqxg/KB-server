@@ -42,8 +42,10 @@ func (s *articleService) GetArticle(ctx context.Context, userId string, id int) 
 		return nil, v1.ErrArticleNotExist
 	}
 	// 私有 判断是否为本人
-	if !(utils.Contains(article.VisibleRange, "private") && userId == article.UserID) {
-		return nil, v1.ErrPermissionDenied
+	if utils.Contains(article.VisibleRange, "private") {
+		if userId != article.UserID {
+			return nil, v1.ErrPermissionDenied
+		}
 	}
 	Author, _ := s.userRepo.GetByUserId(ctx, article.UserID)
 	category, _ := s.articleRepository.GetCategory(ctx, article.CategoryID)
@@ -61,6 +63,8 @@ func (s *articleService) GetArticle(ctx context.Context, userId string, id int) 
 		CommentDisabled: article.CommentDisabled,
 		SourceURI:       article.SourceURI,
 		UploadedFiles:   article.UploadedFiles,
+		CreatedAt:       utils.TimeFormat(article.CreatedAt, utils.FormatDateTime),
+		UpdatedAt:       utils.TimeFormat(article.UpdatedAt, utils.FormatDateTime),
 	}
 	return articleData, nil
 }

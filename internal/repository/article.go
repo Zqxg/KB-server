@@ -97,7 +97,7 @@ func (r *articleRepository) GetCategory(ctx context.Context, id uint) (*vo.Categ
 	var categoryView vo.CategoryView
 
 	// 查询视图中的单个分类，使用传入的 id
-	if err := r.DB(ctx).Table("view_category_tree").Where("cid = ?", id).First(&categoryView).Error; err != nil {
+	if err := r.DB(ctx).Table("view_category_tree").Where("category_id = ?", id).First(&categoryView).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 如果没有找到记录，返回自定义的错误
 			return nil, v1.ErrNotFound

@@ -40,6 +40,8 @@ type ArticleResponseData struct {
 	CommentDisabled bool         `json:"commentDisabled"` // 是否禁用评论
 	SourceURI       string       `json:"sourceUri"`       // 文章外链
 	UploadedFiles   []FileUpload `json:"uploadedFiles"`   // 上传的文件列表
+	CreatedAt       string       `json:"createdAt"`       // 文章创建时间
+	UpdatedAt       string       `json:"updateAt"`        // 文章更新时间
 	//Tags            []Tags       `json:"tags"`            //todo：文章标签
 }
 
