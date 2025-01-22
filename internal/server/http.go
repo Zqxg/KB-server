@@ -86,7 +86,9 @@ func NewHTTPServer(
 			studentUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                 // 新建文章
 			studentUserRouter.GET(enums.ARTICLE+"/getArticleCategory", articleHandler.GetArticleCategory) // 获取文章分组
 			studentUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle)                 // 获取文章详细
-
+			studentUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)          // 修改文章
+			studentUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)          // 删除文章
+			studentUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)  // 批量删除文章
 		}
 		// 学校管理员路由组
 		//schoolAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SCHOOL_ADMIN))

@@ -4,6 +4,7 @@ import (
 	"github.com/gin-gonic/gin"
 	"net/http"
 	v1 "projectName/api/v1"
+	"projectName/internal/enums"
 	"projectName/internal/service/article"
 )
 
@@ -80,7 +81,7 @@ func (h *ArticleHandler) GetArticleCategory(ctx *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Param request body v1.GetArticleRequest true "params"
-// @Success 200 {object} v1.ArticleResponseData
+// @Success 200 {object} v1.ArticleData
 // @Router /article/GetArticle [get]
 func (h *ArticleHandler) GetArticle(ctx *gin.Context) {
 	var req v1.GetArticleRequest
@@ -95,4 +96,101 @@ func (h *ArticleHandler) GetArticle(ctx *gin.Context) {
 		return
 	}
 	v1.HandleSuccess(ctx, articleData)
+}
+
+// UpdateArticle godoc
+// @Summary 修改文章内容
+// @Schemes
+// @Description
+// @Tags 文章模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.UpdateArticleRequest true "params"
+// @Success 200 {object} v1.ArticleData
+// @Router /article/UpdateArticle [post]
+func (h *ArticleHandler) UpdateArticle(ctx *gin.Context) {
+	var req v1.UpdateArticleRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
+	if req.AuthorID == userId || role == enums.SUPER_ADMIN {
+		articleData, err := h.articleService.UpdateArticle(ctx, &req)
+		if err != nil {
+			v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+			return
+		}
+		v1.HandleSuccess(ctx, articleData)
+	} else {
+		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrUnauthorized, nil)
+		return
+	}
+}
+
+// DeleteArticleList godoc
+// @Summary 批量删除文章
+// @Schemes
+// @Description
+// @Tags 文章模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.DelArticleListReq true "params"
+// @Success 200 {object} v1.DeleteArticleResponseData
+// @Router /article/DeleteArticleList [post]
+func (h *ArticleHandler) DeleteArticleList(ctx *gin.Context) {
+	var req v1.DelArticleListReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	role := GetRoleTypeFromCtx(ctx)
+	if role == enums.SUPER_ADMIN {
+		deletedCount, err := h.articleService.DeleteArticleList(ctx, &req)
+		if err != nil {
+			v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+			return
+		}
+		v1.HandleSuccess(ctx, v1.DeleteArticleResponseData{
+			DeletedCount: deletedCount,
+		})
+	} else {
+		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrUnauthorized, nil)
+		return
+	}
+}
+
+// DeleteArticle godoc
+// @Summary 删除文章
+// @Schemes
+// @Description
+// @Tags 文章模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.DeleteArticleRequest true "params"
+// @Success 200 {object} v1.DeleteArticleResponseData
+// @Router /article/DeleteArticle [post]
+func (h *ArticleHandler) DeleteArticle(ctx *gin.Context) {
+	var req v1.DeleteArticleRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
+	if req.AuthorID == userId || role == enums.SUPER_ADMIN {
+		deletedCount, err := h.articleService.DeleteArticle(ctx, req.ArticleID)
+		if err != nil {
+			v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+			return
+		}
+		v1.HandleSuccess(ctx, v1.DeleteArticleResponseData{
+			DeletedCount: deletedCount,
+		})
+	} else {
+		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrPermissionDenied, nil)
+		return
+	}
 }

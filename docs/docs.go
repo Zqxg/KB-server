@@ -24,6 +24,82 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/article/DeleteArticle": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "删除文章",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.DeleteArticleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.DeleteArticleResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/article/DeleteArticleList": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "批量删除文章",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.DelArticleListReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.DeleteArticleResponseData"
+                        }
+                    }
+                }
+            }
+        },
         "/article/GetArticle": {
             "get": {
                 "security": [
@@ -56,7 +132,45 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/v1.ArticleResponseData"
+                            "$ref": "#/definitions/v1.ArticleData"
+                        }
+                    }
+                }
+            }
+        },
+        "/article/UpdateArticle": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "修改文章内容",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateArticleRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.ArticleData"
                         }
                     }
                 }
@@ -441,7 +555,7 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "v1.ArticleResponseData": {
+        "v1.ArticleData": {
             "type": "object",
             "properties": {
                 "articleId": {
@@ -468,6 +582,10 @@ const docTemplate = `{
                     "description": "文章摘要",
                     "type": "string"
                 },
+                "createdAt": {
+                    "description": "文章创建时间",
+                    "type": "string"
+                },
                 "importance": {
                     "description": "文章重要性",
                     "type": "integer"
@@ -476,8 +594,16 @@ const docTemplate = `{
                     "description": "文章外链",
                     "type": "string"
                 },
+                "status": {
+                    "description": "文章状态",
+                    "type": "integer"
+                },
                 "title": {
                     "description": "文章标题",
+                    "type": "string"
+                },
+                "updateAt": {
+                    "description": "文章更新时间",
                     "type": "string"
                 },
                 "uploadedFiles": {
@@ -588,6 +714,40 @@ const docTemplate = `{
             "properties": {
                 "articleId": {
                     "description": "文章ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.DelArticleListReq": {
+            "type": "object",
+            "properties": {
+                "articleIDList": {
+                    "description": "文章ID列表",
+                    "type": "array",
+                    "items": {
+                        "type": "integer"
+                    }
+                }
+            }
+        },
+        "v1.DeleteArticleRequest": {
+            "type": "object",
+            "properties": {
+                "articleId": {
+                    "description": "文章ID",
+                    "type": "integer"
+                },
+                "authorId": {
+                    "description": "作者ID",
+                    "type": "string"
+                }
+            }
+        },
+        "v1.DeleteArticleResponseData": {
+            "type": "object",
+            "properties": {
+                "deletedCount": {
+                    "description": "删除的文章数量",
                     "type": "integer"
                 }
             }
@@ -732,6 +892,64 @@ const docTemplate = `{
                 },
                 "data": {},
                 "message": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.UpdateArticleRequest": {
+            "type": "object",
+            "required": [
+                "authorId",
+                "content",
+                "title",
+                "visibleRange"
+            ],
+            "properties": {
+                "articleId": {
+                    "description": "文章ID",
+                    "type": "integer"
+                },
+                "authorId": {
+                    "description": "作者ID",
+                    "type": "string"
+                },
+                "categoryId": {
+                    "description": "文章分类ID",
+                    "type": "integer"
+                },
+                "commentDisabled": {
+                    "description": "是否禁用评论",
+                    "type": "boolean"
+                },
+                "content": {
+                    "description": "文章内容",
+                    "type": "string"
+                },
+                "contentShort": {
+                    "description": "文章摘要",
+                    "type": "string"
+                },
+                "importance": {
+                    "description": "文章重要性",
+                    "type": "integer"
+                },
+                "sourceUri": {
+                    "description": "文章外链",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "文章标题",
+                    "type": "string"
+                },
+                "uploadedFiles": {
+                    "description": "上传的文件列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.FileUpload"
+                    }
+                },
+                "visibleRange": {
+                    "description": "可见范围",
                     "type": "string"
                 }
             }

@@ -28,7 +28,7 @@ type CreateArticleResponseData struct {
 	ArticleID int `json:"articleId"` // 文章ID
 }
 
-type ArticleResponseData struct {
+type ArticleData struct {
 	ArticleID       uint         `json:"articleId"`       //文章id
 	Title           string       `json:"title" `          // 文章标题
 	Content         string       `json:"content" `        // 文章内容
@@ -40,6 +40,7 @@ type ArticleResponseData struct {
 	CommentDisabled bool         `json:"commentDisabled"` // 是否禁用评论
 	SourceURI       string       `json:"sourceUri"`       // 文章外链
 	UploadedFiles   []FileUpload `json:"uploadedFiles"`   // 上传的文件列表
+	Status          int          `json:"status"`          // 文章状态
 	CreatedAt       string       `json:"createdAt"`       // 文章创建时间
 	UpdatedAt       string       `json:"updateAt"`        // 文章更新时间
 	//Tags            []Tags       `json:"tags"`            //todo：文章标签
@@ -51,5 +52,23 @@ type CategoryData struct {
 }
 
 type GetArticleRequest struct {
-	ArticleID int `json:"articleId"` // 文章ID
+	ArticleID uint `json:"articleId"` // 文章ID
+}
+
+type UpdateArticleRequest struct {
+	ArticleID uint `json:"articleId"` // 文章ID
+	CreateArticleRequest
+}
+
+type DelArticleListReq struct {
+	ArticleIDList []uint `json:"articleIDList"` // 文章ID列表
+}
+
+type DeleteArticleResponseData struct {
+	DeletedCount int `json:"deletedCount"` // 删除的文章数量
+}
+
+type DeleteArticleRequest struct {
+	ArticleID uint   `json:"articleId"` // 文章ID
+	AuthorID  string `json:"authorId"`  // 作者ID
 }

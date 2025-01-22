@@ -6,16 +6,20 @@ import (
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	v1 "projectName/api/v1"
+	"projectName/internal/enums"
 	"projectName/internal/model"
 	"projectName/internal/model/vo"
 )
 
 type ArticleRepository interface {
-	GetArticle(ctx context.Context, id int) (*model.Article, error)
+	GetArticle(ctx context.Context, id uint) (*model.Article, error)
 	CreateArticle(ctx context.Context, article *model.Article) (int, error)
 	GetArticleByTitleAndUserId(ctx context.Context, title string, authorID string) (*model.Article, error)
 	FetchAllCategoriesAndBuildTree(ctx context.Context) ([]vo.CategoryView, error)
 	GetCategory(ctx context.Context, id uint) (*vo.CategoryView, error)
+	UpdateArticle(ctx context.Context, article *model.Article) (*model.Article, error)
+	DeleteArticle(ctx context.Context, id uint) (int, error)
+	DeleteArticleList(ctx context.Context, ids []uint) (int, error)
 }
 
 func NewArticleRepository(
@@ -30,7 +34,7 @@ type articleRepository struct {
 	*Repository
 }
 
-func (r *articleRepository) GetArticle(ctx context.Context, id int) (*model.Article, error) {
+func (r *articleRepository) GetArticle(ctx context.Context, id uint) (*model.Article, error) {
 	var article model.Article
 	if err := r.DB(ctx).Table("kb_article").Where("article_id = ?", id).First(&article).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -108,4 +112,38 @@ func (r *articleRepository) GetCategory(ctx context.Context, id uint) (*vo.Categ
 
 	// 返回查询到的分类信息
 	return &categoryView, nil
+}
+
+func (r *articleRepository) UpdateArticle(ctx context.Context, article *model.Article) (*model.Article, error) {
+	if err := r.DB(ctx).Table("kb_article").Save(article).Error; err != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.UpdateArticle error", zap.Error(err))
+		return nil, err
+	}
+	return article, nil
+}
+
+func (r *articleRepository) DeleteArticle(ctx context.Context, id uint) (int, error) {
+	// 更新文章的 status 字段为已删除状态
+	result := r.DB(ctx).Table("kb_article").
+		Where("article_id = ?", id).
+		Updates(map[string]interface{}{"status": enums.StatusDeleted})
+	if result.Error != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.DeleteArticle error", zap.Error(result.Error))
+		return 0, result.Error
+	}
+	return int(result.RowsAffected), nil
+}
+
+func (r *articleRepository) DeleteArticleList(ctx context.Context, ids []uint) (int, error) {
+	// 更新文章的 status 字段为已删除状态
+	updateResult := r.DB(ctx).Table("kb_article").
+		Where("article_id IN (?)", ids).
+		Update("status", enums.StatusDeleted)
+
+	if updateResult.Error != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.DeleteArticleList UpdateStatus error", zap.Error(updateResult.Error))
+		return 0, updateResult.Error
+	}
+
+	return int(updateResult.RowsAffected), nil
 }
