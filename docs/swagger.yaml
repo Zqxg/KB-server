@@ -46,6 +46,22 @@ definitions:
         description: 可见范围
         type: string
     type: object
+  v1.ArticleList:
+    properties:
+      articleDataList:
+        items:
+          $ref: '#/definitions/v1.ArticleData'
+        type: array
+      pageIndex:
+        description: 当前页码
+        type: integer
+      pageSize:
+        description: 每页大小
+        type: integer
+      totalCount:
+        description: 总记录数
+        type: integer
+    type: object
   v1.CaptchaResponseData:
     properties:
       CaptchaBase64:
@@ -457,6 +473,38 @@ paths:
       security:
       - Bearer: []
       summary: 获取文章分组
+      tags:
+      - 文章模块
+  /article/getArticleListByCategory:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Category ID
+        in: query
+        name: categoryId
+        required: true
+        type: integer
+      - description: Page Index
+        in: query
+        name: pageIndex
+        required: true
+        type: integer
+      - description: Page Size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleList'
+      security:
+      - Bearer: []
+      summary: 分类获取公开文章列表
       tags:
       - 文章模块
   /cancel:

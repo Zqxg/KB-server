@@ -18,6 +18,7 @@ type ArticleService interface {
 	UpdateArticle(ctx context.Context, req *v1.UpdateArticleRequest) (*v1.ArticleData, error)
 	DeleteArticle(ctx context.Context, id uint) (int, error)
 	DeleteArticleList(ctx context.Context, req *v1.DelArticleListReq) (int, error)
+	GetArticleListByCategory(ctx context.Context, req *v1.GetArticleListByCategoryReq) (*v1.ArticleList, error)
 }
 
 func NewArticleService(
@@ -172,4 +173,66 @@ func (s *articleService) DeleteArticleList(ctx context.Context, req *v1.DelArtic
 		return -1, v1.ErrDeleteFailed
 	}
 	return deletedCount, nil
+}
+
+func (s *articleService) GetArticleListByCategory(ctx context.Context, req *v1.GetArticleListByCategoryReq) (*v1.ArticleList, error) {
+	// 查询文章列表及分页信息
+	pageIndex, pageSize := initPage(req.PageIndex, req.PageSize)
+	articles, total, err := s.articleRepository.GetArticleListByCategory(ctx, req.CategoryID, pageIndex, pageSize)
+	if err != nil {
+		return nil, v1.ErrQueryFailed
+	}
+
+	// 映射文章数据
+	var articleList []*v1.ArticleData
+	for _, article := range articles {
+		// 获取作者昵称
+		Author, _ := s.userRepo.GetByUserId(ctx, article.UserID)
+		// 获取分类名称
+		category, _ := s.articleRepository.GetCategory(ctx, article.CategoryID)
+
+		articleData := &v1.ArticleData{
+			ArticleID:       article.ArticleID,
+			Title:           article.Title,
+			Content:         article.Content,
+			ContentShort:    article.ContentShort,
+			Author:          Author.Nickname,
+			Category:        category.CategoryName,
+			Importance:      article.Importance,
+			VisibleRange:    article.VisibleRange,
+			CommentDisabled: article.CommentDisabled,
+			SourceURI:       article.SourceURI,
+			UploadedFiles:   article.UploadedFiles,
+			Status:          article.Status,
+			CreatedAt:       utils.TimeFormat(article.CreatedAt, utils.FormatDateTime),
+			UpdatedAt:       utils.TimeFormat(article.UpdatedAt, utils.FormatDateTime),
+		}
+		articleList = append(articleList, articleData)
+	}
+
+	// 构建返回结构
+	response := &v1.ArticleList{
+		ArticleDataList: articleList,
+		PageResponse: v1.PageResponse{
+			TotalCount: total,
+			PageIndex:  pageIndex,
+			PageSize:   pageSize,
+		},
+	}
+
+	return response, nil
+}
+
+// page初始化
+func initPage(pageIndex int, pageSize int) (int, int) {
+	if pageIndex < 1 {
+		pageIndex = 1
+	}
+	if pageSize < 10 {
+		pageSize = 10
+	}
+	if pageSize > 100 {
+		pageSize = 100
+	}
+	return pageIndex, pageSize
 }

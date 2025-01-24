@@ -6,6 +6,7 @@ import (
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
 	"projectName/internal/service/article"
+	"projectName/pkg/utils"
 )
 
 type ArticleHandler struct {
@@ -193,4 +194,38 @@ func (h *ArticleHandler) DeleteArticle(ctx *gin.Context) {
 		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrPermissionDenied, nil)
 		return
 	}
+}
+
+// GetArticleListByCategory godoc
+// @Summary 分类获取公开文章列表
+// @Schemes
+// @Description
+// @Tags 文章模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param categoryId query int true "Category ID"
+// @Param pageIndex query int true "Page Index"
+// @Param pageSize query int true "Page Size"
+// @Success 200 {object} v1.ArticleList
+// @Router /article/getArticleListByCategory [get]
+func (h *ArticleHandler) GetArticleListByCategory(ctx *gin.Context) {
+	// 从查询参数中获取参数
+	categoryId, _ := utils.ToInt(ctx.DefaultQuery("categoryId", "1")) // 获取 categoryId 参数
+	pageIndex, _ := utils.ToInt(ctx.DefaultQuery("pageIndex", "1"))   // 获取 pageIndex 参数
+	pageSize, _ := utils.ToInt(ctx.DefaultQuery("pageSize", "10"))    // 获取 pageSize 参数
+	req := v1.GetArticleListByCategoryReq{
+		CategoryID: uint(categoryId),
+		PageRequest: v1.PageRequest{
+			PageIndex: pageIndex,
+			PageSize:  pageSize,
+		},
+	}
+	articleList, err := h.articleService.GetArticleListByCategory(ctx, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, articleList)
+
 }

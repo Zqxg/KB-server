@@ -241,6 +241,56 @@ const docTemplate = `{
                 }
             }
         },
+        "/article/getArticleListByCategory": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "分类获取公开文章列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Category ID",
+                        "name": "categoryId",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page Index",
+                        "name": "pageIndex",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page Size",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.ArticleList"
+                        }
+                    }
+                }
+            }
+        },
         "/cancel": {
             "get": {
                 "security": [
@@ -616,6 +666,29 @@ const docTemplate = `{
                 "visibleRange": {
                     "description": "可见范围",
                     "type": "string"
+                }
+            }
+        },
+        "v1.ArticleList": {
+            "type": "object",
+            "properties": {
+                "articleDataList": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.ArticleData"
+                    }
+                },
+                "pageIndex": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "description": "总记录数",
+                    "type": "integer"
                 }
             }
         },

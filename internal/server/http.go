@@ -76,19 +76,19 @@ func NewHTTPServer(
 			commonUserRouter.GET(enums.USER+"/getCollegeList", collegeHandler.GetCollegeList) // 获取学院信息列表
 			commonUserRouter.POST(enums.USER+"/userAuth", userHandler.UserAuth)
 
-			// 无模块
-
+			// 文章模块
+			commonUserRouter.GET(enums.ARTICLE+"/getArticleCategory", articleHandler.GetArticleCategory)             // 获取文章分组
+			commonUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle)                             // 获取文章详细
+			commonUserRouter.GET(enums.ARTICLE+"/getArticleListByCategory", articleHandler.GetArticleListByCategory) // 分类获取公开文章列表
 		}
 		// 学生用户路由组
 		studentUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUTDENT_USER))
 		{
 			// 文章模块
-			studentUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                 // 新建文章
-			studentUserRouter.GET(enums.ARTICLE+"/getArticleCategory", articleHandler.GetArticleCategory) // 获取文章分组
-			studentUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle)                 // 获取文章详细
-			studentUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)          // 修改文章
-			studentUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)          // 删除文章
-			studentUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)  // 批量删除文章
+			studentUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                // 新建文章
+			studentUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)         // 修改文章
+			studentUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)         // 删除文章
+			studentUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList) // 批量删除文章
 		}
 		// 学校管理员路由组
 		//schoolAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SCHOOL_ADMIN))
