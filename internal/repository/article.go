@@ -3,12 +3,14 @@ package repository
 import (
 	"context"
 	"errors"
+	"fmt"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
 	"projectName/internal/model"
 	"projectName/internal/model/vo"
+	"time"
 )
 
 type ArticleRepository interface {
@@ -21,6 +23,7 @@ type ArticleRepository interface {
 	DeleteArticle(ctx context.Context, id uint) (int, error)
 	DeleteArticleList(ctx context.Context, ids []uint) (int, error)
 	GetArticleListByCategory(ctx context.Context, categoryId uint, pageNum int, pageSize int) ([]model.Article, int64, error)
+	GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq, pageNum int, pageSize int) ([]model.Article, int64, error)
 }
 
 func NewArticleRepository(
@@ -185,5 +188,54 @@ func (r *articleRepository) GetArticleListByCategory(ctx context.Context, catego
 	// 打印成功日志
 	r.logger.WithContext(ctx).Info("Successfully fetched article list", zap.Int("articleCount", len(articles)))
 
+	return articles, total, nil
+}
+func (r *articleRepository) GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq, pageNum int, pageSize int) ([]model.Article, int64, error) {
+	// 使用 GORM 获取数据库连接
+	db := r.db.WithContext(ctx)
+
+	// 创建查询构造器，开始构建查询条件
+	query := db.Model(&model.Article{}).Where("user_id = ?", userId)
+
+	// 根据请求参数添加查询条件
+	if req.Title != "" {
+		query = query.Where("title LIKE ?", "%"+req.Title+"%")
+	}
+	if req.CategoryID != 0 {
+		query = query.Where("category_id = ?", req.CategoryID)
+	}
+	if req.CreatedAt != "" {
+		// 转换字符串到时间类型并比较
+		createdAt, err := time.Parse("2006-01-02", req.CreatedAt)
+		if err != nil {
+			return nil, 0, fmt.Errorf("invalid createdAt format: %v", err)
+		}
+		query = query.Where("created_at >= ?", createdAt)
+	}
+	if req.CreatedEnd != "" {
+		// 转换字符串到时间类型并比较
+		createdEnd, err := time.Parse("2006-01-02", req.CreatedEnd)
+		if err != nil {
+			return nil, 0, fmt.Errorf("invalid CreatedEnd format: %v", err)
+		}
+		query = query.Where("created_at <= ?", createdEnd)
+	}
+
+	// 获取符合条件的文章总数
+	var total int64
+	if err := query.Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 计算分页
+	offset := (pageNum - 1) * pageSize
+
+	// 获取分页后的文章列表
+	var articles []model.Article
+	if err := query.Offset(offset).Limit(pageSize).Order("created_at desc").Find(&articles).Error; err != nil {
+		return nil, 0, err
+	}
+
+	// 返回文章列表和总数
 	return articles, total, nil
 }

@@ -181,6 +181,27 @@ definitions:
       collegeId:
         type: integer
     type: object
+  v1.GetUserArticleListReq:
+    properties:
+      CreatedEnd:
+        description: 文章结束时间
+        type: string
+      categoryId:
+        description: 文章分类ID
+        type: integer
+      createdAt:
+        description: 文章创建时间
+        type: string
+      pageIndex:
+        description: 当前页码
+        type: integer
+      pageSize:
+        description: 每页大小
+        type: integer
+      title:
+        description: 文章标题
+        type: string
+    type: object
   v1.GetUserInfoResponseData:
     properties:
       collegeId:
@@ -505,6 +526,29 @@ paths:
       security:
       - Bearer: []
       summary: 分类获取公开文章列表
+      tags:
+      - 文章模块
+  /article/getUserArticleList:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetUserArticleListReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleList'
+      security:
+      - Bearer: []
+      summary: 获取个人文章列表
       tags:
       - 文章模块
   /cancel:

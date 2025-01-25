@@ -291,6 +291,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/article/getUserArticleList": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "获取个人文章列表",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetUserArticleListReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.ArticleList"
+                        }
+                    }
+                }
+            }
+        },
         "/cancel": {
             "get": {
                 "security": [
@@ -863,6 +901,35 @@ const docTemplate = `{
             "properties": {
                 "collegeId": {
                     "type": "integer"
+                }
+            }
+        },
+        "v1.GetUserArticleListReq": {
+            "type": "object",
+            "properties": {
+                "CreatedEnd": {
+                    "description": "文章结束时间",
+                    "type": "string"
+                },
+                "categoryId": {
+                    "description": "文章分类ID",
+                    "type": "integer"
+                },
+                "createdAt": {
+                    "description": "文章创建时间",
+                    "type": "string"
+                },
+                "pageIndex": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "title": {
+                    "description": "文章标题",
+                    "type": "string"
                 }
             }
         },

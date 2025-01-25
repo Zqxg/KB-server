@@ -19,6 +19,7 @@ type ArticleService interface {
 	DeleteArticle(ctx context.Context, id uint) (int, error)
 	DeleteArticleList(ctx context.Context, req *v1.DelArticleListReq) (int, error)
 	GetArticleListByCategory(ctx context.Context, req *v1.GetArticleListByCategoryReq) (*v1.ArticleList, error)
+	GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq) (*v1.ArticleList, error)
 }
 
 func NewArticleService(
@@ -235,4 +236,47 @@ func initPage(pageIndex int, pageSize int) (int, int) {
 		pageSize = 100
 	}
 	return pageIndex, pageSize
+}
+func (s *articleService) GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq) (*v1.ArticleList, error) {
+	// 查询文章列表及分页信息
+	pageIndex, pageSize := initPage(req.PageIndex, req.PageSize)
+	// 查询文章列表
+	articles, total, err := s.articleRepository.GetUserArticleList(ctx, userId, req, pageIndex, pageSize)
+	if err != nil {
+		return nil, v1.ErrQueryFailed
+	}
+	// 映射文章数据
+	Author, _ := s.userRepo.GetByUserId(ctx, userId)
+	var articleList []*v1.ArticleData
+	for _, article := range articles {
+		// 获取分类名称
+		category, _ := s.articleRepository.GetCategory(ctx, article.CategoryID)
+		articleData := &v1.ArticleData{
+			ArticleID:       article.ArticleID,
+			Title:           article.Title,
+			Content:         article.Content,
+			ContentShort:    article.ContentShort,
+			Author:          Author.Nickname,
+			Category:        category.CategoryName,
+			Importance:      article.Importance,
+			VisibleRange:    article.VisibleRange,
+			CommentDisabled: article.CommentDisabled,
+			SourceURI:       article.SourceURI,
+			UploadedFiles:   article.UploadedFiles,
+			Status:          article.Status,
+			CreatedAt:       utils.TimeFormat(article.CreatedAt, utils.FormatDateTime),
+			UpdatedAt:       utils.TimeFormat(article.UpdatedAt, utils.FormatDateTime),
+		}
+		articleList = append(articleList, articleData)
+	}
+	// 构建返回结构
+	response := &v1.ArticleList{
+		ArticleDataList: articleList,
+		PageResponse: v1.PageResponse{
+			TotalCount: total,
+			PageIndex:  pageIndex,
+			PageSize:   pageSize,
+		},
+	}
+	return response, nil
 }

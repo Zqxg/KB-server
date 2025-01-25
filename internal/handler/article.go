@@ -229,3 +229,29 @@ func (h *ArticleHandler) GetArticleListByCategory(ctx *gin.Context) {
 	v1.HandleSuccess(ctx, articleList)
 
 }
+
+// GetUserArticleList godoc
+// @Summary 获取个人文章列表
+// @Schemes
+// @Description
+// @Tags 文章模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.GetUserArticleListReq true "params"
+// @Success 200 {object} v1.ArticleList
+// @Router /article/getUserArticleList [post]
+func (h *ArticleHandler) GetUserArticleList(ctx *gin.Context) {
+	var req v1.GetUserArticleListReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	userId := GetUserIdFromCtx(ctx)
+	articleList, err := h.articleService.GetUserArticleList(ctx, userId, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, articleList)
+}

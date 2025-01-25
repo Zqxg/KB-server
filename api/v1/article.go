@@ -82,3 +82,11 @@ type ArticleList struct {
 	ArticleDataList []*ArticleData
 	PageResponse
 }
+
+type GetUserArticleListReq struct {
+	Title      string `json:"title"`      // 文章标题
+	CategoryID uint   `json:"categoryId"` // 文章分类ID
+	CreatedAt  string `json:"createdAt"`  // 文章创建时间
+	CreatedEnd string `json:"CreatedEnd"` // 文章结束时间
+	PageRequest
+}

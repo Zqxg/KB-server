@@ -85,10 +85,11 @@ func NewHTTPServer(
 		studentUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUTDENT_USER))
 		{
 			// 文章模块
-			studentUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                // 新建文章
-			studentUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)         // 修改文章
-			studentUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)         // 删除文章
-			studentUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList) // 批量删除文章
+			studentUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                  // 新建文章
+			studentUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)           // 修改文章
+			studentUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)           // 删除文章
+			studentUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)   // 批量删除文章
+			studentUserRouter.POST(enums.ARTICLE+"/getUserArticleList", articleHandler.GetUserArticleList) // 获取个人文章列表
 		}
 		// 学校管理员路由组
 		//schoolAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SCHOOL_ADMIN))
