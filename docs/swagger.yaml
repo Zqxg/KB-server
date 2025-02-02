@@ -10,6 +10,9 @@ definitions:
       category:
         description: 文章分类
         type: string
+      categoryId:
+        description: 文章分类ID
+        type: integer
       commentDisabled:
         description: 是否禁用评论
         type: boolean
@@ -162,12 +165,6 @@ definitions:
       fileUrl:
         description: 文件URL
         type: string
-    type: object
-  v1.GetArticleRequest:
-    properties:
-      articleId:
-        description: 文章ID
-        type: integer
     type: object
   v1.GetCollegeListDataResponse:
     properties:
@@ -411,29 +408,6 @@ paths:
       summary: 批量删除文章
       tags:
       - 文章模块
-  /article/GetArticle:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetArticleRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.ArticleData'
-      security:
-      - Bearer: []
-      summary: 获取文章详细
-      tags:
-      - 文章模块
   /article/UpdateArticle:
     post:
       consumes:
@@ -478,6 +452,28 @@ paths:
       security:
       - Bearer: []
       summary: 新建文章
+      tags:
+      - 文章模块
+  /article/getArticle:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Article ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleData'
+      security:
+      - Bearer: []
+      summary: 获取文章详细
       tags:
       - 文章模块
   /article/getArticleCategory:

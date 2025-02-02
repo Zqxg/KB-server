@@ -81,17 +81,22 @@ func (h *ArticleHandler) GetArticleCategory(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param request body v1.GetArticleRequest true "params"
+// @Param id query int true "Article ID"
 // @Success 200 {object} v1.ArticleData
-// @Router /article/GetArticle [get]
+// @Router /article/getArticle [get]
 func (h *ArticleHandler) GetArticle(ctx *gin.Context) {
-	var req v1.GetArticleRequest
-	userId := GetUserIdFromCtx(ctx)
-	if err := ctx.ShouldBindJSON(&req); err != nil {
+	// 从查询参数中获取参数
+	if !utils.IsNumeric(ctx.Query("id")) {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
 		return
 	}
-	articleData, err := h.articleService.GetArticle(ctx, userId, req.ArticleID)
+	articleID, _ := utils.ToInt(ctx.Query("id")) // 获取 articleID 参数
+	if articleID < 0 {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	userId := GetUserIdFromCtx(ctx)
+	articleData, err := h.articleService.GetArticle(ctx, userId, uint(articleID))
 	if err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
 		return

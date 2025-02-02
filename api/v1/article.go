@@ -35,6 +35,7 @@ type ArticleData struct {
 	ContentShort    string       `json:"contentShort"`    // 文章摘要
 	Author          string       `json:"author" `         // 作者
 	Category        string       `json:"category"`        // 文章分类
+	CategoryID      uint         `json:"categoryId"`      // 文章分类ID
 	Importance      int          `json:"importance"`      // 文章重要性
 	VisibleRange    string       `json:"visibleRange" `   // 可见范围
 	CommentDisabled bool         `json:"commentDisabled"` // 是否禁用评论

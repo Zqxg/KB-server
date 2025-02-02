@@ -2,6 +2,7 @@ package article
 
 import (
 	"context"
+	"encoding/json"
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
 	"projectName/internal/model"
@@ -49,6 +50,7 @@ func (s *articleService) GetArticle(ctx context.Context, userId string, id uint)
 	if article.Status != enums.StatusPublished && article.Status != enums.StatusPendingReview {
 		return nil, v1.ErrArticleStatusError
 	}
+
 	// 私有 判断是否为本人
 	if utils.Contains(article.VisibleRange, "private") {
 		if userId != article.UserID {
@@ -58,6 +60,15 @@ func (s *articleService) GetArticle(ctx context.Context, userId string, id uint)
 	Author, _ := s.userRepo.GetByUserId(ctx, article.UserID)
 	category, _ := s.articleRepository.GetCategory(ctx, article.CategoryID)
 
+	// 反序列化上传的文件列表
+	var uploadedFiles []v1.FileUpload
+	if len(article.UploadedFiles) > 0 {
+		err = json.Unmarshal(article.UploadedFiles, &uploadedFiles)
+		if err != nil {
+			return nil, v1.ErrDeserializeFileFailed
+		}
+	}
+
 	// 映射
 	articleData := &v1.ArticleData{
 		ArticleID:       article.ArticleID,
@@ -66,11 +77,12 @@ func (s *articleService) GetArticle(ctx context.Context, userId string, id uint)
 		ContentShort:    article.ContentShort,
 		Author:          Author.Nickname,
 		Category:        category.CategoryName,
+		CategoryID:      article.CategoryID,
 		Importance:      article.Importance,
 		VisibleRange:    article.VisibleRange,
 		CommentDisabled: article.CommentDisabled,
 		SourceURI:       article.SourceURI,
-		UploadedFiles:   article.UploadedFiles,
+		UploadedFiles:   uploadedFiles,
 		Status:          article.Status,
 		CreatedAt:       utils.TimeFormat(article.CreatedAt, utils.FormatDateTime),
 		UpdatedAt:       utils.TimeFormat(article.UpdatedAt, utils.FormatDateTime),
@@ -84,6 +96,10 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 	if article != nil {
 		return -1, v1.ErrArticleAlreadyExist
 	}
+	uploadedFilesData, err := json.Marshal(req.UploadedFiles)
+	if err != nil {
+		return -1, v1.ErrUploadFileFailed
+	}
 	article = &model.Article{
 		Title:           req.Title,
 		Content:         req.Content,
@@ -94,6 +110,7 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 		VisibleRange:    req.VisibleRange,
 		CommentDisabled: req.CommentDisabled,
 		SourceURI:       req.SourceURI,
+		UploadedFiles:   uploadedFilesData,
 		Status:          enums.StatusPublished, // todo：后续设置审核开关
 	}
 	// 创建新文章
@@ -134,6 +151,14 @@ func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticl
 	// 映射
 	Author, _ := s.userRepo.GetByUserId(ctx, article.UserID)
 	category, _ := s.articleRepository.GetCategory(ctx, article.CategoryID)
+	// 反序列化上传的文件列表
+	var uploadedFiles []v1.FileUpload
+	if len(article.UploadedFiles) > 0 {
+		err = json.Unmarshal(article.UploadedFiles, &uploadedFiles)
+		if err != nil {
+			return nil, v1.ErrDeserializeFileFailed
+		}
+	}
 	articleData := &v1.ArticleData{
 		ArticleID:       updateArticle.ArticleID,
 		Title:           updateArticle.Title,
@@ -141,11 +166,12 @@ func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticl
 		ContentShort:    updateArticle.ContentShort,
 		Author:          Author.Nickname,
 		Category:        category.CategoryName,
+		CategoryID:      updateArticle.CategoryID,
 		Importance:      updateArticle.Importance,
 		VisibleRange:    updateArticle.VisibleRange,
 		CommentDisabled: updateArticle.CommentDisabled,
 		SourceURI:       updateArticle.SourceURI,
-		UploadedFiles:   updateArticle.UploadedFiles,
+		UploadedFiles:   uploadedFiles,
 		Status:          updateArticle.Status,
 		CreatedAt:       utils.TimeFormat(updateArticle.CreatedAt, utils.FormatDateTime),
 		UpdatedAt:       utils.TimeFormat(updateArticle.UpdatedAt, utils.FormatDateTime),
@@ -191,7 +217,14 @@ func (s *articleService) GetArticleListByCategory(ctx context.Context, req *v1.G
 		Author, _ := s.userRepo.GetByUserId(ctx, article.UserID)
 		// 获取分类名称
 		category, _ := s.articleRepository.GetCategory(ctx, article.CategoryID)
-
+		// 反序列化上传的文件列表
+		var uploadedFiles []v1.FileUpload
+		if len(article.UploadedFiles) > 0 {
+			err = json.Unmarshal(article.UploadedFiles, &uploadedFiles)
+			if err != nil {
+				return nil, v1.ErrDeserializeFileFailed
+			}
+		}
 		articleData := &v1.ArticleData{
 			ArticleID:       article.ArticleID,
 			Title:           article.Title,
@@ -199,11 +232,12 @@ func (s *articleService) GetArticleListByCategory(ctx context.Context, req *v1.G
 			ContentShort:    article.ContentShort,
 			Author:          Author.Nickname,
 			Category:        category.CategoryName,
+			CategoryID:      article.CategoryID,
 			Importance:      article.Importance,
 			VisibleRange:    article.VisibleRange,
 			CommentDisabled: article.CommentDisabled,
 			SourceURI:       article.SourceURI,
-			UploadedFiles:   article.UploadedFiles,
+			UploadedFiles:   uploadedFiles,
 			Status:          article.Status,
 			CreatedAt:       utils.TimeFormat(article.CreatedAt, utils.FormatDateTime),
 			UpdatedAt:       utils.TimeFormat(article.UpdatedAt, utils.FormatDateTime),
@@ -251,6 +285,14 @@ func (s *articleService) GetUserArticleList(ctx context.Context, userId string, 
 	for _, article := range articles {
 		// 获取分类名称
 		category, _ := s.articleRepository.GetCategory(ctx, article.CategoryID)
+		// 反序列化上传的文件列表
+		var uploadedFiles []v1.FileUpload
+		if len(article.UploadedFiles) > 0 {
+			err = json.Unmarshal(article.UploadedFiles, &uploadedFiles)
+			if err != nil {
+				return nil, v1.ErrDeserializeFileFailed
+			}
+		}
 		articleData := &v1.ArticleData{
 			ArticleID:       article.ArticleID,
 			Title:           article.Title,
@@ -258,11 +300,12 @@ func (s *articleService) GetUserArticleList(ctx context.Context, userId string, 
 			ContentShort:    article.ContentShort,
 			Author:          Author.Nickname,
 			Category:        category.CategoryName,
+			CategoryID:      article.CategoryID,
 			Importance:      article.Importance,
 			VisibleRange:    article.VisibleRange,
 			CommentDisabled: article.CommentDisabled,
 			SourceURI:       article.SourceURI,
-			UploadedFiles:   article.UploadedFiles,
+			UploadedFiles:   uploadedFiles,
 			Status:          article.Status,
 			CreatedAt:       utils.TimeFormat(article.CreatedAt, utils.FormatDateTime),
 			UpdatedAt:       utils.TimeFormat(article.UpdatedAt, utils.FormatDateTime),

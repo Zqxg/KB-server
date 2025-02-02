@@ -100,44 +100,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/article/GetArticle": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "文章模块"
-                ],
-                "summary": "获取文章详细",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetArticleRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ArticleData"
-                        }
-                    }
-                }
-            }
-        },
         "/article/UpdateArticle": {
             "post": {
                 "security": [
@@ -209,6 +171,42 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/v1.CreateArticleResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/article/getArticle": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "获取文章详细",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.ArticleData"
                         }
                     }
                 }
@@ -658,6 +656,10 @@ const docTemplate = `{
                     "description": "文章分类",
                     "type": "string"
                 },
+                "categoryId": {
+                    "description": "文章分类ID",
+                    "type": "integer"
+                },
                 "commentDisabled": {
                     "description": "是否禁用评论",
                     "type": "boolean"
@@ -873,15 +875,6 @@ const docTemplate = `{
                 "fileUrl": {
                     "description": "文件URL",
                     "type": "string"
-                }
-            }
-        },
-        "v1.GetArticleRequest": {
-            "type": "object",
-            "properties": {
-                "articleId": {
-                    "description": "文章ID",
-                    "type": "integer"
                 }
             }
         },

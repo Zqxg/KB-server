@@ -25,6 +25,9 @@ var (
 	ErrUpdateArticleFailed = newError(1102, "修改文章失败")
 	ErrArticleStatusError  = newError(1103, "文章状态异常")
 
+	ErrUploadFileFailed      = newError(1104, "上传文件序列化失败")
+	ErrDeserializeFileFailed = newError(1105, "上传文件反序列化失败")
+
 	// 2000 错误码
 	ErrInvalidCaptcha = newError(2000, "验证码错误")
 
