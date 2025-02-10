@@ -920,6 +920,10 @@ const docTemplate = `{
                     "description": "每页大小",
                     "type": "integer"
                 },
+                "status": {
+                    "description": "文章状态",
+                    "type": "integer"
+                },
                 "title": {
                     "description": "文章标题",
                     "type": "string"

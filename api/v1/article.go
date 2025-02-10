@@ -89,5 +89,6 @@ type GetUserArticleListReq struct {
 	CategoryID uint   `json:"categoryId"` // 文章分类ID
 	CreatedAt  string `json:"createdAt"`  // 文章创建时间
 	CreatedEnd string `json:"CreatedEnd"` // 文章结束时间
+	Status     int    `json:"status"`     // 文章状态
 	PageRequest
 }
