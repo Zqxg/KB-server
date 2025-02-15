@@ -70,8 +70,7 @@ type DeleteArticleResponseData struct {
 }
 
 type DeleteArticleRequest struct {
-	ArticleID uint   `json:"articleId"` // 文章ID
-	AuthorID  string `json:"authorId"`  // 作者ID
+	ArticleID uint `json:"articleId"` // 文章ID
 }
 
 type GetArticleListByCategoryReq struct {

@@ -849,10 +849,6 @@ const docTemplate = `{
                 "articleId": {
                     "description": "文章ID",
                     "type": "integer"
-                },
-                "authorId": {
-                    "description": "作者ID",
-                    "type": "string"
                 }
             }
         },

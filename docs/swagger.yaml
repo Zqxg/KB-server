@@ -147,9 +147,6 @@ definitions:
       articleId:
         description: 文章ID
         type: integer
-      authorId:
-        description: 作者ID
-        type: string
     type: object
   v1.DeleteArticleResponseData:
     properties:

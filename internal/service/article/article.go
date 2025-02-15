@@ -13,6 +13,7 @@ import (
 )
 
 type ArticleService interface {
+	GetArticleById(ctx context.Context, id uint) (*model.Article, error)
 	GetArticle(ctx context.Context, userId string, id uint) (*v1.ArticleData, error)
 	CreateArticle(ctx context.Context, req *v1.CreateArticleRequest) (int, error)
 	GetArticleCategory(ctx context.Context) ([]vo.CategoryView, error)
@@ -39,6 +40,15 @@ type articleService struct {
 	*service.Service
 	articleRepository repository.ArticleRepository
 	userRepo          repository.UserRepository
+}
+
+func (s *articleService) GetArticleById(ctx context.Context, id uint) (*model.Article, error) {
+	// 获取文章
+	article, err := s.articleRepository.GetArticle(ctx, id)
+	if err != nil {
+		return nil, v1.ErrArticleNotExist
+	}
+	return article, nil
 }
 
 func (s *articleService) GetArticle(ctx context.Context, userId string, id uint) (*v1.ArticleData, error) {

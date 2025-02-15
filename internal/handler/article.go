@@ -186,7 +186,12 @@ func (h *ArticleHandler) DeleteArticle(ctx *gin.Context) {
 		return
 	}
 	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
-	if req.AuthorID == userId || role == enums.SUPER_ADMIN {
+	articleData, err := h.articleService.GetArticleById(ctx, req.ArticleID)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	if articleData.UserID == userId || role == enums.SUPER_ADMIN {
 		deletedCount, err := h.articleService.DeleteArticle(ctx, req.ArticleID)
 		if err != nil {
 			v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
