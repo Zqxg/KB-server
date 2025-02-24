@@ -289,6 +289,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/article/getArticleListByEs": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "es文章查询",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetArticleListByEsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.SearchArticleResp"
+                        }
+                    }
+                }
+            }
+        },
         "/article/getUserArticleList": {
             "post": {
                 "security": [
@@ -732,6 +770,82 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.ArticleSearchInfo": {
+            "type": "object",
+            "properties": {
+                "article_id": {
+                    "description": "文章ID",
+                    "type": "integer"
+                },
+                "category": {
+                    "description": "分类（例如：海军报文）",
+                    "type": "string"
+                },
+                "category_id": {
+                    "description": "分类ID",
+                    "type": "integer"
+                },
+                "comment_disabled": {
+                    "description": "是否禁用评论",
+                    "type": "boolean"
+                },
+                "content": {
+                    "description": "文章内容",
+                    "type": "string"
+                },
+                "content_short": {
+                    "description": "文章简介（可选）",
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "deleted_at": {
+                    "description": "删除时间（可选）",
+                    "type": "string"
+                },
+                "importance": {
+                    "description": "重要性",
+                    "type": "integer"
+                },
+                "score": {
+                    "description": "评分（例如：基于ES的相关度评分）",
+                    "type": "number"
+                },
+                "source_uri": {
+                    "description": "来源URI",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "文章状态",
+                    "type": "integer"
+                },
+                "title": {
+                    "description": "文章标题",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
+                },
+                "uploaded_files": {
+                    "description": "上传文件列表（可选）",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.FileUpload"
+                    }
+                },
+                "user_id": {
+                    "description": "用户ID",
+                    "type": "string"
+                },
+                "visible_range": {
+                    "description": "可见范围",
+                    "type": "string"
+                }
+            }
+        },
         "v1.CaptchaResponseData": {
             "type": "object",
             "properties": {
@@ -870,6 +984,61 @@ const docTemplate = `{
                 },
                 "fileUrl": {
                     "description": "文件URL",
+                    "type": "string"
+                }
+            }
+        },
+        "v1.GetArticleListByEsReq": {
+            "type": "object",
+            "properties": {
+                "advSearch": {
+                    "description": "是否启用高级搜索",
+                    "type": "boolean"
+                },
+                "categories": {
+                    "description": "分类id，用于筛选",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "column": {
+                    "description": "排序字段，通常是 \"_score\"",
+                    "type": "string"
+                },
+                "content": {
+                    "description": "搜索的内容关键词",
+                    "type": "string"
+                },
+                "keywords": {
+                    "description": "搜索的关键字数组",
+                    "type": "array",
+                    "items": {
+                        "type": "string"
+                    }
+                },
+                "order": {
+                    "description": "排序方式，\"asc\" 或 \"desc\"",
+                    "type": "string"
+                },
+                "pageIndex": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "phraseMatch": {
+                    "description": "是否启用短语匹配",
+                    "type": "boolean"
+                },
+                "searchMode": {
+                    "description": "搜索模式标识（例如 \"0\" 代表普通搜索 \"1\"）",
+                    "type": "string"
+                },
+                "title": {
+                    "description": "搜索的标题",
                     "type": "string"
                 }
             }
@@ -1026,6 +1195,30 @@ const docTemplate = `{
                 "data": {},
                 "message": {
                     "type": "string"
+                }
+            }
+        },
+        "v1.SearchArticleResp": {
+            "type": "object",
+            "properties": {
+                "articles": {
+                    "description": "文章列表",
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.ArticleSearchInfo"
+                    }
+                },
+                "pageIndex": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "description": "总记录数",
+                    "type": "integer"
                 }
             }
         },

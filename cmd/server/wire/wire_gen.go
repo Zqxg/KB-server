@@ -34,7 +34,8 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 	captchaService := user.NewCaptchaService(duration)
 	db := repository.NewDB(viperViper, logger)
 	client := repository.NewRedis(viperViper)
-	repositoryRepository := repository.NewRepository(logger, db, client)
+	elasticClient := repository.NewESClient(viperViper)
+	repositoryRepository := repository.NewRepository(logger, db, client, elasticClient)
 	transaction := repository.NewTransaction(repositoryRepository)
 	sidSid := sid.NewSid()
 	serviceService := service.NewService(transaction, logger, sidSid, jwtJWT)
@@ -64,7 +65,7 @@ func ProvideCaptchaExpireDuration() time.Duration {
 }
 
 // 提供 repository 层的实例
-var repositorySet = wire.NewSet(repository.NewDB, repository.NewRedis, repository.NewRepository, repository.NewTransaction, repository.NewUserRepository, repository.NewCollegeRepository, repository.NewArticleRepository)
+var repositorySet = wire.NewSet(repository.NewDB, repository.NewRedis, repository.NewESClient, repository.NewRepository, repository.NewTransaction, repository.NewUserRepository, repository.NewCollegeRepository, repository.NewArticleRepository)
 
 // 提供 service 层的实例
 var serviceSet = wire.NewSet(service.NewService, user.NewUserService, ProvideCaptchaExpireDuration, user.NewCaptchaService, user.NewCollegeService, article.NewArticleService)

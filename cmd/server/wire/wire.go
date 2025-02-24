@@ -30,6 +30,7 @@ func ProvideCaptchaExpireDuration() time.Duration {
 var repositorySet = wire.NewSet(
 	repository.NewDB,
 	repository.NewRedis,
+	repository.NewESClient,
 	repository.NewRepository,
 	repository.NewTransaction,
 	repository.NewUserRepository,

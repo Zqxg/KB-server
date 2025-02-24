@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"github.com/glebarez/sqlite"
+	"github.com/olivere/elastic/v7"
 	"github.com/redis/go-redis/v9"
 	"github.com/spf13/viper"
 	"gorm.io/driver/mysql"
@@ -17,20 +18,23 @@ import (
 const ctxTxKey = "TxKey"
 
 type Repository struct {
-	db     *gorm.DB
-	rdb    *redis.Client
-	logger *log.Logger
+	db       *gorm.DB
+	rdb      *redis.Client
+	logger   *log.Logger
+	esClient *elastic.Client // esClient 实例
 }
 
 func NewRepository(
 	logger *log.Logger,
 	db *gorm.DB,
 	rdb *redis.Client,
+	esClient *elastic.Client,
 ) *Repository {
 	return &Repository{
-		db:     db,
-		rdb:    rdb,
-		logger: logger,
+		db:       db,
+		rdb:      rdb,
+		esClient: esClient,
+		logger:   logger,
 	}
 }
 
@@ -118,4 +122,17 @@ func NewRedis(conf *viper.Viper) *redis.Client {
 	}
 
 	return rdb
+}
+
+func NewESClient(conf *viper.Viper) *elastic.Client {
+	esURL := conf.GetString("data.elasticsearch.url") // 从配置文件中获取 ES URL
+	esClient, err := elastic.NewClient(
+		elastic.SetURL(esURL),         // 设置 ES 的 URL
+		elastic.SetSniff(false),       // 禁用嗅探
+		elastic.SetHealthcheck(false), // 禁用健康检查
+	)
+	if err != nil {
+		panic(fmt.Sprintf("Failed to create Elasticsearch client: %s", err.Error()))
+	}
+	return esClient
 }

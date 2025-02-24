@@ -3,6 +3,7 @@ package article
 import (
 	"context"
 	"encoding/json"
+	"github.com/olivere/elastic/v7"
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
 	"projectName/internal/model"
@@ -10,6 +11,7 @@ import (
 	"projectName/internal/repository"
 	"projectName/internal/service"
 	"projectName/pkg/utils"
+	"strings"
 )
 
 type ArticleService interface {
@@ -22,6 +24,7 @@ type ArticleService interface {
 	DeleteArticleList(ctx context.Context, req *v1.DelArticleListReq) (int, error)
 	GetArticleListByCategory(ctx context.Context, req *v1.GetArticleListByCategoryReq) (*v1.ArticleList, error)
 	GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq) (*v1.ArticleList, error)
+	GetArticleListByEs(ctx context.Context, req *v1.GetArticleListByEsReq) (*v1.SearchArticleResp, error)
 }
 
 func NewArticleService(
@@ -125,6 +128,26 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 	}
 	// 创建新文章
 	articleId, err := s.articleRepository.CreateArticle(ctx, article)
+	// 判断是否公开，如果公开则创建es文档
+	if strings.Contains(article.VisibleRange, "public") {
+		esArticle := &model.EsArticle{
+			ArticleID:    uint(articleId),
+			Title:        article.Title,
+			Content:      article.Content,
+			CategoryID:   article.CategoryID,
+			UserID:       article.UserID,
+			Status:       article.Status,
+			VisibleRange: article.VisibleRange,
+			CreatedAt:    article.CreatedAt,
+			UpdatedAt:    article.UpdatedAt,
+		}
+		esArticle.ArticleID = uint(articleId)
+
+		// 创建es文档
+		if err = s.articleRepository.CreateEsArticle(ctx, esArticle); err != nil {
+			return -1, v1.ErrCreateEsArticleFailed
+		}
+	}
 	if err != nil {
 		return -1, v1.ErrCreateArticleFailed
 	}
@@ -332,4 +355,93 @@ func (s *articleService) GetUserArticleList(ctx context.Context, userId string, 
 		},
 	}
 	return response, nil
+}
+
+func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArticleListByEsReq) (*v1.SearchArticleResp, error) {
+	// 1. 设置分页信息
+	pageNo, pageSize := initPage(req.PageIndex, req.PageSize)
+
+	// 2. 构建查询条件
+	query := elastic.NewBoolQuery()
+
+	// 根据标题进行搜索 逗号分隔
+	if req.Title != "" {
+		query = query.Must(elastic.NewMatchQuery("title", req.Title))
+	}
+
+	// 根据内容进行搜索 逗号分隔
+	if req.Content != "" {
+		query = query.Must(elastic.NewMatchQuery("content", req.Content))
+	}
+
+	// 可以根据需要增加更多的过滤条件，例如状态（status）、重要性（importance）等
+	if req.SearchMode == "1" {
+		// todo: 高级搜索处理（例如，可能加上更多的过滤条件或权重设置）
+	}
+
+	// 根据关键字进行全文搜索 逗号分隔
+	if len(req.Keywords) > 0 {
+		for _, keyword := range req.Keywords {
+			if req.PhraseMatch { // 启用短语匹配
+				query = query.Should(elastic.NewMatchPhraseQuery("content", keyword))
+			} else {
+				query = query.Should(elastic.NewMatchQuery("content", keyword))
+			}
+		}
+	}
+
+	// 将 req.Categories 转换为 []interface{}
+	var categories []interface{}
+	for _, category := range req.Categories {
+		categories = append(categories, category)
+	}
+	// 根据分类 ID 进行过滤（如果有）
+	if len(req.Categories) > 0 {
+		query = query.Filter(elastic.NewTermsQuery("category_id", categories...))
+	}
+
+	// 3. 添加高亮查询
+	highlight := elastic.NewHighlight().Field("content").PreTags("<em>").PostTags("</em>")
+
+	// 4. 设置分页查询
+	from := (pageNo - 1) * pageSize
+
+	// 5. 调用 repository 中的查询方法
+	searchResult, err := s.articleRepository.GetArticleListByEs(ctx, query, highlight, from, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	// 6. 解析搜索结果，构建响应数据
+	var articles []v1.ArticleSearchInfo
+	for _, hit := range searchResult.Hits.Hits {
+		var esArticle model.EsArticle
+		var article v1.ArticleSearchInfo
+		if err = json.Unmarshal(hit.Source, &esArticle); err != nil {
+			continue
+		}
+		// 获取并设置评分
+		article.EsArticle = esArticle
+		article.Score = *hit.Score
+
+		// 获取高亮内容（如果有）
+		if highlightFields, ok := hit.Highlight["content"]; ok {
+			// 将高亮部分替换为 HTML 格式
+			article.EsArticle.Content = strings.Join(highlightFields, "...")
+		}
+
+		articles = append(articles, article)
+	}
+
+	// 7. 构建分页响应
+	resp := &v1.SearchArticleResp{
+		PageResponse: v1.PageResponse{
+			TotalCount: searchResult.Hits.TotalHits.Value,
+			PageIndex:  pageNo,
+			PageSize:   pageSize,
+		},
+		Articles: articles,
+	}
+
+	return resp, nil
 }

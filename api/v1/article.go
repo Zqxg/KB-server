@@ -1,6 +1,7 @@
 package v1
 
 import (
+	"projectName/internal/model"
 	"projectName/internal/model/vo"
 )
 
@@ -90,4 +91,30 @@ type GetUserArticleListReq struct {
 	CreatedEnd string `json:"CreatedEnd"` // 文章结束时间
 	Status     int    `json:"status"`     // 文章状态
 	PageRequest
+}
+
+type GetArticleListByEsReq struct {
+	PageRequest
+	Content     string   `json:"content"`     // 搜索的内容关键词
+	Title       string   `json:"title"`       // 搜索的标题
+	Keywords    []string `json:"keywords"`    // 搜索的关键字数组
+	PhraseMatch bool     `json:"phraseMatch"` // 是否启用短语匹配
+	AdvSearch   bool     `json:"advSearch"`   // 是否启用高级搜索
+	Column      string   `json:"column"`      // 排序字段，通常是 "_score"
+	Order       string   `json:"order"`       // 排序方式，"asc" 或 "desc"
+	Categories  []string `json:"categories"`  // 分类id，用于筛选
+	SearchMode  string   `json:"searchMode"`  // 搜索模式标识（例如 "0" 代表普通搜索 "1"）
+}
+
+type SearchArticleResp struct {
+	PageResponse
+	Articles []ArticleSearchInfo `json:"articles"` // 文章列表
+}
+
+type ArticleSearchInfo struct {
+	EsArticle model.EsArticle // 文章数据
+	Score     float64         `json:"score"` // 评分（例如：基于ES的相关度评分）
+	//Tags            []string     `json:"tags"`             // 文章标签（可选）
+	//Comments        *int         `json:"comments"`         // 评论数（可选）
+	//Views           *int         `json:"views"`            // 浏览量（可选）
 }

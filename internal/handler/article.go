@@ -265,3 +265,39 @@ func (h *ArticleHandler) GetUserArticleList(ctx *gin.Context) {
 	}
 	v1.HandleSuccess(ctx, articleList)
 }
+
+// GetArticleListByEs godoc
+// @Summary es文章查询
+// @Schemes
+// @Description
+// @Tags 文章模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.GetArticleListByEsReq true "params"
+// @Success 200 {object} v1.SearchArticleResp
+// @Router /article/getArticleListByEs [post]
+func (h *ArticleHandler) GetArticleListByEs(ctx *gin.Context) {
+	var req v1.GetArticleListByEsReq
+
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	// 默认值
+	if req.Column == "" {
+		req.SearchMode = "_score"
+	}
+	if req.Order == "" {
+		req.Order = "desc"
+	}
+	if req.SearchMode == "" {
+		req.SearchMode = "0"
+	}
+
+	articleList, err := h.articleService.GetArticleListByEs(ctx, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+	}
+	v1.HandleSuccess(ctx, articleList)
+}

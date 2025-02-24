@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"fmt"
+	"github.com/olivere/elastic/v7"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 	v1 "projectName/api/v1"
@@ -24,6 +25,10 @@ type ArticleRepository interface {
 	DeleteArticleList(ctx context.Context, ids []uint) (int, error)
 	GetArticleListByCategory(ctx context.Context, categoryId uint, pageNum int, pageSize int) ([]model.Article, int64, error)
 	GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq, pageNum int, pageSize int) ([]model.Article, int64, error)
+	GetArticleListByEs(ctx context.Context, query *elastic.BoolQuery, highlight *elastic.Highlight, from, size int) (*elastic.SearchResult, error)
+	CreateEsArticle(ctx context.Context, article *model.EsArticle) error
+	UpdateEsArticle(ctx context.Context, article *model.EsArticle) error
+	DeleteEsArticle(ctx context.Context, article *model.EsArticle) error
 }
 
 func NewArticleRepository(
@@ -241,4 +246,60 @@ func (r *articleRepository) GetUserArticleList(ctx context.Context, userId strin
 
 	// 返回文章列表和总数
 	return articles, total, nil
+}
+
+// GetArticleListByEs es查询
+func (r *Repository) GetArticleListByEs(ctx context.Context, query *elastic.BoolQuery, highlight *elastic.Highlight, from, size int) (*elastic.SearchResult, error) {
+	searchResult, err := r.esClient.Search().
+		Index("kb_article").
+		Query(query).
+		Highlight(highlight).  // 高亮设置
+		From(from).Size(size). // 分页设置
+		Do(ctx)
+	r.logger.WithContext(ctx).Info("ArticleRepository.GetArticleListByEs", zap.Any("searchResult", searchResult))
+	if err != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.GetArticleListByEs error", zap.Error(err))
+		return nil, fmt.Errorf("failed to execute Elasticsearch query: %w", err)
+	}
+	return searchResult, nil
+}
+
+func (r *Repository) CreateEsArticle(ctx context.Context, article *model.EsArticle) error {
+	_, err := r.esClient.Index().
+		Index("kb_article").
+		Id(fmt.Sprintf("%d", article.ArticleID)).
+		BodyJson(article).
+		Do(ctx)
+	r.logger.WithContext(ctx).Info("ArticleRepository.CreateEsArticle", zap.Any("article", article))
+	if err != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.CreateEsArticle error", zap.Error(err))
+		return fmt.Errorf("failed to create Elasticsearch document: %w", err)
+	}
+	return nil
+}
+
+func (r *Repository) UpdateEsArticle(ctx context.Context, article *model.EsArticle) error {
+	_, err := r.esClient.Update().
+		Index("kb_article").
+		Id(fmt.Sprintf("%d", article.ArticleID)).
+		Doc(article).
+		Do(ctx)
+	r.logger.WithContext(ctx).Info("ArticleRepository.UpdateEsArticle", zap.Any("article", article))
+	if err != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.UpdateEsArticle error", zap.Error(err))
+		return fmt.Errorf("failed to update Elasticsearch document: %w", err)
+	}
+	return nil
+}
+func (r *Repository) DeleteEsArticle(ctx context.Context, article *model.EsArticle) error {
+	_, err := r.esClient.Delete().
+		Index("kb_article").
+		Id(fmt.Sprintf("%d", article.ArticleID)).
+		Do(ctx)
+	r.logger.WithContext(ctx).Info("ArticleRepository.DeleteEsArticle", zap.Any("article", article))
+	if err != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.DeleteEsArticle error", zap.Error(err))
+		return fmt.Errorf("failed to delete Elasticsearch document: %w", err)
+	}
+	return nil
 }

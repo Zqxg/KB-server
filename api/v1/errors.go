@@ -38,6 +38,9 @@ var (
 	ErrDeleteFailed = newError(3003, "删除失败")
 	ErrQueryFailed  = newError(3004, "查询失败")
 
+	// 4000 es
+	ErrCreateEsArticleFailed = newError(4000, "创建es文章失败")
+
 	// 20000 业务逻辑错误
 	ErrParamEmpty          = newError(20000, "参数为空")
 	ErrUserAlreadyAuth     = newError(20001, "用户已认证")
