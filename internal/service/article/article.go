@@ -138,10 +138,14 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 			UserID:       article.UserID,
 			Status:       article.Status,
 			VisibleRange: article.VisibleRange,
+			UploadedFile: false,
 			CreatedAt:    article.CreatedAt,
 			UpdatedAt:    article.UpdatedAt,
 		}
 		esArticle.ArticleID = uint(articleId)
+		if article.UploadedFiles != nil {
+			esArticle.UploadedFile = true
+		}
 
 		// 创建es文档
 		if err = s.articleRepository.CreateEsArticle(ctx, esArticle); err != nil {
@@ -401,7 +405,10 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 	}
 
 	// 3. 添加高亮查询
-	highlight := elastic.NewHighlight().Field("content").PreTags("<em>").PostTags("</em>")
+	highlight := elastic.NewHighlight().
+		Field("content").PreTags("<mark>").PostTags("</mark>").
+		Field("title").PreTags("<mark>").PostTags("</mark>").
+		Field("contentShort").PreTags("<mark>").PostTags("</mark>")
 
 	// 4. 设置分页查询
 	from := (pageNo - 1) * pageSize
@@ -428,6 +435,16 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 		if highlightFields, ok := hit.Highlight["content"]; ok {
 			// 将高亮部分替换为 HTML 格式
 			article.EsArticle.Content = strings.Join(highlightFields, "...")
+		}
+
+		if highlightFields, ok := hit.Highlight["title"]; ok {
+			// 将标题的高亮部分替换为 HTML 格式
+			article.EsArticle.Title = strings.Join(highlightFields, "...")
+		}
+
+		if highlightFields, ok := hit.Highlight["contentShort"]; ok {
+			// 将摘要的高亮部分替换为 HTML 格式
+			article.EsArticle.ContentShort = strings.Join(highlightFields, "...")
 		}
 
 		articles = append(articles, article)
