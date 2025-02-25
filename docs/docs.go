@@ -679,6 +679,55 @@ const docTemplate = `{
         }
     },
     "definitions": {
+        "model.EsArticle": {
+            "type": "object",
+            "properties": {
+                "article_id": {
+                    "type": "integer"
+                },
+                "category_id": {
+                    "type": "integer"
+                },
+                "comment_disabled": {
+                    "type": "boolean"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "content_short": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "使用 sql.NullTime",
+                    "type": "string"
+                },
+                "importance": {
+                    "type": "integer"
+                },
+                "source_uri": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "使用 sql.NullTime",
+                    "type": "string"
+                },
+                "uploaded_file": {
+                    "type": "boolean"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "visible_range": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.ArticleData": {
             "type": "object",
             "properties": {
@@ -773,76 +822,17 @@ const docTemplate = `{
         "v1.ArticleSearchInfo": {
             "type": "object",
             "properties": {
-                "article_id": {
-                    "description": "文章ID",
-                    "type": "integer"
-                },
-                "category": {
-                    "description": "分类（例如：海军报文）",
-                    "type": "string"
-                },
-                "category_id": {
-                    "description": "分类ID",
-                    "type": "integer"
-                },
-                "comment_disabled": {
-                    "description": "是否禁用评论",
-                    "type": "boolean"
-                },
-                "content": {
-                    "description": "文章内容",
-                    "type": "string"
-                },
-                "content_short": {
-                    "description": "文章简介（可选）",
-                    "type": "string"
-                },
-                "created_at": {
-                    "description": "创建时间",
-                    "type": "string"
-                },
-                "deleted_at": {
-                    "description": "删除时间（可选）",
-                    "type": "string"
-                },
-                "importance": {
-                    "description": "重要性",
-                    "type": "integer"
+                "esArticle": {
+                    "description": "文章数据",
+                    "allOf": [
+                        {
+                            "$ref": "#/definitions/model.EsArticle"
+                        }
+                    ]
                 },
                 "score": {
                     "description": "评分（例如：基于ES的相关度评分）",
                     "type": "number"
-                },
-                "source_uri": {
-                    "description": "来源URI",
-                    "type": "string"
-                },
-                "status": {
-                    "description": "文章状态",
-                    "type": "integer"
-                },
-                "title": {
-                    "description": "文章标题",
-                    "type": "string"
-                },
-                "updated_at": {
-                    "description": "更新时间",
-                    "type": "string"
-                },
-                "uploaded_files": {
-                    "description": "上传文件列表（可选）",
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/v1.FileUpload"
-                    }
-                },
-                "user_id": {
-                    "description": "用户ID",
-                    "type": "string"
-                },
-                "visible_range": {
-                    "description": "可见范围",
-                    "type": "string"
                 }
             }
         },
@@ -999,7 +989,7 @@ const docTemplate = `{
                     "description": "分类id，用于筛选",
                     "type": "array",
                     "items": {
-                        "type": "string"
+                        "type": "integer"
                     }
                 },
                 "column": {

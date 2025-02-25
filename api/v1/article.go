@@ -102,7 +102,7 @@ type GetArticleListByEsReq struct {
 	AdvSearch   bool     `json:"advSearch"`   // 是否启用高级搜索
 	Column      string   `json:"column"`      // 排序字段，通常是 "_score"
 	Order       string   `json:"order"`       // 排序方式，"asc" 或 "desc"
-	Categories  []string `json:"categories"`  // 分类id，用于筛选
+	Categories  []int    `json:"categories"`  // 分类id，用于筛选
 	SearchMode  string   `json:"searchMode"`  // 搜索模式标识（例如 "0" 代表普通搜索 "1"）
 }
 
