@@ -213,6 +213,33 @@ func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticl
 		CreatedAt:       utils.TimeFormat(updateArticle.CreatedAt, utils.FormatDateTime),
 		UpdatedAt:       utils.TimeFormat(updateArticle.UpdatedAt, utils.FormatDateTime),
 	}
+	// 判断是否公开，如果公开则更新es文档
+	if strings.Contains(article.VisibleRange, "public") {
+		esArticle := &model.EsArticle{
+			ArticleID:    uint(article.ArticleID),
+			Title:        article.Title,
+			Content:      article.Content,
+			CategoryID:   article.CategoryID,
+			UserID:       article.UserID,
+			Status:       article.Status,
+			VisibleRange: article.VisibleRange,
+			UploadedFile: false,
+			CreatedAt:    article.CreatedAt,
+			UpdatedAt:    article.UpdatedAt,
+		}
+		if article.UploadedFiles != nil {
+			esArticle.UploadedFile = true
+		}
+		// 更新es文档
+		if err = s.articleRepository.UpdateEsArticle(ctx, esArticle); err != nil {
+			return nil, v1.ErrUpdateEsArticleFailed
+		}
+	} else {
+		// 删除es文档
+		if err = s.articleRepository.DeleteEsArticle(ctx, uint(article.ArticleID)); err != nil {
+			return nil, v1.ErrDeleteEsArticleFailed
+		}
+	}
 	return articleData, nil
 }
 
@@ -226,6 +253,10 @@ func (s *articleService) DeleteArticle(ctx context.Context, id uint) (int, error
 	deletedCount, err := s.articleRepository.DeleteArticle(ctx, article.ArticleID)
 	if err != nil {
 		return -1, v1.ErrDeleteFailed
+	}
+	// 删除es文档
+	if err = s.articleRepository.DeleteEsArticle(ctx, uint(article.ArticleID)); err != nil {
+		return -1, v1.ErrDeleteEsArticleFailed
 	}
 	return deletedCount, nil
 }
@@ -370,12 +401,12 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 
 	// 根据标题进行搜索 逗号分隔
 	if req.Title != "" {
-		query = query.Must(elastic.NewMatchQuery("title", req.Title))
+		query = query.Should(elastic.NewMatchQuery("title", req.Title))
 	}
 
 	// 根据内容进行搜索 逗号分隔
 	if req.Content != "" {
-		query = query.Must(elastic.NewMatchQuery("content", req.Content))
+		query = query.Should(elastic.NewMatchQuery("content", req.Content))
 	}
 
 	// 可以根据需要增加更多的过滤条件，例如状态（status）、重要性（importance）等
@@ -387,9 +418,13 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 	if len(req.Keywords) > 0 {
 		for _, keyword := range req.Keywords {
 			if req.PhraseMatch { // 启用短语匹配
-				query = query.Should(elastic.NewMatchPhraseQuery("content", keyword))
+				query = query.Should(elastic.NewMatchPhraseQuery("content", keyword)).
+					Should(elastic.NewMatchPhraseQuery("title", keyword)).
+					Should(elastic.NewMatchPhraseQuery("contentShort", keyword))
 			} else {
-				query = query.Should(elastic.NewMatchQuery("content", keyword))
+				query = query.Should(elastic.NewMatchQuery("content", keyword)).
+					Should(elastic.NewMatchQuery("title", keyword)).
+					Should(elastic.NewMatchQuery("contentShort", keyword))
 			}
 		}
 	}

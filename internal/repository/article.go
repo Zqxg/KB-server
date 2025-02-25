@@ -28,7 +28,7 @@ type ArticleRepository interface {
 	GetArticleListByEs(ctx context.Context, query *elastic.BoolQuery, highlight *elastic.Highlight, from, size int) (*elastic.SearchResult, error)
 	CreateEsArticle(ctx context.Context, article *model.EsArticle) error
 	UpdateEsArticle(ctx context.Context, article *model.EsArticle) error
-	DeleteEsArticle(ctx context.Context, article *model.EsArticle) error
+	DeleteEsArticle(ctx context.Context, articleId uint) error
 }
 
 func NewArticleRepository(
@@ -291,12 +291,12 @@ func (r *Repository) UpdateEsArticle(ctx context.Context, article *model.EsArtic
 	}
 	return nil
 }
-func (r *Repository) DeleteEsArticle(ctx context.Context, article *model.EsArticle) error {
+func (r *Repository) DeleteEsArticle(ctx context.Context, articleId uint) error {
 	_, err := r.esClient.Delete().
 		Index("kb_article").
-		Id(fmt.Sprintf("%d", article.ArticleID)).
+		Id(fmt.Sprintf("%d", articleId)).
 		Do(ctx)
-	r.logger.WithContext(ctx).Info("ArticleRepository.DeleteEsArticle", zap.Any("article", article))
+	r.logger.WithContext(ctx).Info("ArticleRepository.DeleteEsArticle", zap.Any("articleId", articleId))
 	if err != nil {
 		r.logger.WithContext(ctx).Error("ArticleRepository.DeleteEsArticle error", zap.Error(err))
 		return fmt.Errorf("failed to delete Elasticsearch document: %w", err)

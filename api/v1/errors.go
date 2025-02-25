@@ -40,6 +40,9 @@ var (
 
 	// 4000 es
 	ErrCreateEsArticleFailed = newError(4000, "创建es文章失败")
+	ErrUpdateEsArticleFailed = newError(4001, "更新es文章失败")
+	ErrDeleteEsArticleFailed = newError(4002, "删除es文章失败")
+	ErrQueryEsArticleFailed  = newError(4003, "查询es文章失败")
 
 	// 20000 业务逻辑错误
 	ErrParamEmpty          = newError(20000, "参数为空")
