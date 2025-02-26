@@ -458,28 +458,47 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 	var articles []v1.ArticleSearchInfo
 	for _, hit := range searchResult.Hits.Hits {
 		var esArticle model.EsArticle
-		var article v1.ArticleSearchInfo
+
 		if err = json.Unmarshal(hit.Source, &esArticle); err != nil {
 			continue
 		}
+		article := v1.ArticleSearchInfo{
+			Title:           esArticle.Title,
+			Content:         esArticle.Content,
+			ContentShort:    esArticle.ContentShort,
+			VisibleRange:    esArticle.VisibleRange,
+			UploadedFile:    esArticle.UploadedFile,
+			Status:          esArticle.Status,
+			ArticleID:       esArticle.ArticleID,
+			CreatedAt:       esArticle.CreatedAt,
+			UpdatedAt:       esArticle.UpdatedAt,
+			Author:          "",
+			Category:        "",
+			Importance:      esArticle.Importance,
+			CommentDisabled: esArticle.CommentDisabled,
+			SourceURI:       esArticle.SourceURI,
+		}
 		// 获取并设置评分
-		article.EsArticle = esArticle
+		user, _ := s.userRepo.GetByUserId(ctx, esArticle.UserID)
+		article.Author = user.Nickname
+		category, _ := s.articleRepository.GetCategory(ctx, esArticle.CategoryID)
+		article.Category = category.CategoryName
 		article.Score = *hit.Score
 
 		// 获取高亮内容（如果有）
 		if highlightFields, ok := hit.Highlight["content"]; ok {
 			// 将高亮部分替换为 HTML 格式
-			article.EsArticle.Content = strings.Join(highlightFields, "...")
+			article.Content = strings.Join(highlightFields, "...")
 		}
 
 		if highlightFields, ok := hit.Highlight["title"]; ok {
 			// 将标题的高亮部分替换为 HTML 格式
-			article.EsArticle.Title = strings.Join(highlightFields, "...")
+			article.Title = strings.Join(highlightFields, "...")
 		}
 
 		if highlightFields, ok := hit.Highlight["contentShort"]; ok {
 			// 将摘要的高亮部分替换为 HTML 格式
-			article.EsArticle.ContentShort = strings.Join(highlightFields, "...")
+			article.ContentShort = strings.Join(highlightFields, "...")
 		}
 
 		articles = append(articles, article)

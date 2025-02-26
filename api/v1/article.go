@@ -1,8 +1,8 @@
 package v1
 
 import (
-	"projectName/internal/model"
 	"projectName/internal/model/vo"
+	"time"
 )
 
 // CreateArticleRequest 用于接收创建文章请求的数据
@@ -112,8 +112,21 @@ type SearchArticleResp struct {
 }
 
 type ArticleSearchInfo struct {
-	EsArticle model.EsArticle // 文章数据
-	Score     float64         `json:"score"` // 评分（例如：基于ES的相关度评分）
+	ArticleID       uint      `json:"article_id"`
+	Title           string    `json:"title"`
+	Content         string    `json:"content"`
+	ContentShort    string    `json:"content_short"`
+	Author          string    `json:"author"`
+	Category        string    `json:"category"`
+	Importance      int       `json:"importance"`
+	VisibleRange    string    `json:"visible_range"`
+	CommentDisabled bool      `json:"comment_disabled"`
+	SourceURI       string    `json:"source_uri"`
+	Status          int       `json:"status"`
+	UploadedFile    bool      `json:"uploaded_file"`
+	CreatedAt       time.Time `json:"created_at"` // 使用 sql.NullTime
+	UpdatedAt       time.Time `json:"updated_at"` // 使用 sql.NullTime
+	Score           float64   `json:"score"`      // 评分（例如：基于ES的相关度评分）
 	//Tags            []string     `json:"tags"`             // 文章标签（可选）
 	//Comments        *int         `json:"comments"`         // 评论数（可选）
 	//Views           *int         `json:"views"`            // 浏览量（可选）

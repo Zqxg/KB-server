@@ -679,55 +679,6 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "model.EsArticle": {
-            "type": "object",
-            "properties": {
-                "article_id": {
-                    "type": "integer"
-                },
-                "category_id": {
-                    "type": "integer"
-                },
-                "comment_disabled": {
-                    "type": "boolean"
-                },
-                "content": {
-                    "type": "string"
-                },
-                "content_short": {
-                    "type": "string"
-                },
-                "created_at": {
-                    "description": "使用 sql.NullTime",
-                    "type": "string"
-                },
-                "importance": {
-                    "type": "integer"
-                },
-                "source_uri": {
-                    "type": "string"
-                },
-                "status": {
-                    "type": "integer"
-                },
-                "title": {
-                    "type": "string"
-                },
-                "updated_at": {
-                    "description": "使用 sql.NullTime",
-                    "type": "string"
-                },
-                "uploaded_file": {
-                    "type": "boolean"
-                },
-                "user_id": {
-                    "type": "string"
-                },
-                "visible_range": {
-                    "type": "string"
-                }
-            }
-        },
         "v1.ArticleData": {
             "type": "object",
             "properties": {
@@ -822,17 +773,53 @@ const docTemplate = `{
         "v1.ArticleSearchInfo": {
             "type": "object",
             "properties": {
-                "esArticle": {
-                    "description": "文章数据",
-                    "allOf": [
-                        {
-                            "$ref": "#/definitions/model.EsArticle"
-                        }
-                    ]
+                "article_id": {
+                    "type": "integer"
+                },
+                "author": {
+                    "type": "string"
+                },
+                "category": {
+                    "type": "string"
+                },
+                "comment_disabled": {
+                    "type": "boolean"
+                },
+                "content": {
+                    "type": "string"
+                },
+                "content_short": {
+                    "type": "string"
+                },
+                "created_at": {
+                    "description": "使用 sql.NullTime",
+                    "type": "string"
+                },
+                "importance": {
+                    "type": "integer"
                 },
                 "score": {
                     "description": "评分（例如：基于ES的相关度评分）",
                     "type": "number"
+                },
+                "source_uri": {
+                    "type": "string"
+                },
+                "status": {
+                    "type": "integer"
+                },
+                "title": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "使用 sql.NullTime",
+                    "type": "string"
+                },
+                "uploaded_file": {
+                    "type": "boolean"
+                },
+                "visible_range": {
+                    "type": "string"
                 }
             }
         },
