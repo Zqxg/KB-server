@@ -399,25 +399,20 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 	// 2. 构建查询条件
 	query := elastic.NewBoolQuery()
 
-	// 根据标题进行搜索 逗号分隔
+	// 根据标题进行搜索
 	if req.Title != "" {
 		query = query.Should(elastic.NewMatchQuery("title", req.Title))
 	}
 
-	// 根据内容进行搜索 逗号分隔
+	// 根据内容进行搜索
 	if req.Content != "" {
 		query = query.Should(elastic.NewMatchQuery("content", req.Content))
 	}
 
-	// 可以根据需要增加更多的过滤条件，例如状态（status）、重要性（importance）等
-	if req.SearchMode == "1" {
-		// todo: 高级搜索处理（例如，可能加上更多的过滤条件或权重设置）
-	}
-
-	// 根据关键字进行全文搜索 逗号分隔
+	// 根据关键字进行全文搜索
 	if len(req.Keywords) > 0 {
 		for _, keyword := range req.Keywords {
-			if req.PhraseMatch { // 启用短语匹配
+			if req.PhraseMatch {
 				query = query.Should(elastic.NewMatchPhraseQuery("content", keyword)).
 					Should(elastic.NewMatchPhraseQuery("title", keyword)).
 					Should(elastic.NewMatchPhraseQuery("contentShort", keyword))
@@ -429,13 +424,31 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 		}
 	}
 
-	// 将 req.Categories 转换为 []interface{}
-	var categories []interface{}
-	for _, category := range req.Categories {
-		categories = append(categories, category)
+	// 高级搜索处理
+	if req.AdvSearch {
+		// 根据摘要（contentShort）进行搜索
+		if req.Content != "" {
+			query = query.Should(elastic.NewMatchQuery("contentShort", req.Content))
+		}
+
+		// 根据发布时间进行范围过滤
+		if req.CreateTimeStart != "" && req.CreateTimeEnd != "" {
+			query = query.Filter(elastic.NewRangeQuery("created_at").
+				Gte(req.CreateTimeStart).Lte(req.CreateTimeEnd))
+		}
+
+		// 根据重要性进行过滤
+		if req.Importance > 0 {
+			query = query.Filter(elastic.NewTermsQuery("importance", req.Importance))
+		}
 	}
-	// 根据分类 ID 进行过滤（如果有）
+
+	// 根据分类 ID 进行过滤
 	if len(req.Categories) > 0 {
+		var categories []interface{}
+		for _, category := range req.Categories {
+			categories = append(categories, category)
+		}
 		query = query.Filter(elastic.NewTermsQuery("category_id", categories...))
 	}
 
@@ -458,10 +471,10 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 	var articles []v1.ArticleSearchInfo
 	for _, hit := range searchResult.Hits.Hits {
 		var esArticle model.EsArticle
-
-		if err = json.Unmarshal(hit.Source, &esArticle); err != nil {
+		if err := json.Unmarshal(hit.Source, &esArticle); err != nil {
 			continue
 		}
+
 		article := v1.ArticleSearchInfo{
 			Title:           esArticle.Title,
 			Content:         esArticle.Content,
@@ -478,6 +491,7 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 			CommentDisabled: esArticle.CommentDisabled,
 			SourceURI:       esArticle.SourceURI,
 		}
+
 		// 获取并设置评分
 		user, _ := s.userRepo.GetByUserId(ctx, esArticle.UserID)
 		article.Author = user.Nickname
@@ -485,19 +499,16 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 		article.Category = category.CategoryName
 		article.Score = *hit.Score
 
-		// 获取高亮内容（如果有）
+		// 获取高亮内容
 		if highlightFields, ok := hit.Highlight["content"]; ok {
-			// 将高亮部分替换为 HTML 格式
 			article.Content = strings.Join(highlightFields, "...")
 		}
 
 		if highlightFields, ok := hit.Highlight["title"]; ok {
-			// 将标题的高亮部分替换为 HTML 格式
 			article.Title = strings.Join(highlightFields, "...")
 		}
 
 		if highlightFields, ok := hit.Highlight["contentShort"]; ok {
-			// 将摘要的高亮部分替换为 HTML 格式
 			article.ContentShort = strings.Join(highlightFields, "...")
 		}
 

@@ -980,6 +980,18 @@
                     "description": "搜索的内容关键词",
                     "type": "string"
                 },
+                "createTimeEnd": {
+                    "description": "文章结束时间",
+                    "type": "string"
+                },
+                "createTimeStart": {
+                    "description": "文章创建时间",
+                    "type": "string"
+                },
+                "importance": {
+                    "description": "文章重要性",
+                    "type": "integer"
+                },
                 "keywords": {
                     "description": "搜索的关键字数组",
                     "type": "array",
