@@ -286,13 +286,10 @@ func (h *ArticleHandler) GetArticleListByEs(ctx *gin.Context) {
 	}
 	// 默认值
 	if req.Column == "" {
-		req.SearchMode = "_score"
+		req.Column = "_score"
 	}
 	if req.Order == "" {
 		req.Order = "desc"
-	}
-	if req.SearchMode == "" {
-		req.SearchMode = "0"
 	}
 
 	articleList, err := h.articleService.GetArticleListByEs(ctx, &req)

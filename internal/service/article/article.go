@@ -399,38 +399,27 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 	// 2. 构建查询条件
 	query := elastic.NewBoolQuery()
 
-	// 根据标题进行搜索
-	if req.Title != "" {
-		query = query.Should(elastic.NewMatchQuery("title", req.Title))
-	}
+	if req.AdvSearch { // 高级搜索，必须满足所有条件
+		// 根据标题进行搜索
+		if req.Title != "" {
+			query = query.Should(elastic.NewMatchQuery("title", req.Title))
+		}
 
-	// 根据内容进行搜索
-	if req.Content != "" {
-		query = query.Should(elastic.NewMatchQuery("content", req.Content))
-	}
+		// 根据内容进行搜索
+		if req.Content != "" {
+			query = query.Should(elastic.NewMatchQuery("content", req.Content))
+		}
 
-	// 根据关键字进行全文搜索
-	if len(req.Keywords) > 0 {
-		for _, keyword := range req.Keywords {
-			if req.PhraseMatch {
-				query = query.Should(elastic.NewMatchPhraseQuery("content", keyword)).
-					Should(elastic.NewMatchPhraseQuery("title", keyword)).
-					Should(elastic.NewMatchPhraseQuery("contentShort", keyword))
-			} else {
-				query = query.Should(elastic.NewMatchQuery("content", keyword)).
-					Should(elastic.NewMatchQuery("title", keyword)).
-					Should(elastic.NewMatchQuery("contentShort", keyword))
+		// 根据关键字进行全文搜索
+		if len(req.Keywords) > 0 {
+			for _, keyword := range req.Keywords {
+				if req.PhraseMatch {
+					query = query.Must(elastic.NewMatchPhraseQuery("contentShort", keyword))
+				} else {
+					query = query.Should(elastic.NewMatchQuery("contentShort", keyword))
+				}
 			}
 		}
-	}
-
-	// 高级搜索处理
-	if req.AdvSearch {
-		// 根据摘要（contentShort）进行搜索
-		if req.Content != "" {
-			query = query.Should(elastic.NewMatchQuery("contentShort", req.Content))
-		}
-
 		// 根据发布时间进行范围过滤
 		if req.CreateTimeStart != "" && req.CreateTimeEnd != "" {
 			query = query.Filter(elastic.NewRangeQuery("created_at").
@@ -438,8 +427,24 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, req *v1.GetArti
 		}
 
 		// 根据重要性进行过滤
-		if req.Importance > 0 {
-			query = query.Filter(elastic.NewTermsQuery("importance", req.Importance))
+		importance, _ := utils.ToInt(req.Importance)
+		if importance > 0 {
+			query = query.Filter(elastic.NewTermsQuery("importance", importance))
+		}
+	} else { // 普通搜索，只要满足一个条件即可
+		// 根据关键字进行全文搜索
+		if len(req.Keywords) > 0 {
+			for _, keyword := range req.Keywords {
+				if req.PhraseMatch {
+					query = query.Must(elastic.NewMatchPhraseQuery("content", keyword)).
+						Must(elastic.NewMatchPhraseQuery("title", keyword)).
+						Must(elastic.NewMatchPhraseQuery("contentShort", keyword))
+				} else {
+					query = query.Should(elastic.NewMatchQuery("content", keyword)).
+						Should(elastic.NewMatchQuery("title", keyword)).
+						Should(elastic.NewMatchQuery("contentShort", keyword))
+				}
+			}
 		}
 	}
 

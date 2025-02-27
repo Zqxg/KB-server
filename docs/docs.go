@@ -997,7 +997,7 @@ const docTemplate = `{
                 },
                 "importance": {
                     "description": "文章重要性",
-                    "type": "integer"
+                    "type": "string"
                 },
                 "keywords": {
                     "description": "搜索的关键字数组",
@@ -1021,10 +1021,6 @@ const docTemplate = `{
                 "phraseMatch": {
                     "description": "是否启用短语匹配",
                     "type": "boolean"
-                },
-                "searchMode": {
-                    "description": "搜索模式标识（例如 \"0\" 代表普通搜索 \"1\"）",
-                    "type": "string"
                 },
                 "title": {
                     "description": "搜索的标题",
