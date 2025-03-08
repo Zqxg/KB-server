@@ -17,7 +17,6 @@ type Article struct {
 	VisibleRange    string         `gorm:"type:varchar(255);not null"` // 可见范围
 	CommentDisabled bool           `gorm:"type:boolean;default:false"` // 是否禁用评论
 	SourceURI       string         `gorm:"type:varchar(255)"`          // 文章外链
-	Status          int            `gorm:"type:int;default:0"`         // 文章状态
 	UploadedFiles   []byte         `gorm:"type:json"`                  // 上传的文件列表
 	CreatedAt       time.Time      `gorm:"autoCreateTime" `            // 文章创建时间
 	UpdatedAt       time.Time      `gorm:"autoUpdateTime" `            // 文章更新时间
