@@ -31,10 +31,12 @@ type UserService interface {
 func NewUserService(
 	service *service.Service,
 	userRepo repository.UserRepository,
+	kbRepo repository.KBRepository,
 	captchaService CaptchaService, // 在构造函数中传入验证码服务
 ) UserService {
 	return &userService{
 		userRepo:       userRepo,
+		kbRepo:         kbRepo,
 		captchaService: captchaService, // 注入验证码服务
 		Service:        service,
 	}
@@ -42,6 +44,7 @@ func NewUserService(
 
 type userService struct {
 	userRepo       repository.UserRepository
+	kbRepo         repository.KBRepository
 	captchaService CaptchaService // 新增验证码服务
 	*service.Service
 }
@@ -90,7 +93,15 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 		if err = s.userRepo.Create(ctx, user); err != nil {
 			return err
 		}
-		// TODO: other repo
+		// 新增私人知识库
+		kb := &model.KnowledgeBase{
+			KbName:   "私人知识库",
+			UserID:   &user.UserId,
+			IsPublic: false,
+		}
+		if _, err = s.kbRepo.CreateKB(ctx, kb); err != nil {
+			return err
+		}
 		return nil
 	})
 	return err
@@ -195,6 +206,11 @@ func (s *userService) Cancel(ctx context.Context, userId string) error {
 	if err := s.userRepo.DeleteByUserId(ctx, userId); err != nil {
 		s.Logger.Error("userService.Cancel error", zap.Error(err))
 		return v1.ErrCancelFail
+	}
+	// 删除私人知识库
+	if err := s.kbRepo.DeleteKBByUserId(ctx, userId); err != nil {
+		s.Logger.Error("userService.Cancel error", zap.Error(err))
+		return v1.ErrDeleteKnowledgeFailed
 	}
 	return nil
 }

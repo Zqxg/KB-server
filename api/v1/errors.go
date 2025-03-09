@@ -31,6 +31,22 @@ var (
 	// 2000 错误码
 	ErrInvalidCaptcha = newError(2000, "验证码错误")
 
+	// 2100 知识库
+	ErrKnowledgeNotExist = newError(2100, "知识库不存在")
+	ErrKnowledgeExist    = newError(2101, "知识库已存在")
+	ErrKnowledgeEmpty    = newError(2102, "知识库为空")
+	// 知识库删除错误
+	ErrDeleteKnowledgeFailed = newError(2103, "删除知识库失败")
+	ErrDeleteKnowledgeExist  = newError(2104, "知识库存在文章")
+	ErrDeleteKnowledgePublic = newError(2105, "公共知识库不能删除")
+	// 知识库创建错误
+	ErrCreateKnowledgeFailed = newError(2106, "创建知识库失败")
+	ErrCreateKnowledgeExist  = newError(2107, "知识库已存在")
+	ErrCreateKnowledgePublic = newError(2108, "公共知识库不能创建")
+	// 知识库更新错误
+	ErrUpdateKnowledgeFailed = newError(2109, "更新知识库失败")
+	ErrUpdateKnowledgePublic = newError(2110, "公共知识库不能更新")
+
 	// 3000 数据库
 	ErrDatabase     = newError(3000, "数据库错误")
 	ErrInsertFailed = newError(3001, "插入失败")

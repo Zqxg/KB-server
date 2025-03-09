@@ -63,7 +63,7 @@ func NewHTTPServer(
 			noAuthRouter.POST("/passwordLogin", userHandler.PasswordLogin)
 			noAuthRouter.GET("/getCaptcha", userHandler.GetCaptcha)
 		}
-		// 权限包含关系：超级管理员 > 学校管理员 > 学生用户 > 普通用户
+		// 权限包含关系：超级管理员 > 普通用户
 		// 普通用户路由组
 		commonUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.COMMON_USER))
 		{
@@ -81,17 +81,44 @@ func NewHTTPServer(
 			commonUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle)                             // 获取文章详细
 			commonUserRouter.GET(enums.ARTICLE+"/getArticleListByCategory", articleHandler.GetArticleListByCategory) // 分类获取公开文章列表
 			commonUserRouter.POST(enums.ARTICLE+"/getArticleListByEs", articleHandler.GetArticleListByEs)            // es文章查询
+			commonUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                             // 新建文章
+			commonUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)                      // 修改文章
+			commonUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)                      // 删除文章
+			commonUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)              // 批量删除文章
+			commonUserRouter.POST(enums.ARTICLE+"/getUserArticleList", articleHandler.GetUserArticleList)            // 获取个人文章列表
+
+			// 知识库模块
+			//commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBListByTeamId", articleHandler.GetKBListByTeamId)                      // 团队id获取知识库列表
+			//commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKnowledgeBase", articleHandler.GetKnowledgeBase)                              // 获取知识库详细
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createKnowledgeBase", articleHandler.CreateKnowledgeBase) // 新建团队知识库
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateKnowledgeBase", articleHandler.UpdateKnowledgeBase) // 修改团队知识库
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKnowledgeBase", articleHandler.DeleteKnowledgeBase) // 删除团队知识库
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKnowledgeBaseList", articleHandler.DeleteKnowledgeBaseList)               // 批量删除团队知识库
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getUserKnowledgeBaseList", articleHandler.GetUserKnowledgeBase)                 // 获取私人知识库
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKnowledgeBaseListByEs", articleHandler.GetKnowledgeBaseListByEs)             // es团队知识库查询
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKnowledgeBaseListByCategory", articleHandler.GetKnowledgeBaseListByCategory) // 分类获取公开知识库列表
+
+			// 团队模块
+			//commonUserRouter.GET(enums.TEAM+"/getTeamList", articleHandler.GetTeamList)                      // 获取团队列表
+			//commonUserRouter.GET(enums.TEAM+"/getTeam", articleHandler.GetTeam)                              // 获取团队详细
+			//commonUserRouter.POST(enums.TEAM+"/createTeam", articleHandler.CreateTeam) // 新建团队
+			//commonUserRouter.POST(enums.TEAM+"/updateTeam", articleHandler.UpdateTeam) // 修改团队
+			//commonUserRouter.POST(enums.TEAM+"/deleteTeam", articleHandler.DeleteTeam) // 删除团队
+			//commonUserRouter.POST(enums.TEAM+"/deleteTeamList", articleHandler.DeleteTeamList)               // 批量删除团队
+			//commonUserRouter.POST(enums.TEAM+"/getUserTeamList", articleHandler.GetUserTeam)                 // 获取个人团队
+			//commonUserRouter.POST(enums.TEAM+"/getTeamListByCategory", articleHandler.GetTeamListByCategory) // 分类获取公开团队列表
+
+			//commonUserRouter.POST(enums.TEAM+"/getTeamMemberList", articleHandler.GetTeamMemberList) // 获取团队成员列表
+			//commonUserRouter.POST(enums.TEAM+"/addTeamMember", articleHandler.AddTeamMember)         // 添加团队成员
+			//commonUserRouter.POST(enums.TEAM+"/deleteTeamMember", articleHandler.DeleteTeamMember)   // 删除团队成员
+			//commonUserRouter.POST(enums.TEAM+"/updateTeamMember", articleHandler.UpdateTeamMember)   // 修改团队成员
+
 		}
-		// 学生用户路由组
-		studentUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUTDENT_USER))
-		{
-			// 文章模块
-			studentUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                  // 新建文章
-			studentUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)           // 修改文章
-			studentUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)           // 删除文章
-			studentUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)   // 批量删除文章
-			studentUserRouter.POST(enums.ARTICLE+"/getUserArticleList", articleHandler.GetUserArticleList) // 获取个人文章列表
-		}
+		//// 学生用户路由组
+		//studentUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUTDENT_USER))
+		//{
+		//
+		//}
 		// 学校管理员路由组
 		//schoolAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SCHOOL_ADMIN))
 		//{
