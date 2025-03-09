@@ -7,9 +7,9 @@ import (
 )
 
 type TeamRepository interface {
-	CreateTeam(ctx context.Context, team *model.Team) error
+	CreateTeam(ctx context.Context, team *model.Team) (uint, error)
 	GetTeamByID(ctx context.Context, teamID uint) (*model.Team, error)
-	GetTeamListByUserId(ctx context.Context, userId string, pageIndex, pageSize int) ([]*model.Team, int64, error)
+	GetTeamList(ctx context.Context, teamName, createdBy string, pageIndex, pageSize int) ([]model.Team, int64, error)
 	UpdateTeam(ctx context.Context, team *model.Team) error
 	DeleteTeam(ctx context.Context, teamID uint) error
 
@@ -20,6 +20,7 @@ type TeamRepository interface {
 	UpdateTeamMemberRole(ctx context.Context, teamMemberID uint, role int) error
 	GetTeamMemberListByTeamID(ctx context.Context, teamID uint) ([]*model.Member, error)
 	GetTeamMemberListByUserID(ctx context.Context, userID string) ([]*model.Member, error)
+	GetMemberByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.Member, error)
 }
 
 func NewTeamRepository(
@@ -34,12 +35,12 @@ type teamRepository struct {
 	*Repository
 }
 
-func (r *teamRepository) CreateTeam(ctx context.Context, team *model.Team) error {
+func (r *teamRepository) CreateTeam(ctx context.Context, team *model.Team) (uint, error) {
 	if err := r.DB(ctx).Table("sys_team").Create(&team).Error; err != nil {
 		r.logger.WithContext(ctx).Error("TeamRepository.CreateTeam error", zap.Error(err))
-		return err
+		return 0, nil
 	}
-	return nil
+	return team.TeamID, nil
 }
 
 func (r *teamRepository) GetTeamByID(ctx context.Context, teamID uint) (*model.Team, error) {
@@ -51,21 +52,33 @@ func (r *teamRepository) GetTeamByID(ctx context.Context, teamID uint) (*model.T
 	return &team, nil
 }
 
-func (r *teamRepository) GetTeamListByUserId(ctx context.Context, userId string, pageIndex, pageSize int) ([]*model.Team, int64, error) {
-	var teams []*model.Team
-	var total int64
-	offset := (pageIndex - 1) * pageSize
-	query := r.DB(ctx).Table("sys_team").Where("user_id =?", userId)
-	if err := query.Count(&total).Error; err != nil {
-		r.logger.WithContext(ctx).Error("TeamRepository.GetTeamListByUserId error", zap.Error(err))
+func (r *teamRepository) GetTeamList(ctx context.Context, teamName, createdBy string, pageIndex, pageSize int) ([]model.Team, int64, error) {
+	var teams []model.Team
+	var totalCount int64
+
+	// 构建查询
+	db := r.DB(ctx).Table("sys_team").Where("deleted_at IS NULL")
+
+	// 条件判断 - 模糊查询
+	if teamName != "" {
+		db = db.Where("team_name LIKE ?", "%"+teamName+"%")
+	}
+	if createdBy != "" {
+		db = db.Where("created_by LIKE ?", "%"+createdBy+"%")
+	}
+
+	// 分页及数据查询
+	if err := db.Count(&totalCount).Error; err != nil {
 		return nil, 0, err
 	}
-	if err := query.Offset(offset).Limit(pageSize).Find(&teams).Error; err != nil {
-		r.logger.WithContext(ctx).Error("TeamRepository.GetTeamListByUserId error", zap.Error(err))
+
+	if err := db.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&teams).Error; err != nil {
 		return nil, 0, err
 	}
-	return teams, total, nil
+
+	return teams, totalCount, nil
 }
+
 func (r *teamRepository) UpdateTeam(ctx context.Context, team *model.Team) error {
 	if err := r.DB(ctx).Table("sys_team").Where("team_id =?", team.TeamID).Updates(&team).Error; err != nil {
 		r.logger.WithContext(ctx).Error("TeamRepository.UpdateTeam error", zap.Error(err))
@@ -74,6 +87,12 @@ func (r *teamRepository) UpdateTeam(ctx context.Context, team *model.Team) error
 	return nil
 }
 func (r *teamRepository) DeleteTeam(ctx context.Context, teamID uint) error {
+	// 软删除团队成员
+	if err := r.DB(ctx).Table("sys_member").Where("team_id =?", teamID).Delete(&model.Member{}).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.DeleteTeam error", zap.Error(err))
+		return err
+	}
+	// 软删除团队
 	if err := r.DB(ctx).Table("sys_team").Where("team_id =?", teamID).Delete(&model.Team{}).Error; err != nil {
 		r.logger.WithContext(ctx).Error("TeamRepository.DeleteTeam error", zap.Error(err))
 		return err
@@ -133,4 +152,14 @@ func (r *teamRepository) GetTeamMemberListByUserID(ctx context.Context, userID s
 		return nil, err
 	}
 	return teamMembers, nil
+}
+
+func (r *teamRepository) GetMemberByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.Member, error) {
+	var teamMember model.Member
+	// `idx_team_user`
+	if err := r.DB(ctx).Table("sys_member").Where("team_id =? and user_id =?", teamID, userID).First(&teamMember).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetMemberByTeamIDAndUserID error", zap.Error(err))
+		return nil, err
+	}
+	return &teamMember, nil
 }

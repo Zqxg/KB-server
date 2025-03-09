@@ -22,6 +22,7 @@ func NewHTTPServer(
 	userHandler *handler.UserHandler,
 	collegeHandler *handler.CollegeHandler,
 	articleHandler *handler.ArticleHandler,
+	teamHandler *handler.TeamHandler,
 
 ) *http.Server {
 	gin.SetMode(gin.DebugMode)
@@ -88,30 +89,28 @@ func NewHTTPServer(
 			commonUserRouter.POST(enums.ARTICLE+"/getUserArticleList", articleHandler.GetUserArticleList)            // 获取个人文章列表
 
 			// 知识库模块
-			//commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBListByTeamId", articleHandler.GetKBListByTeamId)                      // 团队id获取知识库列表
-			//commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKnowledgeBase", articleHandler.GetKnowledgeBase)                              // 获取知识库详细
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createKnowledgeBase", articleHandler.CreateKnowledgeBase) // 新建团队知识库
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateKnowledgeBase", articleHandler.UpdateKnowledgeBase) // 修改团队知识库
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKnowledgeBase", articleHandler.DeleteKnowledgeBase) // 删除团队知识库
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKnowledgeBaseList", articleHandler.DeleteKnowledgeBaseList)               // 批量删除团队知识库
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getUserKnowledgeBaseList", articleHandler.GetUserKnowledgeBase)                 // 获取私人知识库
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKnowledgeBaseListByEs", articleHandler.GetKnowledgeBaseListByEs)             // es团队知识库查询
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKnowledgeBaseListByCategory", articleHandler.GetKnowledgeBaseListByCategory) // 分类获取公开知识库列表
+			//commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBListByTeamId", knowledgeBaseHandler.GetKBListByTeamId)                      // 团队id获取知识库列表
+			//commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKnowledgeBase", knowledgeBaseHandler.GetKnowledgeBase)                              // 获取知识库详细
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createKnowledgeBase", knowledgeBaseHandler.CreateKnowledgeBase) // 新建团队知识库
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateKnowledgeBase", knowledgeBaseHandler.UpdateKnowledgeBase) // 修改团队知识库
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKnowledgeBase", knowledgeBaseHandler.DeleteKnowledgeBase) // 删除团队知识库
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKnowledgeBaseList", knowledgeBaseHandler.DeleteKnowledgeBaseList)               // 批量删除团队知识库
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getUserKnowledgeBaseList", knowledgeBaseHandler.GetUserKnowledgeBase)                 // 获取私人知识库
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKnowledgeBaseListByEs", knowledgeBaseHandler.GetKnowledgeBaseListByEs)             // es团队知识库查询
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKnowledgeBaseListByCategory", knowledgeBaseHandler.GetKnowledgeBaseListByCategory) // 分类获取公开知识库列表
 
 			// 团队模块
-			//commonUserRouter.GET(enums.TEAM+"/getTeamList", articleHandler.GetTeamList)                      // 获取团队列表
-			//commonUserRouter.GET(enums.TEAM+"/getTeam", articleHandler.GetTeam)                              // 获取团队详细
-			//commonUserRouter.POST(enums.TEAM+"/createTeam", articleHandler.CreateTeam) // 新建团队
-			//commonUserRouter.POST(enums.TEAM+"/updateTeam", articleHandler.UpdateTeam) // 修改团队
-			//commonUserRouter.POST(enums.TEAM+"/deleteTeam", articleHandler.DeleteTeam) // 删除团队
-			//commonUserRouter.POST(enums.TEAM+"/deleteTeamList", articleHandler.DeleteTeamList)               // 批量删除团队
-			//commonUserRouter.POST(enums.TEAM+"/getUserTeamList", articleHandler.GetUserTeam)                 // 获取个人团队
-			//commonUserRouter.POST(enums.TEAM+"/getTeamListByCategory", articleHandler.GetTeamListByCategory) // 分类获取公开团队列表
+			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)  // 新建团队
+			commonUserRouter.POST(enums.TEAM+"/updateTeam", teamHandler.UpdateTeam)  // 修改团队
+			commonUserRouter.POST(enums.TEAM+"/deleteTeam", teamHandler.DeleteTeam)  // 删除团队
+			commonUserRouter.GET(enums.TEAM+"/getTeamList", teamHandler.GetTeamList) // 获取团队列表
+			//commonUserRouter.GET(enums.TEAM+"/getTeam", teamHandler.GetTeam)              // todo 获取团队详细
+			//commonUserRouter.POST(enums.TEAM+"/getUserTeamList", teamHandler.GetUserTeam) // todo 获取个人团队列表
 
-			//commonUserRouter.POST(enums.TEAM+"/getTeamMemberList", articleHandler.GetTeamMemberList) // 获取团队成员列表
-			//commonUserRouter.POST(enums.TEAM+"/addTeamMember", articleHandler.AddTeamMember)         // 添加团队成员
-			//commonUserRouter.POST(enums.TEAM+"/deleteTeamMember", articleHandler.DeleteTeamMember)   // 删除团队成员
-			//commonUserRouter.POST(enums.TEAM+"/updateTeamMember", articleHandler.UpdateTeamMember)   // 修改团队成员
+			//commonUserRouter.POST(enums.TEAM+"/getTeamMemberList", teamHandler.GetTeamMemberList) // 获取团队成员列表
+			//commonUserRouter.POST(enums.TEAM+"/addTeamMember", teamHandler.AddTeamMember)         // 添加团队成员
+			//commonUserRouter.POST(enums.TEAM+"/deleteTeamMember", teamHandler.DeleteTeamMember)   // 删除团队成员
+			//commonUserRouter.POST(enums.TEAM+"/updateTeamMember", teamHandler.UpdateTeamMember)   // 修改团队成员
 
 		}
 		//// 学生用户路由组
@@ -126,6 +125,7 @@ func NewHTTPServer(
 		// 超级管理员路由组
 		//superAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUPER_ADMIN))
 		//{
+		//commonUserRouter.POST(enums.TEAM+"/deleteTeamList", teamHandler.DeleteTeamList)               // 管理员批量删除团队
 		//}
 	}
 

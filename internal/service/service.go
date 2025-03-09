@@ -27,3 +27,17 @@ func NewService(
 		Tm:     tm,
 	}
 }
+
+// page初始化
+func InitPage(pageIndex int, pageSize int) (int, int) {
+	if pageIndex < 1 {
+		pageIndex = 1
+	}
+	if pageSize < 10 {
+		pageSize = 10
+	}
+	if pageSize > 100 {
+		pageSize = 100
+	}
+	return pageIndex, pageSize
+}
