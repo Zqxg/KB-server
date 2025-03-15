@@ -13,21 +13,31 @@ type TeamService interface {
 	CreateTeam(ctx *gin.Context, userId string, req *v1.CreateTeamRequest) (uint, error)
 	UpdateTeam(ctx *gin.Context, userId string, req *v1.UpdateTeamRequest) error
 	DeleteTeam(ctx *gin.Context, userId string, teamId uint) error
-	GetTeamList(ctx *gin.Context, req *v1.GetTeamListReq) (v1.GetTeamListResp, error)
+	GetTeamList(ctx *gin.Context, req *v1.GetTeamListReq) (*v1.GetTeamListResp, error)
+	GetTeamInfo(ctx *gin.Context, teamId int) (*v1.GetTeamInfoResp, error)
+	GetUserTeamList(ctx *gin.Context, userId string, pageIndex, pageSize int) (*v1.GetUserTeamListResp, error)
+	GetTeamMemberList(ctx *gin.Context, teamId int) ([]*model.Member, error)
+	AddTeamMember(ctx *gin.Context, userID string, req *v1.AddTeamMemberReq) error
+	DeleteTeamMember(ctx *gin.Context, userID string, req *v1.DeleteTeamMemberReq) error
+	UpdateTeamMemberRole(ctx *gin.Context, userID string, req *v1.UpdateTeamMemberRoleReq) error
+	QuitTeam(ctx *gin.Context, userID string, teamId uint) error
 }
 
 func NewTeamService(
 	service *service.Service,
+	userRepository repository.UserRepository,
 	teamRepository repository.TeamRepository,
 ) TeamService {
 	return &teamService{
 		Service:        service,
+		userRepository: userRepository,
 		teamRepository: teamRepository,
 	}
 }
 
 type teamService struct {
 	*service.Service
+	userRepository repository.UserRepository
 	teamRepository repository.TeamRepository
 }
 
@@ -51,7 +61,7 @@ func (s *teamService) CreateTeam(ctx *gin.Context, userId string, req *v1.Create
 		}
 		err = s.teamRepository.CreateTeamMember(ctx, teamMember)
 		if err != nil {
-			return 0, err
+			return 0, v1.ErrCreateTeamFailed
 		}
 	}
 	return teamId, nil
@@ -69,7 +79,7 @@ func (s *teamService) UpdateTeam(ctx *gin.Context, userId string, req *v1.Update
 		Description: req.Description,
 	}
 	if err := s.teamRepository.UpdateTeam(ctx, team); err != nil {
-		return err
+		return v1.ErrUpdateTeamFailed
 	}
 	return nil
 }
@@ -81,7 +91,7 @@ func (s *teamService) DeleteTeam(ctx *gin.Context, userId string, teamId uint) e
 	}
 	// 删除团队
 	if err := s.teamRepository.DeleteTeam(ctx, teamId); err != nil {
-		return err
+		return v1.ErrDeleteTeamFailed
 	}
 	return nil
 }
@@ -99,18 +109,18 @@ func (s *teamService) isTeamLeaderOrAdmin(ctx *gin.Context, teamId uint, userId 
 	return member.Role == enums.LEADER || member.Role == enums.ADMIN
 }
 
-func (s *teamService) GetTeamList(ctx *gin.Context, req *v1.GetTeamListReq) (v1.GetTeamListResp, error) {
+func (s *teamService) GetTeamList(ctx *gin.Context, req *v1.GetTeamListReq) (*v1.GetTeamListResp, error) {
 	// 初始化分页信息
 	pageIndex, pageSize := service.InitPage(req.PageIndex, req.PageSize)
 
 	// 查询团队列表
 	teams, totalCount, err := s.teamRepository.GetTeamList(ctx, req.TeamName, req.CreatedBy, pageIndex, pageSize)
 	if err != nil {
-		return v1.GetTeamListResp{}, err
+		return nil, err
 	}
 
 	// 构建响应
-	return v1.GetTeamListResp{
+	return &v1.GetTeamListResp{
 		TeamList: teams,
 		PageResponse: v1.PageResponse{
 			TotalCount: totalCount, // 增加总数，方便前端分页
@@ -118,4 +128,130 @@ func (s *teamService) GetTeamList(ctx *gin.Context, req *v1.GetTeamListReq) (v1.
 			PageSize:   pageSize,
 		},
 	}, nil
+}
+
+func (s *teamService) GetTeamInfo(ctx *gin.Context, teamId int) (*v1.GetTeamInfoResp, error) {
+	team, err := s.teamRepository.GetTeamByID(ctx, uint(teamId))
+	if err != nil {
+		return nil, v1.ErrGetTeamInfoFailed
+	}
+	members, err := s.teamRepository.GetTeamMemberListByTeamID(ctx, uint(teamId))
+	if err != nil {
+		return nil, v1.ErrGetTeamMemberListFailed
+	}
+
+	return &v1.GetTeamInfoResp{
+		Team:   *team,
+		Member: members,
+	}, nil
+
+}
+
+func (s *teamService) GetUserTeamList(ctx *gin.Context, userId string, pageIndex, pageSize int) (*v1.GetUserTeamListResp, error) {
+	index, size := service.InitPage(pageIndex, pageSize)
+	teams, total, err := s.teamRepository.GetTeamList(ctx, "", userId, index, size)
+	if err != nil {
+		return nil, v1.ErrGetTeamInfoFailed
+	}
+	return &v1.GetUserTeamListResp{
+		TeamList: teams,
+		PageResponse: v1.PageResponse{
+			TotalCount: total,
+			PageIndex:  index,
+			PageSize:   size,
+		},
+	}, nil
+}
+
+func (s *teamService) GetTeamMemberList(ctx *gin.Context, teamId int) ([]*model.Member, error) {
+	// 判断团队是否存在
+	team, err := s.teamRepository.GetTeamByID(ctx, uint(teamId))
+	if err != nil || team == nil {
+		return nil, v1.ErrTeamNotExist
+	}
+
+	memberList, err := s.teamRepository.GetTeamMemberListByTeamID(ctx, uint(teamId))
+	if err != nil {
+		return nil, v1.ErrGetTeamMemberListFailed
+	}
+	return memberList, nil
+}
+
+func (s *teamService) AddTeamMember(ctx *gin.Context, userID string, req *v1.AddTeamMemberReq) error {
+	// 判断用户是否为团队负责人或者管理员
+	if !s.isTeamLeaderOrAdmin(ctx, req.TeamID, userID) {
+		return v1.ErrNoTeamAdminPermission
+	}
+	// 判断用户是否存在
+	_, err := s.userRepository.GetByUserId(ctx, req.MemberID)
+	if err != nil {
+		return v1.ErrUserNotExist
+	}
+	// 判断用户是否已经在团队中
+	_, err = s.teamRepository.GetMemberByTeamIDAndUserID(ctx, req.TeamID, req.MemberID)
+	if err != nil {
+		return v1.ErrMemberExist
+	}
+	// 构建成员表
+	teamMember := &model.Member{
+		TeamID: req.TeamID,
+		UserID: req.MemberID,
+		Role:   req.RoleType,
+	}
+	err = s.teamRepository.CreateTeamMember(ctx, teamMember)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *teamService) DeleteTeamMember(ctx *gin.Context, userID string, req *v1.DeleteTeamMemberReq) error {
+	// 判断用户是否为团队负责人或者管理员
+	if !s.isTeamLeaderOrAdmin(ctx, req.TeamID, userID) {
+		return v1.ErrNoTeamAdminPermission
+	}
+	// 判断用户是否在团队中
+	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, req.TeamID, req.MemberID)
+	if err != nil {
+		return v1.ErrMemberNotExist
+	}
+	// 删除成员
+	err = s.teamRepository.DeleteTeamMember(ctx, member.MemberID)
+	if err != nil {
+		return err
+	}
+	return nil
+}
+
+func (s *teamService) UpdateTeamMemberRole(ctx *gin.Context, userID string, req *v1.UpdateTeamMemberRoleReq) error {
+	// 判断用户是否为团队负责人或者管理员
+	if !s.isTeamLeaderOrAdmin(ctx, req.TeamID, userID) {
+		return v1.ErrNoTeamAdminPermission
+	}
+	// 判断用户是否在团队中
+	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, req.TeamID, req.MemberID)
+	if err != nil {
+		return v1.ErrMemberNotExist
+	}
+	// 更新成员角色
+	member.Role = req.RoleType
+	err = s.teamRepository.UpdateTeamMember(ctx, member)
+	if err != nil {
+		return v1.ErrUpdateMemberFailed
+	}
+	return nil
+}
+
+func (s *teamService) QuitTeam(ctx *gin.Context, userID string, teamId uint) error {
+	// 判断用户是否在团队中
+	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, teamId, userID)
+	if err != nil {
+		return v1.ErrMemberNotExist
+	}
+	// 删除成员
+	err = s.teamRepository.DeleteTeamMember(ctx, member.MemberID)
+	if err != nil {
+		return v1.ErrDeleteMemberFailed
+	}
+	return nil
 }

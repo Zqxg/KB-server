@@ -47,6 +47,22 @@ var (
 	ErrUpdateKnowledgeFailed = newError(2109, "更新知识库失败")
 	ErrUpdateKnowledgePublic = newError(2110, "公共知识库不能更新")
 
+	// 2200 team
+	ErrTeamNotExist      = newError(2200, "团队不存在")
+	ErrTeamExist         = newError(2201, "团队已存在")
+	ErrTeamEmpty         = newError(2202, "团队为空")
+	ErrDeleteTeamFailed  = newError(2203, "删除团队失败")
+	ErrCreateTeamFailed  = newError(2206, "创建团队失败")
+	ErrUpdateTeamFailed  = newError(2209, "更新团队失败")
+	ErrGetTeamInfoFailed = newError(2210, "获取团队信息失败")
+	// 2300 成员
+	ErrNoTeamAdminPermission   = newError(2304, "无团队管理员权限")
+	ErrMemberNotExist          = newError(2300, "成员不存在")
+	ErrMemberExist             = newError(2301, "成员已存在")
+	ErrDeleteMemberFailed      = newError(2303, "删除成员失败")
+	ErrUpdateMemberFailed      = newError(2304, "更新成员失败")
+	ErrGetTeamMemberListFailed = newError(2305, "获取团队成员列表失败")
+
 	// 3000 数据库
 	ErrDatabase     = newError(3000, "数据库错误")
 	ErrInsertFailed = newError(3001, "插入失败")

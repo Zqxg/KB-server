@@ -12,6 +12,7 @@ import (
 	"projectName/internal/server"
 	"projectName/internal/service"
 	"projectName/internal/service/article"
+	"projectName/internal/service/team"
 	"projectName/internal/service/user"
 	"projectName/pkg/app"
 	"projectName/pkg/jwt"
@@ -36,6 +37,8 @@ var repositorySet = wire.NewSet(
 	repository.NewUserRepository,
 	repository.NewCollegeRepository,
 	repository.NewArticleRepository,
+	repository.NewTeamRepository,
+	repository.NewKBRepository,
 )
 
 // 提供 service 层的实例
@@ -46,6 +49,7 @@ var serviceSet = wire.NewSet(
 	user.NewCaptchaService,       // 使用 ProvideCaptchaExpireDuration 提供的 time.Duration 类型实例
 	user.NewCollegeService,
 	article.NewArticleService,
+	team.NewTeamService,
 )
 
 // 提供 handler 层的实例
@@ -54,6 +58,7 @@ var handlerSet = wire.NewSet(
 	handler.NewUserHandler,
 	handler.NewCollegeHandler,
 	handler.NewArticleHandler,
+	handler.NewTeamHandler,
 )
 
 // 提供 job 层的实例

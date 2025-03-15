@@ -100,17 +100,18 @@ func NewHTTPServer(
 			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKnowledgeBaseListByCategory", knowledgeBaseHandler.GetKnowledgeBaseListByCategory) // 分类获取公开知识库列表
 
 			// 团队模块
-			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)  // 新建团队
-			commonUserRouter.POST(enums.TEAM+"/updateTeam", teamHandler.UpdateTeam)  // 修改团队
-			commonUserRouter.POST(enums.TEAM+"/deleteTeam", teamHandler.DeleteTeam)  // 删除团队
-			commonUserRouter.GET(enums.TEAM+"/getTeamList", teamHandler.GetTeamList) // 获取团队列表
-			//commonUserRouter.GET(enums.TEAM+"/getTeam", teamHandler.GetTeam)              // todo 获取团队详细
-			//commonUserRouter.POST(enums.TEAM+"/getUserTeamList", teamHandler.GetUserTeam) // todo 获取个人团队列表
+			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)          // 新建团队
+			commonUserRouter.POST(enums.TEAM+"/updateTeam", teamHandler.UpdateTeam)          // 修改团队
+			commonUserRouter.POST(enums.TEAM+"/deleteTeam", teamHandler.DeleteTeam)          // 删除团队
+			commonUserRouter.GET(enums.TEAM+"/getTeamList", teamHandler.GetTeamList)         // 获取团队列表
+			commonUserRouter.GET(enums.TEAM+"/getTeamInfo", teamHandler.GetTeamInfo)         // 获取团队详细
+			commonUserRouter.GET(enums.TEAM+"/getUserTeamList", teamHandler.GetUserTeamList) // 获取个人团队列表
 
-			//commonUserRouter.POST(enums.TEAM+"/getTeamMemberList", teamHandler.GetTeamMemberList) // 获取团队成员列表
-			//commonUserRouter.POST(enums.TEAM+"/addTeamMember", teamHandler.AddTeamMember)         // 添加团队成员
-			//commonUserRouter.POST(enums.TEAM+"/deleteTeamMember", teamHandler.DeleteTeamMember)   // 删除团队成员
-			//commonUserRouter.POST(enums.TEAM+"/updateTeamMember", teamHandler.UpdateTeamMember)   // 修改团队成员
+			commonUserRouter.GET(enums.TEAM+"/getTeamMemberList", teamHandler.GetTeamMemberList)        // 获取团队成员列表
+			commonUserRouter.POST(enums.TEAM+"/addTeamMember", teamHandler.AddTeamMember)               // 添加团队成员
+			commonUserRouter.POST(enums.TEAM+"/deleteTeamMember", teamHandler.DeleteTeamMember)         // 删除团队成员
+			commonUserRouter.POST(enums.TEAM+"/UpdateTeamMemberRole", teamHandler.UpdateTeamMemberRole) // 修改团队成员角色
+			commonUserRouter.POST(enums.TEAM+"/quitTeam", teamHandler.QuitTeam)                         // 退出团队
 
 		}
 		//// 学生用户路由组
