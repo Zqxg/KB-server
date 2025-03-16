@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/article/DeleteArticle": {
+        "/knowledgeBase/DeleteArticle": {
             "post": {
                 "security": [
                     {
@@ -62,7 +62,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/article/DeleteArticleList": {
+        "/knowledgeBase/DeleteArticleList": {
             "post": {
                 "security": [
                     {
@@ -100,7 +100,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/article/UpdateArticle": {
+        "/knowledgeBase/UpdateArticle": {
             "post": {
                 "security": [
                     {
@@ -138,7 +138,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/article/createArticle": {
+        "/knowledgeBase/createArticle": {
             "post": {
                 "security": [
                     {
@@ -176,7 +176,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/article/getArticle": {
+        "/knowledgeBase/getArticle": {
             "get": {
                 "security": [
                     {
@@ -212,7 +212,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/article/getArticleCategory": {
+        "/knowledgeBase/getArticleCategory": {
             "get": {
                 "security": [
                     {
@@ -239,7 +239,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/article/getArticleListByCategory": {
+        "/knowledgeBase/getArticleListByCategory": {
             "get": {
                 "security": [
                     {
@@ -289,7 +289,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/article/getArticleListByEs": {
+        "/knowledgeBase/getArticleListByEs": {
             "post": {
                 "security": [
                     {
@@ -327,7 +327,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/article/getUserArticleList": {
+        "/knowledgeBase/getUserArticleList": {
             "post": {
                 "security": [
                     {

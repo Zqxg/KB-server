@@ -2,7 +2,7 @@ package enums
 
 const (
 	USER           = "/user"
-	ARTICLE        = "/article"
+	ARTICLE        = "/knowledgeBase"
 	KNOWLEDGE_BASE = "/knowledgeBase"
 	TEAM           = "/team"
 )

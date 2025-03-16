@@ -1,0 +1,164 @@
+package knowledgeBase
+
+import (
+	"github.com/gin-gonic/gin"
+	v1 "projectName/api/v1"
+	"projectName/internal/enums"
+	"projectName/internal/model"
+	"projectName/internal/repository"
+	"projectName/internal/service"
+)
+
+type KnowledgeBaseService interface {
+	CreateKnowledgeBase(ctx *gin.Context, userId string, req *v1.CreateKBRequest) (uint, error)
+	UpdateKBName(ctx *gin.Context, userId string, req *v1.UpdateKBNameReq) error
+	DeleteKB(ctx *gin.Context, userId string, kbId uint) error
+	GetKBInfo(ctx *gin.Context, kbId uint) (*v1.GetKBInfoResp, error)
+	GetKBListByTeamId(ctx *gin.Context, req *v1.GetKBListByTeamIdReq) (*v1.GetKBListByTeamIdResp, error)
+}
+
+func NewKnowledgeBaseService(
+	service *service.Service,
+	kbRepository repository.KBRepository,
+	teamRepository repository.TeamRepository,
+	userRepository repository.UserRepository,
+) KnowledgeBaseService {
+	return &knowledgeBaseService{
+		Service:        service,
+		kbRepository:   kbRepository,
+		teamRepository: teamRepository,
+		userRepository: userRepository,
+	}
+}
+
+type knowledgeBaseService struct {
+	*service.Service
+	kbRepository   repository.KBRepository
+	teamRepository repository.TeamRepository
+	userRepository repository.UserRepository
+}
+
+func (s *knowledgeBaseService) CreateKnowledgeBase(ctx *gin.Context, userId string, req *v1.CreateKBRequest) (uint, error) {
+	// 校验团队是否存在
+	team, err := s.teamRepository.GetTeamByID(ctx, req.TeamID)
+	if err != nil {
+		return 0, err
+	}
+	// 获取用户角色
+	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, req.TeamID, userId)
+	// 校验用户是否为团队leader或admin
+	if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
+		return 0, v1.ErrPermissionDenied
+	}
+	// 创建知识库
+	knowledgeBase := &model.KnowledgeBase{
+		TeamID:    &team.TeamID,
+		KbName:    req.Name,
+		CreatedBy: userId,
+		UserID:    nil,   //团队知识库的userID为nil
+		IsPublic:  false, //团队知识库
+	}
+	kbId, err := s.kbRepository.CreateKB(ctx, knowledgeBase)
+	if err != nil {
+		return 0, err
+	}
+	return kbId, nil
+}
+
+func (s *knowledgeBaseService) UpdateKBName(ctx *gin.Context, userId string, req *v1.UpdateKBNameReq) error {
+	// 判断知识库是否存在
+	kb, err := s.kbRepository.GetKBById(ctx, req.KBID)
+	if err != nil {
+		return v1.ErrKnowledgeNotExist
+	}
+	// 获取用户角色
+	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, *kb.TeamID, userId)
+	// 校验用户是否为团队leader或admin
+	if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
+		return v1.ErrPermissionDenied
+	}
+	// 更新知识库名称
+	kb.KbName = req.Name
+	err = s.kbRepository.UpdateKB(ctx, kb)
+	return v1.ErrUpdateKnowledgeFailed
+}
+
+func (s *knowledgeBaseService) DeleteKB(ctx *gin.Context, userId string, kbId uint) error {
+	// 判断知识库是否存在
+	kb, err := s.kbRepository.GetKBById(ctx, kbId)
+	if err != nil {
+		return v1.ErrKnowledgeNotExist
+	}
+	// 获取用户角色
+	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, *kb.TeamID, userId)
+	// 校验用户是否为团队leader或admin
+	if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
+		return v1.ErrPermissionDenied
+	}
+	// 删除知识库
+	err = s.kbRepository.DeleteKB(ctx, kbId)
+	return v1.ErrDeleteKnowledgeFailed
+}
+
+func (s *knowledgeBaseService) GetKBInfo(ctx *gin.Context, kbId uint) (*v1.GetKBInfoResp, error) {
+	// 判断知识库是否存在
+	kb, err := s.kbRepository.GetKBViewById(ctx, kbId)
+	if err != nil {
+		return nil, v1.ErrKnowledgeNotExist
+	}
+
+	// 获取知识库信息
+	kbInfo := &v1.GetKBInfoResp{
+		KBID:      kb.KBID,
+		KbName:    kb.KbName,
+		TeamID:    kb.TeamID,
+		TeamName:  kb.TeamName,
+		IsPublic:  kb.IsPublic,
+		UserID:    kb.UserID,
+		UserName:  kb.UserName,
+		KBType:    kb.KBType,
+		CreatedAt: kb.CreatedAt,
+		UpdatedAt: kb.UpdatedAt,
+	}
+	return kbInfo, nil
+}
+
+func (s *knowledgeBaseService) GetKBListByTeamId(ctx *gin.Context, req *v1.GetKBListByTeamIdReq) (*v1.GetKBListByTeamIdResp, error) {
+	// 初始化分页参数
+	pageIndex, pageSize := service.InitPage(req.PageIndex, req.PageSize)
+
+	// 获取知识库列表
+	kbList, total, err := s.kbRepository.GetKBListByTeamId(ctx, req.TeamID, pageIndex, pageSize)
+	if err != nil {
+		return nil, err
+	}
+
+	// 组装返回数据
+	var kbInfoList []v1.GetKBInfoResp
+	for _, kb := range kbList {
+		kbInfoList = append(kbInfoList, v1.GetKBInfoResp{
+			KBID:      kb.KBID,
+			KbName:    kb.KbName,
+			TeamID:    kb.TeamID,
+			UserID:    kb.UserID,
+			TeamName:  kb.TeamName, // 这里假设 `team` 结构体有 `Name` 字段
+			UserName:  kb.UserName,
+			IsPublic:  kb.IsPublic,
+			KBType:    kb.KBType,
+			CreatedAt: kb.CreatedAt,
+			UpdatedAt: kb.UpdatedAt,
+		})
+	}
+
+	// 组装响应数据
+	resp := &v1.GetKBListByTeamIdResp{
+		KBList: kbInfoList,
+		PageResponse: v1.PageResponse{
+			PageIndex:  pageIndex,
+			PageSize:   pageSize,
+			TotalCount: total,
+		},
+	}
+
+	return resp, nil
+}

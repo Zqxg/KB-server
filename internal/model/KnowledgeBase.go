@@ -12,6 +12,7 @@ type KnowledgeBase struct {
 	TeamID    *uint          `gorm:""`                           // 团队ID (NULL 表示公共知识库)
 	UserID    *string        `gorm:"type:varchar(255)"`          // 用户ID (NULL 表示非私人知识库)
 	IsPublic  bool           `gorm:"type:boolean;default:false"` // 是否为公共知识库
+	CreatedBy string         `gorm:"type:varchar(255)"`          // 创建者
 	CreatedAt time.Time      `gorm:"autoCreateTime"`
 	UpdatedAt time.Time      `gorm:"autoUpdateTime"`
 	DeletedAt gorm.DeletedAt `gorm:"index"`

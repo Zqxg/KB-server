@@ -157,6 +157,16 @@ func ToInt(s string) (int, error) {
 	return result, nil
 }
 
+// ToUint 将字符串转换为无符号整数，如果转换失败则返回错误
+func ToUint(s string) (uint, error) {
+	var result uint
+	_, err := fmt.Sscanf(s, "%d", &result)
+	if err != nil || result < 0 {
+		return 0, errors.New("invalid unsigned integer format")
+	}
+	return result, nil
+}
+
 // ToFloat 将字符串转换为浮点数，如果转换失败则返回错误
 func ToFloat(s string) (float64, error) {
 	var result float64

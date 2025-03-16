@@ -23,6 +23,7 @@ func NewHTTPServer(
 	collegeHandler *handler.CollegeHandler,
 	articleHandler *handler.ArticleHandler,
 	teamHandler *handler.TeamHandler,
+	knowledgeBaseHandler *handler.KnowledgeBaseHandler,
 
 ) *http.Server {
 	gin.SetMode(gin.DebugMode)
@@ -89,15 +90,11 @@ func NewHTTPServer(
 			commonUserRouter.POST(enums.ARTICLE+"/getUserArticleList", articleHandler.GetUserArticleList)            // 获取个人文章列表
 
 			// 知识库模块
-			//commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBListByTeamId", knowledgeBaseHandler.GetKBListByTeamId)                      // 团队id获取知识库列表
-			//commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKnowledgeBase", knowledgeBaseHandler.GetKnowledgeBase)                              // 获取知识库详细
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createKnowledgeBase", knowledgeBaseHandler.CreateKnowledgeBase) // 新建团队知识库
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateKnowledgeBase", knowledgeBaseHandler.UpdateKnowledgeBase) // 修改团队知识库
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKnowledgeBase", knowledgeBaseHandler.DeleteKnowledgeBase) // 删除团队知识库
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKnowledgeBaseList", knowledgeBaseHandler.DeleteKnowledgeBaseList)               // 批量删除团队知识库
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getUserKnowledgeBaseList", knowledgeBaseHandler.GetUserKnowledgeBase)                 // 获取私人知识库
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKnowledgeBaseListByEs", knowledgeBaseHandler.GetKnowledgeBaseListByEs)             // es团队知识库查询
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKnowledgeBaseListByCategory", knowledgeBaseHandler.GetKnowledgeBaseListByCategory) // 分类获取公开知识库列表
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKBListByTeamId", knowledgeBaseHandler.GetKBListByTeamId) // 团队id获取知识库列表
+			commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBInfo", knowledgeBaseHandler.GetKBInfo)                  // 获取知识库详细
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createKB", knowledgeBaseHandler.CreateKB)                   // 新建团队知识库
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateKBName", knowledgeBaseHandler.UpdateKBName)           // 修改团队知识库名称
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKB", knowledgeBaseHandler.DeleteKB)                   // 删除团队知识库
 
 			// 团队模块
 			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)          // 新建团队

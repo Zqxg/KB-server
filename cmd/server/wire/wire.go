@@ -11,7 +11,7 @@ import (
 	"projectName/internal/repository"
 	"projectName/internal/server"
 	"projectName/internal/service"
-	"projectName/internal/service/article"
+	"projectName/internal/service/knowledgeBase"
 	"projectName/internal/service/team"
 	"projectName/internal/service/user"
 	"projectName/pkg/app"
@@ -48,8 +48,9 @@ var serviceSet = wire.NewSet(
 	ProvideCaptchaExpireDuration, // 提供 time.Duration 类型实例
 	user.NewCaptchaService,       // 使用 ProvideCaptchaExpireDuration 提供的 time.Duration 类型实例
 	user.NewCollegeService,
-	article.NewArticleService,
+	knowledgeBase.NewArticleService,
 	team.NewTeamService,
+	knowledgeBase.NewKnowledgeBaseService,
 )
 
 // 提供 handler 层的实例
@@ -59,6 +60,7 @@ var handlerSet = wire.NewSet(
 	handler.NewCollegeHandler,
 	handler.NewArticleHandler,
 	handler.NewTeamHandler,
+	handler.NewKnowledgeBaseHandler,
 )
 
 // 提供 job 层的实例

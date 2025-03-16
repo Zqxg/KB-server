@@ -14,7 +14,7 @@ import (
 	"projectName/internal/repository"
 	"projectName/internal/server"
 	"projectName/internal/service"
-	"projectName/internal/service/article"
+	"projectName/internal/service/knowledgeBase"
 	"projectName/internal/service/team"
 	"projectName/internal/service/user"
 	"projectName/pkg/app"
@@ -48,12 +48,13 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 	collegeService := user.NewCollegeService(serviceService, collegeRepository)
 	collegeHandler := handler.NewCollegeHandler(handlerHandler, collegeService)
 	articleRepository := repository.NewArticleRepository(repositoryRepository)
-	articleService := article.NewArticleService(serviceService, articleRepository, userRepository)
+	articleService := knowledgeBase.NewArticleService(serviceService, articleRepository, userRepository)
 	articleHandler := handler.NewArticleHandler(handlerHandler, articleService)
 	teamRepository := repository.NewTeamRepository(repositoryRepository)
-	teamService := team.NewTeamService(serviceService, teamRepository)
+	teamService := team.NewTeamService(serviceService, userRepository, teamRepository)
 	teamHandler := handler.NewTeamHandler(handlerHandler, teamService)
-	httpServer := server.NewHTTPServer(logger, viperViper, jwtJWT, userHandler, collegeHandler, articleHandler, teamHandler)
+	knowledgeBaseHandler := handler.NewKnowledgeBaseHandler(handlerHandler, teamService)
+	httpServer := server.NewHTTPServer(logger, viperViper, jwtJWT, userHandler, collegeHandler, articleHandler, teamHandler, knowledgeBaseHandler)
 	jobJob := job.NewJob(transaction, logger, sidSid)
 	userJob := job.NewUserJob(jobJob, userRepository)
 	jobServer := server.NewJobServer(logger, userJob)
@@ -73,10 +74,10 @@ func ProvideCaptchaExpireDuration() time.Duration {
 var repositorySet = wire.NewSet(repository.NewDB, repository.NewRedis, repository.NewESClient, repository.NewRepository, repository.NewTransaction, repository.NewUserRepository, repository.NewCollegeRepository, repository.NewArticleRepository, repository.NewTeamRepository, repository.NewKBRepository)
 
 // 提供 service 层的实例
-var serviceSet = wire.NewSet(service.NewService, user.NewUserService, ProvideCaptchaExpireDuration, user.NewCaptchaService, user.NewCollegeService, article.NewArticleService, team.NewTeamService)
+var serviceSet = wire.NewSet(service.NewService, user.NewUserService, ProvideCaptchaExpireDuration, user.NewCaptchaService, user.NewCollegeService, knowledgeBase.NewArticleService, team.NewTeamService, knowledgeBase.NewKnowledgeBaseService)
 
 // 提供 handler 层的实例
-var handlerSet = wire.NewSet(handler.NewHandler, handler.NewUserHandler, handler.NewCollegeHandler, handler.NewArticleHandler, handler.NewTeamHandler)
+var handlerSet = wire.NewSet(handler.NewHandler, handler.NewUserHandler, handler.NewCollegeHandler, handler.NewArticleHandler, handler.NewTeamHandler, handler.NewKnowledgeBaseHandler)
 
 // 提供 job 层的实例
 var jobSet = wire.NewSet(job.NewJob, job.NewUserJob)

@@ -5,18 +5,18 @@ import (
 	"net/http"
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
-	"projectName/internal/service/article"
+	"projectName/internal/service/knowledgeBase"
 	"projectName/pkg/utils"
 )
 
 type ArticleHandler struct {
 	*Handler
-	articleService article.ArticleService
+	articleService knowledgeBase.ArticleService
 }
 
 func NewArticleHandler(
 	handler *Handler,
-	articleService article.ArticleService,
+	articleService knowledgeBase.ArticleService,
 ) *ArticleHandler {
 	return &ArticleHandler{
 		Handler:        handler,
@@ -34,7 +34,7 @@ func NewArticleHandler(
 // @Security Bearer
 // @Param request body v1.CreateArticleRequest true "params"
 // @Success 200 {object} v1.CreateArticleResponseData
-// @Router /article/createArticle [post]
+// @Router /knowledgeBase/createArticle [post]
 func (h *ArticleHandler) CreateArticle(ctx *gin.Context) {
 	var req v1.CreateArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -61,7 +61,7 @@ func (h *ArticleHandler) CreateArticle(ctx *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Success 200 {object} v1.CategoryData
-// @Router /article/getArticleCategory [get]
+// @Router /knowledgeBase/getArticleCategory [get]
 func (h *ArticleHandler) GetArticleCategory(ctx *gin.Context) {
 	categories, err := h.articleService.GetArticleCategory(ctx)
 	if err != nil {
@@ -83,7 +83,7 @@ func (h *ArticleHandler) GetArticleCategory(ctx *gin.Context) {
 // @Security Bearer
 // @Param id query int true "Article ID"
 // @Success 200 {object} v1.ArticleData
-// @Router /article/getArticle [get]
+// @Router /knowledgeBase/getArticle [get]
 func (h *ArticleHandler) GetArticle(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	if !utils.IsNumeric(ctx.Query("id")) {
@@ -114,7 +114,7 @@ func (h *ArticleHandler) GetArticle(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.UpdateArticleRequest true "params"
 // @Success 200 {object} v1.ArticleData
-// @Router /article/UpdateArticle [post]
+// @Router /knowledgeBase/UpdateArticle [post]
 func (h *ArticleHandler) UpdateArticle(ctx *gin.Context) {
 	var req v1.UpdateArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -145,7 +145,7 @@ func (h *ArticleHandler) UpdateArticle(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.DelArticleListReq true "params"
 // @Success 200 {object} v1.DeleteArticleResponseData
-// @Router /article/DeleteArticleList [post]
+// @Router /knowledgeBase/DeleteArticleList [post]
 func (h *ArticleHandler) DeleteArticleList(ctx *gin.Context) {
 	var req v1.DelArticleListReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -178,7 +178,7 @@ func (h *ArticleHandler) DeleteArticleList(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.DeleteArticleRequest true "params"
 // @Success 200 {object} v1.DeleteArticleResponseData
-// @Router /article/DeleteArticle [post]
+// @Router /knowledgeBase/DeleteArticle [post]
 func (h *ArticleHandler) DeleteArticle(ctx *gin.Context) {
 	var req v1.DeleteArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -218,7 +218,7 @@ func (h *ArticleHandler) DeleteArticle(ctx *gin.Context) {
 // @Param pageIndex query int true "Page Index"
 // @Param pageSize query int true "Page Size"
 // @Success 200 {object} v1.ArticleList
-// @Router /article/getArticleListByCategory [get]
+// @Router /knowledgeBase/getArticleListByCategory [get]
 func (h *ArticleHandler) GetArticleListByCategory(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	categoryId, _ := utils.ToInt(ctx.DefaultQuery("categoryId", "1")) // 获取 categoryId 参数
@@ -250,7 +250,7 @@ func (h *ArticleHandler) GetArticleListByCategory(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.GetUserArticleListReq true "params"
 // @Success 200 {object} v1.ArticleList
-// @Router /article/getUserArticleList [post]
+// @Router /knowledgeBase/getUserArticleList [post]
 func (h *ArticleHandler) GetUserArticleList(ctx *gin.Context) {
 	var req v1.GetUserArticleListReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -276,7 +276,7 @@ func (h *ArticleHandler) GetUserArticleList(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.GetArticleListByEsReq true "params"
 // @Success 200 {object} v1.SearchArticleResp
-// @Router /article/getArticleListByEs [post]
+// @Router /knowledgeBase/getArticleListByEs [post]
 func (h *ArticleHandler) GetArticleListByEs(ctx *gin.Context) {
 	var req v1.GetArticleListByEsReq
 

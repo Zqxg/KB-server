@@ -191,7 +191,7 @@ func (r *articleRepository) GetArticleListByCategory(ctx context.Context, catego
 	}
 
 	// 打印成功日志
-	r.logger.WithContext(ctx).Info("Successfully fetched article list", zap.Int("articleCount", len(articles)))
+	r.logger.WithContext(ctx).Info("Successfully fetched knowledgeBase list", zap.Int("articleCount", len(articles)))
 
 	return articles, total, nil
 }
@@ -270,7 +270,7 @@ func (r *Repository) CreateEsArticle(ctx context.Context, article *model.EsArtic
 		Id(fmt.Sprintf("%d", article.ArticleID)).
 		BodyJson(article).
 		Do(ctx)
-	r.logger.WithContext(ctx).Info("ArticleRepository.CreateEsArticle", zap.Any("article", article))
+	r.logger.WithContext(ctx).Info("ArticleRepository.CreateEsArticle", zap.Any("knowledgeBase", article))
 	if err != nil {
 		r.logger.WithContext(ctx).Error("ArticleRepository.CreateEsArticle error", zap.Error(err))
 		return fmt.Errorf("failed to create Elasticsearch document: %w", err)
@@ -284,7 +284,7 @@ func (r *Repository) UpdateEsArticle(ctx context.Context, article *model.EsArtic
 		Id(fmt.Sprintf("%d", article.ArticleID)).
 		Doc(article).
 		Do(ctx)
-	r.logger.WithContext(ctx).Info("ArticleRepository.UpdateEsArticle", zap.Any("article", article))
+	r.logger.WithContext(ctx).Info("ArticleRepository.UpdateEsArticle", zap.Any("knowledgeBase", article))
 	if err != nil {
 		r.logger.WithContext(ctx).Error("ArticleRepository.UpdateEsArticle error", zap.Error(err))
 		return fmt.Errorf("failed to update Elasticsearch document: %w", err)
