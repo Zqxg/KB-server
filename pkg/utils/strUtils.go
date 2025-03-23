@@ -87,6 +87,16 @@ func Contains(s, substr string) bool {
 	return strings.Contains(s, substr)
 }
 
+// 判断列表中是否包含指定字符串
+func ContainsString(slice []string, target string) bool {
+	for _, str := range slice {
+		if str == target {
+			return true
+		}
+	}
+	return false
+}
+
 // ReplaceAll 替换字符串中的所有子字符串
 func ReplaceAll(s, old, new string) string {
 	return strings.ReplaceAll(s, old, new)

@@ -52,27 +52,6 @@ func (h *ArticleHandler) CreateArticle(ctx *gin.Context) {
 
 }
 
-// GetArticleCategory godoc
-// @Summary 获取文章分组
-// @Schemes
-// @Description
-// @Tags 文章模块
-// @Accept json
-// @Produce json
-// @Security Bearer
-// @Success 200 {object} v1.CategoryData
-// @Router /knowledgeBase/getArticleCategory [get]
-func (h *ArticleHandler) GetArticleCategory(ctx *gin.Context) {
-	categories, err := h.articleService.GetArticleCategory(ctx)
-	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
-		return
-	}
-	v1.HandleSuccess(ctx, v1.CategoryData{
-		CategoryList: categories,
-	})
-}
-
 // GetArticle godoc
 // @Summary 获取文章详细
 // @Schemes
@@ -206,40 +185,6 @@ func (h *ArticleHandler) DeleteArticle(ctx *gin.Context) {
 	}
 }
 
-// GetArticleListByCategory godoc
-// @Summary 分类获取公开文章列表
-// @Schemes
-// @Description
-// @Tags 文章模块
-// @Accept json
-// @Produce json
-// @Security Bearer
-// @Param categoryId query int true "Category ID"
-// @Param pageIndex query int true "Page Index"
-// @Param pageSize query int true "Page Size"
-// @Success 200 {object} v1.ArticleList
-// @Router /knowledgeBase/getArticleListByCategory [get]
-func (h *ArticleHandler) GetArticleListByCategory(ctx *gin.Context) {
-	// 从查询参数中获取参数
-	categoryId, _ := utils.ToInt(ctx.DefaultQuery("categoryId", "1")) // 获取 categoryId 参数
-	pageIndex, _ := utils.ToInt(ctx.DefaultQuery("pageIndex", "1"))   // 获取 pageIndex 参数
-	pageSize, _ := utils.ToInt(ctx.DefaultQuery("pageSize", "10"))    // 获取 pageSize 参数
-	req := v1.GetArticleListByCategoryReq{
-		CategoryID: uint(categoryId),
-		PageRequest: v1.PageRequest{
-			PageIndex: pageIndex,
-			PageSize:  pageSize,
-		},
-	}
-	articleList, err := h.articleService.GetArticleListByCategory(ctx, &req)
-	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
-		return
-	}
-	v1.HandleSuccess(ctx, articleList)
-
-}
-
 // GetUserArticleList godoc
 // @Summary 获取个人文章列表
 // @Schemes
@@ -291,8 +236,9 @@ func (h *ArticleHandler) GetArticleListByEs(ctx *gin.Context) {
 	if req.Order == "" {
 		req.Order = "desc"
 	}
+	userId := GetUserIdFromCtx(ctx)
 
-	articleList, err := h.articleService.GetArticleListByEs(ctx, &req)
+	articleList, err := h.articleService.GetArticleListByEs(ctx, userId, &req)
 	if err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
 	}

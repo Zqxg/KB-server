@@ -32,12 +32,14 @@ func NewUserService(
 	service *service.Service,
 	userRepo repository.UserRepository,
 	kbRepo repository.KBRepository,
+	articleRepo repository.ArticleRepository,
 	captchaService CaptchaService, // 在构造函数中传入验证码服务
 ) UserService {
 	return &userService{
 		userRepo:       userRepo,
 		kbRepo:         kbRepo,
 		captchaService: captchaService, // 注入验证码服务
+		articleRepo:    articleRepo,
 		Service:        service,
 	}
 }
@@ -46,6 +48,7 @@ type userService struct {
 	userRepo       repository.UserRepository
 	kbRepo         repository.KBRepository
 	captchaService CaptchaService // 新增验证码服务
+	articleRepo    repository.ArticleRepository
 	*service.Service
 }
 
@@ -104,7 +107,13 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 		}
 		return nil
 	})
-	return err
+	// 新增es索引 私人知识库
+	index := enums.Private_knowledge_index + user.UserId
+	if err = s.articleRepo.CreateEsIndex(ctx, index); err != nil {
+		s.Logger.Error("add es index failed", zap.Error(err))
+		return v1.ErrCreateEsIndexFailed
+	}
+	return nil
 }
 
 func (s *userService) PasswordLogin(ctx context.Context, req *v1.PasswordLoginRequest) (string, error) {
@@ -206,6 +215,12 @@ func (s *userService) Cancel(ctx context.Context, userId string) error {
 	if err := s.userRepo.DeleteByUserId(ctx, userId); err != nil {
 		s.Logger.Error("userService.Cancel error", zap.Error(err))
 		return v1.ErrCancelFail
+	}
+	// 删除es索引
+	index := enums.Private_knowledge_index + userId
+	if err := s.articleRepo.DeleteEsIndex(ctx, index); err != nil {
+		s.Logger.Error("userService.Cancel error", zap.Error(err))
+		return v1.ErrDeleteEsIndexFailed
 	}
 	// 删除私人知识库
 	if err := s.kbRepo.DeleteKBByUserId(ctx, userId); err != nil {

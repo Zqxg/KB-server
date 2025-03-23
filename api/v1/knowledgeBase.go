@@ -1,6 +1,9 @@
 package v1
 
-import "time"
+import (
+	"projectName/internal/model/vo"
+	"time"
+)
 
 type CreateKBRequest struct {
 	TeamID uint   `json:"teamID" binding:"required"`
@@ -40,4 +43,32 @@ type GetKBListByTeamIdReq struct {
 type GetKBListByTeamIdResp struct {
 	KBList []GetKBInfoResp `json:"kb_list"`
 	PageResponse
+}
+
+type CreateCategoryReq struct {
+	KBID         uint   `json:"kb_id" binding:"required"`
+	CategoryName string `json:"category_name" binding:"required"`
+	ParentId     uint   `json:"parent_id"`
+}
+
+type UpdateCategoryReq struct {
+	CID          uint   `json:"cid" binding:"required"`
+	CategoryName string `json:"category_name" binding:"required"`
+}
+
+type DeleteCategoryReq struct {
+	CID uint `json:"cid" binding:"required"`
+}
+
+type CategoryList []vo.CategoryView
+type CategoryData struct {
+	CategoryList
+}
+
+type GetKBListByTypeReq struct {
+	KBType string `json:"kb_type"`
+}
+
+type KBList struct {
+	KBList []*vo.KbKnowledgeBaseView `json:"kb_list"`
 }

@@ -11,9 +11,9 @@ type EsArticle struct {
 	Content         string    `json:"content"`
 	ContentShort    string    `json:"content_short"`
 	UserID          string    `json:"user_id"`
+	KBID            uint      `json:"kb_id"` // 知识库ID
 	CategoryID      uint      `json:"category_id"`
 	Importance      int       `json:"importance"`
-	VisibleRange    string    `json:"visible_range"`
 	CommentDisabled bool      `json:"comment_disabled"`
 	SourceURI       string    `json:"source_uri"`
 	Status          int       `json:"status"`

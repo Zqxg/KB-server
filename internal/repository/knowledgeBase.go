@@ -14,8 +14,16 @@ type KBRepository interface {
 	DeleteKBByUserId(ctx context.Context, userId string) error
 	GetKBById(ctx context.Context, id uint) (*model.KnowledgeBase, error)
 	GetKBViewById(ctx context.Context, id uint) (*vo.KbKnowledgeBaseView, error)
+	GetKBTypeById(ctx context.Context, id uint) (string, error)
 	GetKBListByTeamId(ctx context.Context, teamId uint, pageIndex, pageSize int) ([]*vo.KbKnowledgeBaseView, int64, error)
+	GetKBListByTypeAndUserId(ctx context.Context, userId, kbType string) ([]*vo.KbKnowledgeBaseView, error)
 	//GetKBList(ctx context.Context, req *model.GetKBListReq) ([]*model.KnowledgeBase, int64, error)
+	CreateCategory(ctx context.Context, category *model.Category) (uint, error)
+	UpdateCategory(ctx context.Context, category *model.Category) error
+	DeleteCategory(ctx context.Context, id uint) error
+	GetCategoryList(ctx context.Context, kbId uint) ([]*model.Category, error)
+	GetCategoryById(ctx context.Context, id uint) (*model.Category, error)
+	GetCategoryTreeByKB(ctx context.Context, kbId uint) ([]vo.CategoryView, error)
 }
 
 func NewKBRepository(
@@ -78,6 +86,14 @@ func (r *kbRepository) GetKBViewById(ctx context.Context, id uint) (*vo.KbKnowle
 	}
 	return &knowledge, nil
 }
+func (r *kbRepository) GetKBTypeById(ctx context.Context, id uint) (string, error) {
+	var knowledgeView *vo.KbKnowledgeBaseView
+	if err := r.DB(ctx).Table("kb_knowledgeBase_view").Where("kb_id =?", id).First(&knowledgeView).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.GetKBTypeById error", zap.Error(err))
+		return "", err
+	}
+	return knowledgeView.KBType, nil
+}
 
 // GetKBListByTeamId 获取指定 teamId 的知识库列表（分页）
 func (r *kbRepository) GetKBListByTeamId(ctx context.Context, teamId uint, pageIndex, pageSize int) ([]*vo.KbKnowledgeBaseView, int64, error) {
@@ -100,4 +116,88 @@ func (r *kbRepository) GetKBListByTeamId(ctx context.Context, teamId uint, pageI
 	}
 
 	return kbList, total, nil
+}
+
+// CreateCategory 创建分类
+func (r *kbRepository) CreateCategory(ctx context.Context, category *model.Category) (uint, error) {
+	if err := r.DB(ctx).Table("kb_category").Create(&category).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.CreateCategory error", zap.Error(err))
+		return 0, err
+	}
+	return category.CId, nil
+}
+
+// UpdateCategory 更新分类
+func (r *kbRepository) UpdateCategory(ctx context.Context, category *model.Category) error {
+	if err := r.DB(ctx).Table("kb_category").Where("c_id =?", category.CId).Updates(&category).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.UpdateCategory error", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+// DeleteCategory 删除分类
+func (r *kbRepository) DeleteCategory(ctx context.Context, id uint) error {
+	if err := r.DB(ctx).Table("kb_category").Where("c_id =?", id).Delete(&model.Category{}).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.DeleteCategory error", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+// GetCategoryList 获取分类列表
+func (r *kbRepository) GetCategoryList(ctx context.Context, kbId uint) ([]*model.Category, error) {
+	var categories []*model.Category
+	if err := r.DB(ctx).Table("kb_category").Where("kb_id =?", kbId).Find(&categories).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.GetCategoryList error", zap.Error(err))
+		return nil, err
+	}
+	return categories, nil
+}
+
+// GetCategoryById 获取分类信息
+func (r *kbRepository) GetCategoryById(ctx context.Context, id uint) (*model.Category, error) {
+	var category model.Category
+	if err := r.DB(ctx).Table("kb_category").Where("c_id =?", id).First(&category).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.GetCategoryById error", zap.Error(err))
+	}
+	return &category, nil
+}
+
+// GetCategoryTreeByKB 获取指定知识库的分类树结构
+func (r *kbRepository) GetCategoryTreeByKB(ctx context.Context, kbId uint) ([]vo.CategoryView, error) {
+	var categories []vo.CategoryView
+	if err := r.DB(ctx).Table("kb_category_view").
+		Where("kb_id = ?", kbId).
+		Order("level ASC, category_id ASC"). // 先按层级、再按ID排序，方便递归
+		Find(&categories).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.GetCategoryTreeByKB error", zap.Error(err))
+		return nil, err
+	}
+
+	tree := buildCategoryTree(categories, 0) // 从 parent_id = 0 开始构建树
+	return tree, nil
+}
+
+// buildCategoryTree 递归生成分类树
+func buildCategoryTree(data []vo.CategoryView, parentId uint) []vo.CategoryView {
+	var result []vo.CategoryView
+	for _, item := range data {
+		if item.ParentId == parentId {
+			item.Children = buildCategoryTree(data, item.CId)
+			result = append(result, item)
+		}
+	}
+	return result
+}
+
+func (r *kbRepository) GetKBListByTypeAndUserId(ctx context.Context, userId, kbType string) ([]*vo.KbKnowledgeBaseView, error) {
+	var kbList []*vo.KbKnowledgeBaseView
+	if err := r.DB(ctx).Table("kb_knowledgeBase_view").
+		Where("user_id = ? AND kb_type = ?", userId, kbType).
+		Find(&kbList).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.GetKBListByTypeAndUserId error", zap.Error(err))
+		return nil, err
+	}
+	return kbList, nil
 }

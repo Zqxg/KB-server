@@ -61,7 +61,7 @@ func NewHTTPServer(
 		// 无需权限路由组
 		noAuthRouter := v1.Group("/")
 		{
-			noAuthRouter.POST("/register", userHandler.Register)
+			noAuthRouter.POST("/register", userHandler.Register) // todo es
 			noAuthRouter.POST("/passwordLogin", userHandler.PasswordLogin)
 			noAuthRouter.GET("/getCaptcha", userHandler.GetCaptcha)
 		}
@@ -71,7 +71,7 @@ func NewHTTPServer(
 		{
 			// 用户模块
 			commonUserRouter.GET(enums.USER+"/logout", userHandler.Logout)                    // 退出
-			commonUserRouter.GET(enums.USER+"/cancel", userHandler.Cancel)                    // 注销
+			commonUserRouter.GET(enums.USER+"/cancel", userHandler.Cancel)                    // 注销 todo es
 			commonUserRouter.GET(enums.USER+"/getUserInfo", userHandler.GetUserInfo)          // 获取用户信息
 			commonUserRouter.POST(enums.USER+"/updateProfile", userHandler.UpdateProfile)     // 修改用户信息
 			commonUserRouter.GET(enums.USER+"/getCollege", collegeHandler.GetCollege)         // 获取学院信息
@@ -79,25 +79,32 @@ func NewHTTPServer(
 			commonUserRouter.POST(enums.USER+"/userAuth", userHandler.UserAuth)
 
 			// 文章模块
-			commonUserRouter.GET(enums.ARTICLE+"/getArticleCategory", articleHandler.GetArticleCategory)             // 获取文章分组
-			commonUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle)                             // 获取文章详细
-			commonUserRouter.GET(enums.ARTICLE+"/getArticleListByCategory", articleHandler.GetArticleListByCategory) // 分类获取公开文章列表
-			commonUserRouter.POST(enums.ARTICLE+"/getArticleListByEs", articleHandler.GetArticleListByEs)            // es文章查询
-			commonUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                             // 新建文章
-			commonUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)                      // 修改文章
-			commonUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)                      // 删除文章
-			commonUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)              // 批量删除文章
-			commonUserRouter.POST(enums.ARTICLE+"/getUserArticleList", articleHandler.GetUserArticleList)            // 获取个人文章列表
+			//commonUserRouter.GET(enums.ARTICLE+"/getArticleCategory", articleHandler.GetArticleCategory)             // 获取文章分组
+			commonUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle) // 获取文章详细
+			//commonUserRouter.GET(enums.ARTICLE+"/getArticleListByCategory", articleHandler.GetArticleListByCategory) // 分类获取公开文章列表
+			commonUserRouter.POST(enums.ARTICLE+"/getArticleListByEs", articleHandler.GetArticleListByEs) // es文章查询
+			commonUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                  // 新建文章
+			commonUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)           // 修改文章
+			commonUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)           // 删除文章
+			commonUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)   // 批量删除文章
+			commonUserRouter.POST(enums.ARTICLE+"/getUserArticleList", articleHandler.GetUserArticleList) // 获取个人文章列表
 
 			// 知识库模块
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKBListByTeamId", knowledgeBaseHandler.GetKBListByTeamId) // 团队id获取知识库列表
+			commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBListByType", knowledgeBaseHandler.GetKBListByType)      // 获取知识库列表(私人知识库、公共知识库)
 			commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBInfo", knowledgeBaseHandler.GetKBInfo)                  // 获取知识库详细
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createKB", knowledgeBaseHandler.CreateKB)                   // 新建团队知识库
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateKBName", knowledgeBaseHandler.UpdateKBName)           // 修改团队知识库名称
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKB", knowledgeBaseHandler.DeleteKB)                   // 删除团队知识库
+			// 知识库分类模块
+			commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getCategoryListByKB", knowledgeBaseHandler.GetCategoryListByKB) // 获取知识库分类列表
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createCategory", knowledgeBaseHandler.CreateCategory)          // 新建知识库分类
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateCategory", knowledgeBaseHandler.UpdateCategory)          // 修改知识库分类
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteCategory", knowledgeBaseHandler.DeleteCategory)          // 删除知识库分类
+			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getArticleListByCategory", knowledgeBaseHandler.GetCategoryList) // 多种查询分类
 
 			// 团队模块
-			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)          // 新建团队
+			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)          // 新建团队 todo es
 			commonUserRouter.POST(enums.TEAM+"/updateTeam", teamHandler.UpdateTeam)          // 修改团队
 			commonUserRouter.POST(enums.TEAM+"/deleteTeam", teamHandler.DeleteTeam)          // 删除团队
 			commonUserRouter.GET(enums.TEAM+"/getTeamList", teamHandler.GetTeamList)         // 获取团队列表

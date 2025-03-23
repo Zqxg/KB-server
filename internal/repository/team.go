@@ -21,6 +21,7 @@ type TeamRepository interface {
 	GetTeamMemberListByTeamID(ctx context.Context, teamID uint) ([]*model.Member, error)
 	GetTeamMemberListByUserID(ctx context.Context, userID string) ([]*model.Member, error)
 	GetMemberByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.Member, error)
+	GetTeamListByUserID(ctx context.Context, userID string) ([]string, error)
 }
 
 func NewTeamRepository(
@@ -162,4 +163,13 @@ func (r *teamRepository) GetMemberByTeamIDAndUserID(ctx context.Context, teamID 
 		return nil, err
 	}
 	return &teamMember, nil
+}
+
+func (r *teamRepository) GetTeamListByUserID(ctx context.Context, userID string) ([]string, error) {
+	var teamIDs []string
+	if err := r.DB(ctx).Table("sys_member").Where("user_id =?", userID).Pluck("team_id", &teamIDs).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetTeamListByUserID error", zap.Error(err))
+		return nil, err
+	}
+	return teamIDs, nil
 }

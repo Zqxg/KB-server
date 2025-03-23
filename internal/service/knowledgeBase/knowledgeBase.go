@@ -5,6 +5,7 @@ import (
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
 	"projectName/internal/model"
+	"projectName/internal/model/vo"
 	"projectName/internal/repository"
 	"projectName/internal/service"
 )
@@ -15,6 +16,13 @@ type KnowledgeBaseService interface {
 	DeleteKB(ctx *gin.Context, userId string, kbId uint) error
 	GetKBInfo(ctx *gin.Context, kbId uint) (*v1.GetKBInfoResp, error)
 	GetKBListByTeamId(ctx *gin.Context, req *v1.GetKBListByTeamIdReq) (*v1.GetKBListByTeamIdResp, error)
+	GetKBListByType(ctx *gin.Context, userId string, kbType string) ([]*vo.KbKnowledgeBaseView, error)
+
+	CreateCategory(ctx *gin.Context, userId string, req *v1.CreateCategoryReq) error
+	UpdateCategory(ctx *gin.Context, userId string, req *v1.UpdateCategoryReq) error
+	DeleteCategory(ctx *gin.Context, userId string, req *v1.DeleteCategoryReq) error
+	GetCategoryListByKB(ctx *gin.Context, kbID uint) ([]vo.CategoryView, error)
+	//GetCategoryList(ctx *gin.Context, userId string, req *v1.GetCategoryListReq) (*v1.GetCategoryListResp, error)
 }
 
 func NewKnowledgeBaseService(
@@ -161,4 +169,107 @@ func (s *knowledgeBaseService) GetKBListByTeamId(ctx *gin.Context, req *v1.GetKB
 	}
 
 	return resp, nil
+}
+
+func (s *knowledgeBaseService) CreateCategory(ctx *gin.Context, userId string, req *v1.CreateCategoryReq) error {
+	// 校验知识库是否存在
+	kb, err := s.kbRepository.GetKBById(ctx, req.KBID)
+	if err != nil {
+		return v1.ErrKnowledgeNotExist
+	}
+	// 获取用户角色
+	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, *kb.TeamID, userId)
+	// 校验用户是否为团队leader或admin
+	if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
+		return v1.ErrPermissionDenied
+	}
+	// 创建分类
+	category := &model.Category{
+		KbID:         req.KBID,
+		ParentId:     req.ParentId,
+		CategoryName: req.CategoryName,
+	}
+	_, err = s.kbRepository.CreateCategory(ctx, category)
+	if err != nil {
+		return v1.ErrCreateCategoryFailed
+	}
+	return nil
+}
+
+func (s *knowledgeBaseService) UpdateCategory(ctx *gin.Context, userId string, req *v1.UpdateCategoryReq) error {
+	// 判断分类是否存在
+	category, err := s.kbRepository.GetCategoryById(ctx, req.CID)
+	if err != nil {
+		return v1.ErrCategoryNotExist
+	}
+	// 获取用户角色
+	kb, err := s.kbRepository.GetKBById(ctx, category.KbID)
+	if err != nil {
+		return v1.ErrKnowledgeNotExist
+	}
+	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, *kb.TeamID, userId)
+	// 校验用户是否为团队leader或admin
+	if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
+		return v1.ErrPermissionDenied
+	}
+	// 更新分类
+	category.CategoryName = req.CategoryName
+	err = s.kbRepository.UpdateCategory(ctx, category)
+	if err != nil {
+		return v1.ErrUpdateCategoryFailed
+	}
+	return nil
+}
+
+func (s *knowledgeBaseService) DeleteCategory(ctx *gin.Context, userId string, req *v1.DeleteCategoryReq) error {
+	// 判断分类是否存在
+	category, err := s.kbRepository.GetCategoryById(ctx, req.CID)
+	if err != nil {
+		return v1.ErrCategoryNotExist
+	}
+	// 获取用户角色
+	kb, err := s.kbRepository.GetKBById(ctx, category.KbID)
+	if err != nil {
+		return v1.ErrKnowledgeNotExist
+	}
+	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, *kb.TeamID, userId)
+	// 校验用户是否为团队leader或admin
+	if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
+		return v1.ErrPermissionDenied
+	}
+	// 删除分类
+	err = s.kbRepository.DeleteCategory(ctx, req.CID)
+	if err != nil {
+		return v1.ErrDeleteCategoryFailed
+	}
+	return nil
+}
+
+func (s *knowledgeBaseService) GetCategoryListByKB(ctx *gin.Context, kbID uint) ([]vo.CategoryView, error) {
+	// 获取分类列表
+	categoryList, err := s.kbRepository.GetCategoryTreeByKB(ctx, kbID)
+	if err != nil {
+		return nil, v1.ErrGetCategoryListFailed
+	}
+	return categoryList, nil
+}
+
+func (s *knowledgeBaseService) GetKBListByType(ctx *gin.Context, userId string, kbType string) ([]*vo.KbKnowledgeBaseView, error) {
+
+	// 根据类型获取知识库列表
+	if kbType == "public" {
+		kbList, err := s.kbRepository.GetKBListByTypeAndUserId(ctx, "", "publicKB")
+		if err != nil {
+			return nil, v1.ErrKnowledgeNotExist
+		}
+		return kbList, nil
+	}
+	if kbType == "private" {
+		kbList, err := s.kbRepository.GetKBListByTypeAndUserId(ctx, userId, "privateKB")
+		if err != nil {
+			return nil, v1.ErrKnowledgeNotExist
+		}
+		return kbList, nil
+	}
+	return nil, v1.ErrKnowledgeNotExist
 }

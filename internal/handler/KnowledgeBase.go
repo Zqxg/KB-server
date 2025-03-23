@@ -158,3 +158,134 @@ func (h *KnowledgeBaseHandler) GetKBListByTeamId(ctx *gin.Context) {
 	}
 	v1.HandleSuccess(ctx, kbList)
 }
+
+// CreateCategory godoc
+// @Summary 新建知识库分类
+// @Schemes
+// @Description
+// @Tags 知识库模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param req body v1.CreateCategoryReq true "params"
+// @Success 200 {object} v1.Response
+// @Router /v1/createCategory [post]
+func (h *KnowledgeBaseHandler) CreateCategory(ctx *gin.Context) {
+	var req v1.CreateCategoryReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	userId := GetUserIdFromCtx(ctx)
+	err := h.knowledgeBaseService.CreateCategory(ctx, userId, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, nil)
+}
+
+// UpdateCategory godoc
+// @Summary 更新知识库分类
+// @Schemes
+// @Description
+// @Tags 知识库模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param req body v1.UpdateCategoryReq true "params"
+// @Success 200 {object} v1.Response
+// @Router /v1/updateCategory [post]
+func (h *KnowledgeBaseHandler) UpdateCategory(ctx *gin.Context) {
+	var req v1.UpdateCategoryReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	userId := GetUserIdFromCtx(ctx)
+	err := h.knowledgeBaseService.UpdateCategory(ctx, userId, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, nil)
+}
+
+// DeleteCategory godoc
+// @Summary 删除知识库分类
+// @Schemes
+// @Description
+// @Tags 知识库模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param req body v1.DeleteCategoryReq true "params"
+// @Success 200 {object} v1.Response
+// @Router /v1/deleteCategory [POST]
+func (h *KnowledgeBaseHandler) DeleteCategory(ctx *gin.Context) {
+	var req v1.DeleteCategoryReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	userId := GetUserIdFromCtx(ctx)
+	err := h.knowledgeBaseService.DeleteCategory(ctx, userId, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, nil)
+}
+
+// GetCategoryListByKB godoc
+// @Summary 获取知识库分类列表
+// @Schemes
+// @Description
+// @Tags 知识库模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param kb_id query uint true "知识库ID"
+// @Success 200 {object} v1.CategoryData
+// @Router /v1/getCategoryListByKB [GET]
+func (h *KnowledgeBaseHandler) GetCategoryListByKB(ctx *gin.Context) {
+	kbId, _ := utils.ToUint(ctx.Query("kb_id")) // 获取 kb_id 参数
+	if kbId < 0 {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	categoryList, err := h.knowledgeBaseService.GetCategoryListByKB(ctx, kbId)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, categoryList)
+}
+
+// GetKBListByType godoc
+// @Summary 获取知识库列表(私人知识库、公共知识库)
+// @Schemes
+// @Description
+// @Tags 知识库模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param req body v1.GetKBListByTypeReq true "params"
+// @Success 200 {object} v1.KBList
+// @Router /v1/getKBListByType [post]
+func (h *KnowledgeBaseHandler) GetKBListByType(ctx *gin.Context) {
+	var req v1.GetKBListByTypeReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	userId := GetUserIdFromCtx(ctx)
+	kbList, err := h.knowledgeBaseService.GetKBListByType(ctx, userId, req.KBType)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, &v1.KBList{
+		KBList: kbList,
+	})
+}

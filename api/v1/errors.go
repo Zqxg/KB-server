@@ -10,7 +10,7 @@ var (
 	ErrInternalServerError = newError(500, "内部服务器错误")
 
 	// more biz errors
-	ErrEmailAlreadyUse = newError(1001, "邮箱已存在")
+	//ErrEmailAlreadyUse = newError(1001, "邮箱已存在")
 	ErrPhoneAlreadyUse = newError(1002, "手机号已存在")
 	ErrPhoneFormat     = newError(1003, "手机号格式错误")
 	ErrPasswordFormat  = newError(1004, "密码格式错误")
@@ -19,7 +19,7 @@ var (
 	ErrUserNotExist    = newError(1007, "用户不存在")
 	ErrLogoutFail      = newError(1008, "用户退出失败")
 	ErrCancelFail      = newError(1009, "用户注销失败")
-	ErrEmailFormat     = newError(1010, "邮箱格式错误")
+	//ErrEmailFormat     = newError(1010, "邮箱格式错误")
 
 	ErrArticleNotExist     = newError(1101, "文章不存在")
 	ErrUpdateArticleFailed = newError(1102, "修改文章失败")
@@ -33,24 +33,30 @@ var (
 
 	// 2100 知识库
 	ErrKnowledgeNotExist = newError(2100, "知识库不存在")
-	ErrKnowledgeExist    = newError(2101, "知识库已存在")
-	ErrKnowledgeEmpty    = newError(2102, "知识库为空")
+	//ErrKnowledgeExist    = newError(2101, "知识库已存在")
+	//ErrKnowledgeEmpty    = newError(2102, "知识库为空")
 	// 知识库删除错误
 	ErrDeleteKnowledgeFailed = newError(2103, "删除知识库失败")
-	ErrDeleteKnowledgeExist  = newError(2104, "知识库存在文章")
-	ErrDeleteKnowledgePublic = newError(2105, "公共知识库不能删除")
+	//ErrDeleteKnowledgeExist  = newError(2104, "知识库存在文章")
+	//ErrDeleteKnowledgePublic = newError(2105, "公共知识库不能删除")
 	// 知识库创建错误
-	ErrCreateKnowledgeFailed = newError(2106, "创建知识库失败")
-	ErrCreateKnowledgeExist  = newError(2107, "知识库已存在")
-	ErrCreateKnowledgePublic = newError(2108, "公共知识库不能创建")
+	//ErrCreateKnowledgeFailed = newError(2106, "创建知识库失败")
+	//ErrCreateKnowledgeExist  = newError(2107, "知识库已存在")
+	//ErrCreateKnowledgePublic = newError(2108, "公共知识库不能创建")
 	// 知识库更新错误
 	ErrUpdateKnowledgeFailed = newError(2109, "更新知识库失败")
-	ErrUpdateKnowledgePublic = newError(2110, "公共知识库不能更新")
+	//ErrUpdateKnowledgePublic = newError(2110, "公共知识库不能更新")
+	// 2111 知识库分类
+	ErrCategoryNotExist      = newError(2111, "分类不存在")
+	ErrUpdateCategoryFailed  = newError(2112, "更新分类失败")
+	ErrCreateCategoryFailed  = newError(2113, "创建分类失败")
+	ErrDeleteCategoryFailed  = newError(2114, "删除分类失败")
+	ErrGetCategoryListFailed = newError(2115, "获取分类列表失败")
 
 	// 2200 team
-	ErrTeamNotExist      = newError(2200, "团队不存在")
-	ErrTeamExist         = newError(2201, "团队已存在")
-	ErrTeamEmpty         = newError(2202, "团队为空")
+	ErrTeamNotExist = newError(2200, "团队不存在")
+	//ErrTeamExist         = newError(2201, "团队已存在")
+	//ErrTeamEmpty         = newError(2202, "团队为空")
 	ErrDeleteTeamFailed  = newError(2203, "删除团队失败")
 	ErrCreateTeamFailed  = newError(2206, "创建团队失败")
 	ErrUpdateTeamFailed  = newError(2209, "更新团队失败")
@@ -64,8 +70,8 @@ var (
 	ErrGetTeamMemberListFailed = newError(2305, "获取团队成员列表失败")
 
 	// 3000 数据库
-	ErrDatabase     = newError(3000, "数据库错误")
-	ErrInsertFailed = newError(3001, "插入失败")
+	ErrDatabase = newError(3000, "数据库错误")
+	//ErrInsertFailed = newError(3001, "插入失败")
 	ErrUpdateFailed = newError(3002, "更新失败")
 	ErrDeleteFailed = newError(3003, "删除失败")
 	ErrQueryFailed  = newError(3004, "查询失败")
@@ -74,7 +80,9 @@ var (
 	ErrCreateEsArticleFailed = newError(4000, "创建es文章失败")
 	ErrUpdateEsArticleFailed = newError(4001, "更新es文章失败")
 	ErrDeleteEsArticleFailed = newError(4002, "删除es文章失败")
-	ErrQueryEsArticleFailed  = newError(4003, "查询es文章失败")
+	//ErrQueryEsArticleFailed  = newError(4003, "查询es文章失败")
+	ErrCreateEsIndexFailed = newError(4004, "创建es索引失败")
+	ErrDeleteEsIndexFailed = newError(4005, "删除es索引失败")
 
 	// 20000 业务逻辑错误
 	ErrParamEmpty          = newError(20000, "参数为空")

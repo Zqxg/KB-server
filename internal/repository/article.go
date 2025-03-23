@@ -10,7 +10,6 @@ import (
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
 	"projectName/internal/model"
-	"projectName/internal/model/vo"
 	"time"
 )
 
@@ -18,17 +17,17 @@ type ArticleRepository interface {
 	GetArticle(ctx context.Context, id uint) (*model.Article, error)
 	CreateArticle(ctx context.Context, article *model.Article) (int, error)
 	GetArticleByTitleAndUserId(ctx context.Context, title string, authorID string) (*model.Article, error)
-	FetchAllCategoriesAndBuildTree(ctx context.Context) ([]vo.CategoryView, error)
-	GetCategory(ctx context.Context, id uint) (*vo.CategoryView, error)
 	UpdateArticle(ctx context.Context, article *model.Article) (*model.Article, error)
 	DeleteArticle(ctx context.Context, id uint) (int, error)
 	DeleteArticleList(ctx context.Context, ids []uint) (int, error)
 	GetArticleListByCategory(ctx context.Context, categoryId uint, pageNum int, pageSize int) ([]model.Article, int64, error)
 	GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq, pageNum int, pageSize int) ([]model.Article, int64, error)
-	GetArticleListByEs(ctx context.Context, query *elastic.BoolQuery, highlight *elastic.Highlight, from, size int) (*elastic.SearchResult, error)
-	CreateEsArticle(ctx context.Context, article *model.EsArticle) error
-	UpdateEsArticle(ctx context.Context, article *model.EsArticle) error
-	DeleteEsArticle(ctx context.Context, articleId uint) error
+	GetArticleListByEs(ctx context.Context, indices []string, query *elastic.BoolQuery, highlight *elastic.Highlight, from, size int) (*elastic.SearchResult, error)
+	CreateEsArticle(ctx context.Context, index string, article *model.EsArticle) error
+	UpdateEsArticle(ctx context.Context, index string, article *model.EsArticle) error
+	DeleteEsArticle(ctx context.Context, index string, articleId uint) error
+	CreateEsIndex(ctx context.Context, index string) error // 新增es索引
+	DeleteEsIndex(ctx context.Context, index string) error // 删除es索引
 }
 
 func NewArticleRepository(
@@ -78,49 +77,6 @@ func (r *articleRepository) GetArticleByTitleAndUserId(ctx context.Context, titl
 	}
 
 	return &article, nil
-}
-
-// BuildCategoryTree 用于将平坦的分类数据转换为树状结构
-func BuildCategoryTree(data []vo.CategoryView, parentId uint) []vo.CategoryView {
-	var result []vo.CategoryView
-	for _, item := range data {
-		if item.ParentId == parentId {
-			item.Children = BuildCategoryTree(data, item.CId)
-			result = append(result, item)
-		}
-	}
-	return result
-}
-
-// FetchAllCategoriesAndBuildTree 从数据库获取所有分类数据并构建树状结构
-func (r *articleRepository) FetchAllCategoriesAndBuildTree(ctx context.Context) ([]vo.CategoryView, error) {
-	var categories []vo.CategoryView
-	// 查询视图中的所有分类
-	if err := r.DB(ctx).Table("view_category_tree").Find(&categories).Error; err != nil {
-		r.logger.WithContext(ctx).Error("Failed to fetch categories from view_category_tree", zap.Error(err))
-		return nil, err
-	}
-	// 调用 BuildCategoryTree 函数将平坦的分类数据转换为树状结构
-	tree := BuildCategoryTree(categories, 0)
-	r.logger.WithContext(ctx).Info("Successfully built category tree", zap.Int("rootCount", len(tree)))
-	return tree, nil
-}
-
-func (r *articleRepository) GetCategory(ctx context.Context, id uint) (*vo.CategoryView, error) {
-	var categoryView vo.CategoryView
-
-	// 查询视图中的单个分类，使用传入的 id
-	if err := r.DB(ctx).Table("view_category_tree").Where("category_id = ?", id).First(&categoryView).Error; err != nil {
-		if errors.Is(err, gorm.ErrRecordNotFound) {
-			// 如果没有找到记录，返回自定义的错误
-			return nil, v1.ErrNotFound
-		}
-		r.logger.WithContext(ctx).Error("Failed to fetch category from view_category_tree", zap.Uint("categoryId", id), zap.Error(err))
-		return nil, err
-	}
-
-	// 返回查询到的分类信息
-	return &categoryView, nil
 }
 
 func (r *articleRepository) UpdateArticle(ctx context.Context, article *model.Article) (*model.Article, error) {
@@ -248,25 +204,30 @@ func (r *articleRepository) GetUserArticleList(ctx context.Context, userId strin
 	return articles, total, nil
 }
 
-// GetArticleListByEs es查询
-func (r *Repository) GetArticleListByEs(ctx context.Context, query *elastic.BoolQuery, highlight *elastic.Highlight, from, size int) (*elastic.SearchResult, error) {
-	searchResult, err := r.esClient.Search().
-		Index("kb_article").
+// GetArticleListByEs 根据多个 ES 索引查询文章
+func (r *Repository) GetArticleListByEs(ctx context.Context, indices []string, query *elastic.BoolQuery, highlight *elastic.Highlight, from, size int) (*elastic.SearchResult, error) {
+	r.logger.WithContext(ctx).Info("ES查询索引列表", zap.Any("indices", indices))
+
+	searchService := r.esClient.Search().
+		Index(indices...). // 支持多个索引
 		Query(query).
-		Highlight(highlight).  // 高亮设置
-		From(from).Size(size). // 分页设置
-		Do(ctx)
-	r.logger.WithContext(ctx).Info("ArticleRepository.GetArticleListByEs", zap.Any("searchResult", searchResult))
+		Highlight(highlight).
+		From(from).Size(size) // 分页
+
+	searchResult, err := searchService.Do(ctx)
 	if err != nil {
-		r.logger.WithContext(ctx).Error("ArticleRepository.GetArticleListByEs error", zap.Error(err))
+		r.logger.WithContext(ctx).Error("ArticleRepository.GetArticleListByEs 查询失败", zap.Error(err))
 		return nil, fmt.Errorf("failed to execute Elasticsearch query: %w", err)
 	}
+
+	r.logger.WithContext(ctx).Info("ArticleRepository.GetArticleListByEs 查询成功", zap.Any("total", searchResult.Hits.TotalHits.Value))
 	return searchResult, nil
 }
 
-func (r *Repository) CreateEsArticle(ctx context.Context, article *model.EsArticle) error {
+func (r *Repository) CreateEsArticle(ctx context.Context, index string, article *model.EsArticle) error {
+	r.logger.WithContext(ctx).Info("ES index", zap.Any("index", index))
 	_, err := r.esClient.Index().
-		Index("kb_article").
+		Index(index).
 		Id(fmt.Sprintf("%d", article.ArticleID)).
 		BodyJson(article).
 		Do(ctx)
@@ -278,9 +239,10 @@ func (r *Repository) CreateEsArticle(ctx context.Context, article *model.EsArtic
 	return nil
 }
 
-func (r *Repository) UpdateEsArticle(ctx context.Context, article *model.EsArticle) error {
+func (r *Repository) UpdateEsArticle(ctx context.Context, index string, article *model.EsArticle) error {
+	r.logger.WithContext(ctx).Info("ES index", zap.Any("index", index))
 	_, err := r.esClient.Update().
-		Index("kb_article").
+		Index(index).
 		Id(fmt.Sprintf("%d", article.ArticleID)).
 		Doc(article).
 		Do(ctx)
@@ -291,15 +253,43 @@ func (r *Repository) UpdateEsArticle(ctx context.Context, article *model.EsArtic
 	}
 	return nil
 }
-func (r *Repository) DeleteEsArticle(ctx context.Context, articleId uint) error {
+func (r *Repository) DeleteEsArticle(ctx context.Context, index string, articleId uint) error {
+	r.logger.WithContext(ctx).Info("ES index", zap.Any("index", index))
 	_, err := r.esClient.Delete().
-		Index("kb_article").
+		Index(index).
 		Id(fmt.Sprintf("%d", articleId)).
 		Do(ctx)
 	r.logger.WithContext(ctx).Info("ArticleRepository.DeleteEsArticle", zap.Any("articleId", articleId))
 	if err != nil {
 		r.logger.WithContext(ctx).Error("ArticleRepository.DeleteEsArticle error", zap.Error(err))
 		return fmt.Errorf("failed to delete Elasticsearch document: %w", err)
+	}
+	return nil
+}
+
+func (r *Repository) CreateEsIndex(ctx context.Context, index string) error {
+	// 创建索引
+	createIndex, err := r.esClient.CreateIndex(index).Do(ctx)
+	if err != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.CreateEsIndex error", zap.Error(err))
+		return fmt.Errorf("failed to create Elasticsearch index: %w", err)
+	}
+	if !createIndex.Acknowledged {
+		r.logger.WithContext(ctx).Error("ArticleRepository.CreateEsIndex error", zap.Error(err))
+		return fmt.Errorf("failed to create Elasticsearch index: %w", err)
+	}
+	return nil
+}
+func (r *Repository) DeleteEsIndex(ctx context.Context, index string) error {
+	// 删除索引
+	deleteIndex, err := r.esClient.DeleteIndex(index).Do(ctx)
+	if err != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.DeleteEsIndex error", zap.Error(err))
+		return fmt.Errorf("failed to delete Elasticsearch index: %w", err)
+	}
+	if !deleteIndex.Acknowledged {
+		r.logger.WithContext(ctx).Error("ArticleRepository.DeleteEsIndex error", zap.Error(err))
+		return fmt.Errorf("failed to delete Elasticsearch index: %w", err)
 	}
 	return nil
 }

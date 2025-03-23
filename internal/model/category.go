@@ -10,7 +10,6 @@ type Category struct {
 	CategoryName string `gorm:"type:varchar(255);not null"`
 	ParentId     uint   `gorm:"type:int;default:0"`
 	KbID         uint   `gorm:"not null"` // 所属知识库ID
-	IsDeleted    int    `gorm:"default:0"`
 	CreatedAt    time.Time
 	UpdatedAt    time.Time
 	DeletedAt    gorm.DeletedAt `gorm:"index"`

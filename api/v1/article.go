@@ -1,7 +1,6 @@
 package v1
 
 import (
-	"projectName/internal/model/vo"
 	"time"
 )
 
@@ -11,6 +10,7 @@ type CreateArticleRequest struct {
 	Content         string       `json:"content" binding:"required"`      // 文章内容
 	ContentShort    string       `json:"contentShort"`                    // 文章摘要
 	AuthorID        string       `json:"authorId" binding:"required"`     // 作者ID
+	KBID            uint         `json:"kbId"`                            // 知识库ID
 	CategoryID      uint         `json:"categoryId"`                      // 文章分类ID
 	Importance      int          `json:"importance"`                      // 文章重要性
 	VisibleRange    string       `json:"visibleRange" binding:"required"` // 可见范围
@@ -37,8 +37,8 @@ type ArticleData struct {
 	Author          string       `json:"author" `         // 作者
 	Category        string       `json:"category"`        // 文章分类
 	CategoryID      uint         `json:"categoryId"`      // 文章分类ID
+	KBID            uint         `json:"kbId"`            // 知识库ID
 	Importance      int          `json:"importance"`      // 文章重要性
-	VisibleRange    string       `json:"visibleRange" `   // 可见范围
 	CommentDisabled bool         `json:"commentDisabled"` // 是否禁用评论
 	SourceURI       string       `json:"sourceUri"`       // 文章外链
 	UploadedFiles   []FileUpload `json:"uploadedFiles"`   // 上传的文件列表
@@ -46,11 +46,6 @@ type ArticleData struct {
 	CreatedAt       string       `json:"createdAt"`       // 文章创建时间
 	UpdatedAt       string       `json:"updateAt"`        // 文章更新时间
 	//Tags            []Tags       `json:"tags"`            //todo：文章标签
-}
-
-type CategoryList []vo.CategoryView
-type CategoryData struct {
-	CategoryList
 }
 
 type GetArticleRequest struct {
@@ -121,7 +116,6 @@ type ArticleSearchInfo struct {
 	Author          string    `json:"author"`
 	Category        string    `json:"category"`
 	Importance      int       `json:"importance"`
-	VisibleRange    string    `json:"visible_range"`
 	CommentDisabled bool      `json:"comment_disabled"`
 	SourceURI       string    `json:"source_uri"`
 	Status          int       `json:"status"`
