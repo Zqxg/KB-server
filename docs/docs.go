@@ -24,6 +24,94 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/admin/createPublicKB": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "管理员模块"
+                ],
+                "summary": "创建公共知识库",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateKBRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateKBResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/cancel": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "注销用户",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/getCaptcha": {
+            "get": {
+                "description": "获取验证码生成所需的ID和图片URL",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "获取验证码",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CaptchaResponseData"
+                        }
+                    }
+                }
+            }
+        },
         "/knowledgeBase/DeleteArticle": {
             "post": {
                 "security": [
@@ -212,83 +300,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/knowledgeBase/getArticleCategory": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "文章模块"
-                ],
-                "summary": "获取文章分组",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.CategoryData"
-                        }
-                    }
-                }
-            }
-        },
-        "/knowledgeBase/getArticleListByCategory": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "文章模块"
-                ],
-                "summary": "分类获取公开文章列表",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Category ID",
-                        "name": "categoryId",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Page Index",
-                        "name": "pageIndex",
-                        "in": "query",
-                        "required": true
-                    },
-                    {
-                        "type": "integer",
-                        "description": "Page Size",
-                        "name": "pageSize",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ArticleList"
-                        }
-                    }
-                }
-            }
-        },
         "/knowledgeBase/getArticleListByEs": {
             "post": {
                 "security": [
@@ -365,56 +376,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/cancel": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "用户模块"
-                ],
-                "summary": "注销用户",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/getCaptcha": {
-            "get": {
-                "description": "获取验证码生成所需的ID和图片URL",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "用户模块"
-                ],
-                "summary": "获取验证码",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.CaptchaResponseData"
-                        }
-                    }
-                }
-            }
-        },
         "/passwordLogin": {
             "post": {
                 "consumes": [
@@ -469,6 +430,425 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/v1.RegisterRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/addTeamMember": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "添加团队成员",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.AddTeamMemberReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/createTeam": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "新建团队",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateTeamResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/deleteTeam": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "删除团队",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.DeleteTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/deleteTeamMember": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "删除团队成员",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.DeleteTeamMemberReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/getTeamInfo": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "获取团队详细",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetTeamInfoResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/getTeamList": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "获取团队列表",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetTeamListReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetTeamListResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/getTeamMemberList": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "获取团队成员列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Team ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetTeamMemberListResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/getUserTeamList": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "获取个人团队列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page Index",
+                        "name": "pageIndex",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page Size",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetUserTeamListResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/quitTeam": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "退出团队",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.QuitTeamReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/updateTeam": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "更新团队",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateTeamRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/team/updateTeamMemberRole": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "更新团队成员角色",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateTeamMemberRoleReq"
                         }
                     }
                 ],
@@ -676,9 +1056,402 @@ const docTemplate = `{
                     }
                 }
             }
+        },
+        "/v1/createCategory": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "新建知识库分类",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateCategoryReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/createKB": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "新建团队知识库",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateKBRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateKBResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/deleteCategory": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "删除知识库分类",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.DeleteCategoryReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/deleteKB": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "删除知识库",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.DeleteKBReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/getCategoryListByKB": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "获取知识库分类列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "知识库ID",
+                        "name": "kb_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CategoryData"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/getKBInfo": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "获取知识库信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "知识库ID",
+                        "name": "kb_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetKBInfoResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/getKBListByTeamId": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "获取团队知识库列表",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetKBListByTeamIdReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetKBListByTeamIdResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/getKBListByType": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "获取知识库列表(私人知识库、公共知识库)",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetKBListByTypeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.KBList"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/updateCategory": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "更新知识库分类",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateCategoryReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/updateKBName": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "更新知识库名称",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateKBNameReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
         }
     },
     "definitions": {
+        "v1.AddTeamMemberReq": {
+            "type": "object",
+            "properties": {
+                "member_id": {
+                    "description": "成员ID",
+                    "type": "string"
+                },
+                "role_type": {
+                    "description": "角色类型",
+                    "type": "string"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                }
+            }
+        },
         "v1.ArticleData": {
             "type": "object",
             "properties": {
@@ -718,6 +1491,10 @@ const docTemplate = `{
                     "description": "文章重要性",
                     "type": "integer"
                 },
+                "kbId": {
+                    "description": "知识库ID",
+                    "type": "integer"
+                },
                 "sourceUri": {
                     "description": "文章外链",
                     "type": "string"
@@ -740,10 +1517,6 @@ const docTemplate = `{
                     "items": {
                         "$ref": "#/definitions/v1.FileUpload"
                     }
-                },
-                "visibleRange": {
-                    "description": "可见范围",
-                    "type": "string"
                 }
             }
         },
@@ -817,9 +1590,6 @@ const docTemplate = `{
                 },
                 "uploaded_file": {
                     "type": "boolean"
-                },
-                "visible_range": {
-                    "type": "string"
                 }
             }
         },
@@ -892,6 +1662,10 @@ const docTemplate = `{
                     "description": "文章重要性",
                     "type": "integer"
                 },
+                "kbId": {
+                    "description": "知识库ID",
+                    "type": "integer"
+                },
                 "sourceUri": {
                     "description": "文章外链",
                     "type": "string"
@@ -922,6 +1696,69 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.CreateCategoryReq": {
+            "type": "object",
+            "required": [
+                "category_name",
+                "kb_id"
+            ],
+            "properties": {
+                "category_name": {
+                    "type": "string"
+                },
+                "kb_id": {
+                    "type": "integer"
+                },
+                "parent_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.CreateKBRequest": {
+            "type": "object",
+            "required": [
+                "name",
+                "teamID"
+            ],
+            "properties": {
+                "name": {
+                    "type": "string"
+                },
+                "teamID": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.CreateKBResp": {
+            "type": "object",
+            "properties": {
+                "kb_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.CreateTeamRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "team_name": {
+                    "description": "团队名",
+                    "type": "string"
+                }
+            }
+        },
+        "v1.CreateTeamResp": {
+            "type": "object",
+            "properties": {
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                }
+            }
+        },
         "v1.DelArticleListReq": {
             "type": "object",
             "properties": {
@@ -948,6 +1785,50 @@ const docTemplate = `{
             "properties": {
                 "deletedCount": {
                     "description": "删除的文章数量",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.DeleteCategoryReq": {
+            "type": "object",
+            "required": [
+                "cid"
+            ],
+            "properties": {
+                "cid": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.DeleteKBReq": {
+            "type": "object",
+            "required": [
+                "kb_id"
+            ],
+            "properties": {
+                "kb_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.DeleteTeamMemberReq": {
+            "type": "object",
+            "properties": {
+                "member_id": {
+                    "description": "成员ID",
+                    "type": "string"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.DeleteTeamRequest": {
+            "type": "object",
+            "properties": {
+                "team_id": {
+                    "description": "团队ID",
                     "type": "integer"
                 }
             }
@@ -1047,6 +1928,160 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.GetKBInfoResp": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean"
+                },
+                "kb_id": {
+                    "type": "integer"
+                },
+                "kb_name": {
+                    "type": "string"
+                },
+                "kb_type": {
+                    "type": "string"
+                },
+                "team_id": {
+                    "type": "integer"
+                },
+                "team_name": {
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "type": "string"
+                },
+                "user_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.GetKBListByTeamIdReq": {
+            "type": "object",
+            "required": [
+                "team_id"
+            ],
+            "properties": {
+                "pageIndex": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "team_id": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.GetKBListByTeamIdResp": {
+            "type": "object",
+            "properties": {
+                "kb_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.GetKBInfoResp"
+                    }
+                },
+                "pageIndex": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "totalCount": {
+                    "description": "总记录数",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.GetKBListByTypeReq": {
+            "type": "object",
+            "properties": {
+                "kb_type": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.GetTeamInfoResp": {
+            "type": "object",
+            "properties": {
+                "member": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.MemberData"
+                    }
+                },
+                "team": {
+                    "$ref": "#/definitions/v1.TeamData"
+                }
+            }
+        },
+        "v1.GetTeamListReq": {
+            "type": "object",
+            "properties": {
+                "created_by": {
+                    "description": "创建者ID",
+                    "type": "string"
+                },
+                "pageIndex": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "team_name": {
+                    "description": "团队名",
+                    "type": "string"
+                }
+            }
+        },
+        "v1.GetTeamListResp": {
+            "type": "object",
+            "properties": {
+                "pageIndex": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "team_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.TeamData"
+                    }
+                },
+                "totalCount": {
+                    "description": "总记录数",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.GetTeamMemberListResp": {
+            "type": "object",
+            "properties": {
+                "member_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.MemberData"
+                    }
+                }
+            }
+        },
         "v1.GetUserArticleListReq": {
             "type": "object",
             "properties": {
@@ -1109,10 +2144,77 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.GetUserTeamListResp": {
+            "type": "object",
+            "properties": {
+                "pageIndex": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "pageSize": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "team_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.TeamData"
+                    }
+                },
+                "totalCount": {
+                    "description": "总记录数",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.KBList": {
+            "type": "object",
+            "properties": {
+                "kb_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/vo.KbKnowledgeBaseView"
+                    }
+                }
+            }
+        },
         "v1.LoginResponseData": {
             "type": "object",
             "properties": {
                 "accessToken": {
+                    "type": "string"
+                }
+            }
+        },
+        "v1.MemberData": {
+            "type": "object",
+            "properties": {
+                "join_time": {
+                    "description": "加入时间",
+                    "type": "string"
+                },
+                "member_id": {
+                    "description": "成员ID",
+                    "type": "integer"
+                },
+                "member_name": {
+                    "description": "成员ID",
+                    "type": "string"
+                },
+                "nick_name": {
+                    "description": "成员昵称",
+                    "type": "string"
+                },
+                "role_type": {
+                    "description": "角色类型",
+                    "type": "string"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                },
+                "update_time": {
+                    "description": "更新时间",
                     "type": "string"
                 }
             }
@@ -1141,6 +2243,15 @@ const docTemplate = `{
                 "phone": {
                     "type": "string",
                     "example": "10012239028"
+                }
+            }
+        },
+        "v1.QuitTeamReq": {
+            "type": "object",
+            "properties": {
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
                 }
             }
         },
@@ -1207,6 +2318,35 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.TeamData": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "created_by": {
+                    "description": "创建者ID",
+                    "type": "string"
+                },
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                },
+                "team_name": {
+                    "description": "团队名",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "description": "更新时间",
+                    "type": "string"
+                }
+            }
+        },
         "v1.UpdateArticleRequest": {
             "type": "object",
             "required": [
@@ -1244,6 +2384,10 @@ const docTemplate = `{
                     "description": "文章重要性",
                     "type": "integer"
                 },
+                "kbId": {
+                    "description": "知识库ID",
+                    "type": "integer"
+                },
                 "sourceUri": {
                     "description": "文章外链",
                     "type": "string"
@@ -1265,6 +2409,36 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.UpdateCategoryReq": {
+            "type": "object",
+            "required": [
+                "category_name",
+                "cid"
+            ],
+            "properties": {
+                "category_name": {
+                    "type": "string"
+                },
+                "cid": {
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.UpdateKBNameReq": {
+            "type": "object",
+            "required": [
+                "kb_id",
+                "name"
+            ],
+            "properties": {
+                "kb_id": {
+                    "type": "integer"
+                },
+                "name": {
+                    "type": "string"
+                }
+            }
+        },
         "v1.UpdateProfileRequest": {
             "type": "object",
             "properties": {
@@ -1275,6 +2449,40 @@ const docTemplate = `{
                 "nickname": {
                     "type": "string",
                     "example": "alan"
+                }
+            }
+        },
+        "v1.UpdateTeamMemberRoleReq": {
+            "type": "object",
+            "properties": {
+                "member_id": {
+                    "description": "成员ID",
+                    "type": "string"
+                },
+                "role_type": {
+                    "description": "角色类型",
+                    "type": "string"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.UpdateTeamRequest": {
+            "type": "object",
+            "properties": {
+                "description": {
+                    "description": "描述",
+                    "type": "string"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                },
+                "team_name": {
+                    "description": "团队名",
+                    "type": "string"
                 }
             }
         },
@@ -1296,22 +2504,74 @@ const docTemplate = `{
             "type": "object",
             "properties": {
                 "categoryName": {
+                    "description": "分类名",
                     "type": "string"
                 },
                 "children": {
+                    "description": "子分类",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/vo.CategoryView"
                     }
                 },
                 "cid": {
+                    "description": "分类ID",
+                    "type": "integer"
+                },
+                "kbId": {
+                    "description": "知识库ID",
                     "type": "integer"
                 },
                 "level": {
+                    "description": "层级",
                     "type": "integer"
                 },
                 "parentId": {
+                    "description": "父分类ID",
                     "type": "integer"
+                }
+            }
+        },
+        "vo.KbKnowledgeBaseView": {
+            "type": "object",
+            "properties": {
+                "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
+                    "type": "string"
+                },
+                "is_public": {
+                    "type": "boolean"
+                },
+                "kb_id": {
+                    "type": "integer"
+                },
+                "kb_name": {
+                    "type": "string"
+                },
+                "kb_type": {
+                    "description": "知识库类型：私人/公共/团队",
+                    "type": "string"
+                },
+                "team_id": {
+                    "description": "团队ID，可能为空",
+                    "type": "integer"
+                },
+                "team_name": {
+                    "description": "团队名称",
+                    "type": "string"
+                },
+                "updated_at": {
+                    "type": "string"
+                },
+                "user_id": {
+                    "description": "用户ID，可能为空（私人知识库）",
+                    "type": "string"
+                },
+                "user_name": {
+                    "description": "用户昵称",
+                    "type": "string"
                 }
             }
         }

@@ -18,6 +18,11 @@ type KnowledgeBaseService interface {
 	GetKBListByTeamId(ctx *gin.Context, req *v1.GetKBListByTeamIdReq) (*v1.GetKBListByTeamIdResp, error)
 	GetKBListByType(ctx *gin.Context, userId string, kbType string) ([]*vo.KbKnowledgeBaseView, error)
 
+	CreatePublicKB(ctx *gin.Context, userId string, req *v1.CreateKBRequest) (uint, error)
+	UpdatePublicKB(ctx *gin.Context, req *v1.UpdateKBNameReq) error
+	DeletePublicKB(ctx *gin.Context, kbId uint) error
+	//GetPublicKBList(ctx *gin.Context, req *v1.GetKBListRequest) (*v1.GetKBListResponse, error)
+
 	CreateCategory(ctx *gin.Context, userId string, req *v1.CreateCategoryReq) error
 	UpdateCategory(ctx *gin.Context, userId string, req *v1.UpdateCategoryReq) error
 	DeleteCategory(ctx *gin.Context, userId string, req *v1.DeleteCategoryReq) error
@@ -272,4 +277,47 @@ func (s *knowledgeBaseService) GetKBListByType(ctx *gin.Context, userId string, 
 		return kbList, nil
 	}
 	return nil, v1.ErrKnowledgeNotExist
+}
+
+func (s *knowledgeBaseService) CreatePublicKB(ctx *gin.Context, userId string, req *v1.CreateKBRequest) (uint, error) {
+	// 创建知识库
+	knowledgeBase := &model.KnowledgeBase{
+		KbName:    req.Name,
+		CreatedBy: userId,
+		IsPublic:  true, //团队知识库
+	}
+	kbId, err := s.kbRepository.CreateKB(ctx, knowledgeBase)
+	if err != nil {
+		return 0, err
+	}
+	return kbId, nil
+}
+
+func (s *knowledgeBaseService) UpdatePublicKB(ctx *gin.Context, req *v1.UpdateKBNameReq) error {
+	// 判断知识库是否存在
+	kb, err := s.kbRepository.GetKBById(ctx, req.KBID)
+	if err != nil {
+		return v1.ErrKnowledgeNotExist
+	}
+	// 更新知识库名称
+	kb.KbName = req.Name
+	err = s.kbRepository.UpdateKB(ctx, kb)
+	if err != nil {
+		return v1.ErrUpdateKnowledgeFailed
+	}
+	return nil
+}
+
+func (s *knowledgeBaseService) DeletePublicKB(ctx *gin.Context, kbId uint) error {
+	// 判断知识库是否存在
+	_, err := s.kbRepository.GetKBById(ctx, kbId)
+	if err != nil {
+		return v1.ErrKnowledgeNotExist
+	}
+	// 删除知识库
+	err = s.kbRepository.DeleteKB(ctx, kbId)
+	if err != nil {
+		return v1.ErrDeleteKnowledgeFailed
+	}
+	return nil
 }

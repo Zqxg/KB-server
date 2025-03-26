@@ -11,6 +11,7 @@ import (
 	"projectName/internal/repository"
 	"projectName/internal/server"
 	"projectName/internal/service"
+	"projectName/internal/service/admin"
 	"projectName/internal/service/knowledgeBase"
 	"projectName/internal/service/team"
 	"projectName/internal/service/user"
@@ -39,6 +40,7 @@ var repositorySet = wire.NewSet(
 	repository.NewArticleRepository,
 	repository.NewTeamRepository,
 	repository.NewKBRepository,
+	repository.NewAdminRepository,
 )
 
 // 提供 service 层的实例
@@ -51,6 +53,7 @@ var serviceSet = wire.NewSet(
 	knowledgeBase.NewArticleService,
 	team.NewTeamService,
 	knowledgeBase.NewKnowledgeBaseService,
+	admin.NewAdminService,
 )
 
 // 提供 handler 层的实例
@@ -61,6 +64,7 @@ var handlerSet = wire.NewSet(
 	handler.NewArticleHandler,
 	handler.NewTeamHandler,
 	handler.NewKnowledgeBaseHandler,
+	handler.NewAdminHandler,
 )
 
 // 提供 job 层的实例

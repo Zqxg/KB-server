@@ -1,4 +1,16 @@
 definitions:
+  v1.AddTeamMemberReq:
+    properties:
+      member_id:
+        description: 成员ID
+        type: string
+      role_type:
+        description: 角色类型
+        type: string
+      team_id:
+        description: 团队ID
+        type: integer
+    type: object
   v1.ArticleData:
     properties:
       articleId:
@@ -28,6 +40,9 @@ definitions:
       importance:
         description: 文章重要性
         type: integer
+      kbId:
+        description: 知识库ID
+        type: integer
       sourceUri:
         description: 文章外链
         type: string
@@ -45,9 +60,6 @@ definitions:
         items:
           $ref: '#/definitions/v1.FileUpload'
         type: array
-      visibleRange:
-        description: 可见范围
-        type: string
     type: object
   v1.ArticleList:
     properties:
@@ -98,8 +110,6 @@ definitions:
         type: string
       uploaded_file:
         type: boolean
-      visible_range:
-        type: string
     type: object
   v1.CaptchaResponseData:
     properties:
@@ -144,6 +154,9 @@ definitions:
       importance:
         description: 文章重要性
         type: integer
+      kbId:
+        description: 知识库ID
+        type: integer
       sourceUri:
         description: 文章外链
         type: string
@@ -170,6 +183,48 @@ definitions:
         description: 文章ID
         type: integer
     type: object
+  v1.CreateCategoryReq:
+    properties:
+      category_name:
+        type: string
+      kb_id:
+        type: integer
+      parent_id:
+        type: integer
+    required:
+    - category_name
+    - kb_id
+    type: object
+  v1.CreateKBRequest:
+    properties:
+      name:
+        type: string
+      teamID:
+        type: integer
+    required:
+    - name
+    - teamID
+    type: object
+  v1.CreateKBResp:
+    properties:
+      kb_id:
+        type: integer
+    type: object
+  v1.CreateTeamRequest:
+    properties:
+      description:
+        description: 描述
+        type: string
+      team_name:
+        description: 团队名
+        type: string
+    type: object
+  v1.CreateTeamResp:
+    properties:
+      team_id:
+        description: 团队ID
+        type: integer
+    type: object
   v1.DelArticleListReq:
     properties:
       articleIDList:
@@ -188,6 +243,35 @@ definitions:
     properties:
       deletedCount:
         description: 删除的文章数量
+        type: integer
+    type: object
+  v1.DeleteCategoryReq:
+    properties:
+      cid:
+        type: integer
+    required:
+    - cid
+    type: object
+  v1.DeleteKBReq:
+    properties:
+      kb_id:
+        type: integer
+    required:
+    - kb_id
+    type: object
+  v1.DeleteTeamMemberReq:
+    properties:
+      member_id:
+        description: 成员ID
+        type: string
+      team_id:
+        description: 团队ID
+        type: integer
+    type: object
+  v1.DeleteTeamRequest:
+    properties:
+      team_id:
+        description: 团队ID
         type: integer
     type: object
   v1.FileUpload:
@@ -257,6 +341,110 @@ definitions:
       collegeId:
         type: integer
     type: object
+  v1.GetKBInfoResp:
+    properties:
+      created_at:
+        type: string
+      is_public:
+        type: boolean
+      kb_id:
+        type: integer
+      kb_name:
+        type: string
+      kb_type:
+        type: string
+      team_id:
+        type: integer
+      team_name:
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        type: string
+      user_name:
+        type: string
+    type: object
+  v1.GetKBListByTeamIdReq:
+    properties:
+      pageIndex:
+        description: 当前页码
+        type: integer
+      pageSize:
+        description: 每页大小
+        type: integer
+      team_id:
+        type: integer
+    required:
+    - team_id
+    type: object
+  v1.GetKBListByTeamIdResp:
+    properties:
+      kb_list:
+        items:
+          $ref: '#/definitions/v1.GetKBInfoResp'
+        type: array
+      pageIndex:
+        description: 当前页码
+        type: integer
+      pageSize:
+        description: 每页大小
+        type: integer
+      totalCount:
+        description: 总记录数
+        type: integer
+    type: object
+  v1.GetKBListByTypeReq:
+    properties:
+      kb_type:
+        type: string
+    type: object
+  v1.GetTeamInfoResp:
+    properties:
+      member:
+        items:
+          $ref: '#/definitions/v1.MemberData'
+        type: array
+      team:
+        $ref: '#/definitions/v1.TeamData'
+    type: object
+  v1.GetTeamListReq:
+    properties:
+      created_by:
+        description: 创建者ID
+        type: string
+      pageIndex:
+        description: 当前页码
+        type: integer
+      pageSize:
+        description: 每页大小
+        type: integer
+      team_name:
+        description: 团队名
+        type: string
+    type: object
+  v1.GetTeamListResp:
+    properties:
+      pageIndex:
+        description: 当前页码
+        type: integer
+      pageSize:
+        description: 每页大小
+        type: integer
+      team_list:
+        items:
+          $ref: '#/definitions/v1.TeamData'
+        type: array
+      totalCount:
+        description: 总记录数
+        type: integer
+    type: object
+  v1.GetTeamMemberListResp:
+    properties:
+      member_list:
+        items:
+          $ref: '#/definitions/v1.MemberData'
+        type: array
+    type: object
   v1.GetUserArticleListReq:
     properties:
       CreatedEnd:
@@ -301,9 +489,56 @@ definitions:
       userId:
         type: string
     type: object
+  v1.GetUserTeamListResp:
+    properties:
+      pageIndex:
+        description: 当前页码
+        type: integer
+      pageSize:
+        description: 每页大小
+        type: integer
+      team_list:
+        items:
+          $ref: '#/definitions/v1.TeamData'
+        type: array
+      totalCount:
+        description: 总记录数
+        type: integer
+    type: object
+  v1.KBList:
+    properties:
+      kb_list:
+        items:
+          $ref: '#/definitions/vo.KbKnowledgeBaseView'
+        type: array
+    type: object
   v1.LoginResponseData:
     properties:
       accessToken:
+        type: string
+    type: object
+  v1.MemberData:
+    properties:
+      join_time:
+        description: 加入时间
+        type: string
+      member_id:
+        description: 成员ID
+        type: integer
+      member_name:
+        description: 成员ID
+        type: string
+      nick_name:
+        description: 成员昵称
+        type: string
+      role_type:
+        description: 角色类型
+        type: string
+      team_id:
+        description: 团队ID
+        type: integer
+      update_time:
+        description: 更新时间
         type: string
     type: object
   v1.PasswordLoginRequest:
@@ -325,6 +560,12 @@ definitions:
     - captchaId
     - password
     - phone
+    type: object
+  v1.QuitTeamReq:
+    properties:
+      team_id:
+        description: 团队ID
+        type: integer
     type: object
   v1.RegisterRequest:
     properties:
@@ -371,6 +612,27 @@ definitions:
         description: 总记录数
         type: integer
     type: object
+  v1.TeamData:
+    properties:
+      created_at:
+        description: 创建时间
+        type: string
+      created_by:
+        description: 创建者ID
+        type: string
+      description:
+        description: 描述
+        type: string
+      team_id:
+        description: 团队ID
+        type: integer
+      team_name:
+        description: 团队名
+        type: string
+      updated_at:
+        description: 更新时间
+        type: string
+    type: object
   v1.UpdateArticleRequest:
     properties:
       articleId:
@@ -394,6 +656,9 @@ definitions:
       importance:
         description: 文章重要性
         type: integer
+      kbId:
+        description: 知识库ID
+        type: integer
       sourceUri:
         description: 文章外链
         type: string
@@ -414,6 +679,26 @@ definitions:
     - title
     - visibleRange
     type: object
+  v1.UpdateCategoryReq:
+    properties:
+      category_name:
+        type: string
+      cid:
+        type: integer
+    required:
+    - category_name
+    - cid
+    type: object
+  v1.UpdateKBNameReq:
+    properties:
+      kb_id:
+        type: integer
+      name:
+        type: string
+    required:
+    - kb_id
+    - name
+    type: object
   v1.UpdateProfileRequest:
     properties:
       email:
@@ -421,6 +706,30 @@ definitions:
         type: string
       nickname:
         example: alan
+        type: string
+    type: object
+  v1.UpdateTeamMemberRoleReq:
+    properties:
+      member_id:
+        description: 成员ID
+        type: string
+      role_type:
+        description: 角色类型
+        type: string
+      team_id:
+        description: 团队ID
+        type: integer
+    type: object
+  v1.UpdateTeamRequest:
+    properties:
+      description:
+        description: 描述
+        type: string
+      team_id:
+        description: 团队ID
+        type: integer
+      team_name:
+        description: 团队名
         type: string
     type: object
   v1.UserAuthRequest:
@@ -435,17 +744,55 @@ definitions:
   vo.CategoryView:
     properties:
       categoryName:
+        description: 分类名
         type: string
       children:
+        description: 子分类
         items:
           $ref: '#/definitions/vo.CategoryView'
         type: array
       cid:
+        description: 分类ID
+        type: integer
+      kbId:
+        description: 知识库ID
         type: integer
       level:
+        description: 层级
         type: integer
       parentId:
+        description: 父分类ID
         type: integer
+    type: object
+  vo.KbKnowledgeBaseView:
+    properties:
+      created_at:
+        type: string
+      created_by:
+        type: string
+      is_public:
+        type: boolean
+      kb_id:
+        type: integer
+      kb_name:
+        type: string
+      kb_type:
+        description: 知识库类型：私人/公共/团队
+        type: string
+      team_id:
+        description: 团队ID，可能为空
+        type: integer
+      team_name:
+        description: 团队名称
+        type: string
+      updated_at:
+        type: string
+      user_id:
+        description: 用户ID，可能为空（私人知识库）
+        type: string
+      user_name:
+        description: 用户昵称
+        type: string
     type: object
 host: localhost:8000
 info:
@@ -461,7 +808,7 @@ info:
   title: Nunu Example API
   version: 1.0.0
 paths:
-  /article/DeleteArticle:
+  /admin/createPublicKB:
     post:
       consumes:
       - application/json
@@ -471,204 +818,19 @@ paths:
         name: request
         required: true
         schema:
-          $ref: '#/definitions/v1.DeleteArticleRequest'
+          $ref: '#/definitions/v1.CreateKBRequest'
       produces:
       - application/json
       responses:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/v1.DeleteArticleResponseData'
+            $ref: '#/definitions/v1.CreateKBResp'
       security:
       - Bearer: []
-      summary: 删除文章
+      summary: 创建公共知识库
       tags:
-      - 文章模块
-  /article/DeleteArticleList:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.DelArticleListReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.DeleteArticleResponseData'
-      security:
-      - Bearer: []
-      summary: 批量删除文章
-      tags:
-      - 文章模块
-  /article/UpdateArticle:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.UpdateArticleRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.ArticleData'
-      security:
-      - Bearer: []
-      summary: 修改文章内容
-      tags:
-      - 文章模块
-  /article/createArticle:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.CreateArticleRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.CreateArticleResponseData'
-      security:
-      - Bearer: []
-      summary: 新建文章
-      tags:
-      - 文章模块
-  /article/getArticle:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: Article ID
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.ArticleData'
-      security:
-      - Bearer: []
-      summary: 获取文章详细
-      tags:
-      - 文章模块
-  /article/getArticleCategory:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.CategoryData'
-      security:
-      - Bearer: []
-      summary: 获取文章分组
-      tags:
-      - 文章模块
-  /article/getArticleListByCategory:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: Category ID
-        in: query
-        name: categoryId
-        required: true
-        type: integer
-      - description: Page Index
-        in: query
-        name: pageIndex
-        required: true
-        type: integer
-      - description: Page Size
-        in: query
-        name: pageSize
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.ArticleList'
-      security:
-      - Bearer: []
-      summary: 分类获取公开文章列表
-      tags:
-      - 文章模块
-  /article/getArticleListByEs:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetArticleListByEsReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.SearchArticleResp'
-      security:
-      - Bearer: []
-      summary: es文章查询
-      tags:
-      - 文章模块
-  /article/getUserArticleList:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetUserArticleListReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.ArticleList'
-      security:
-      - Bearer: []
-      summary: 获取个人文章列表
-      tags:
-      - 文章模块
+      - 管理员模块
   /cancel:
     get:
       consumes:
@@ -700,6 +862,166 @@ paths:
       summary: 获取验证码
       tags:
       - 用户模块
+  /knowledgeBase/DeleteArticle:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DeleteArticleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.DeleteArticleResponseData'
+      security:
+      - Bearer: []
+      summary: 删除文章
+      tags:
+      - 文章模块
+  /knowledgeBase/DeleteArticleList:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DelArticleListReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.DeleteArticleResponseData'
+      security:
+      - Bearer: []
+      summary: 批量删除文章
+      tags:
+      - 文章模块
+  /knowledgeBase/UpdateArticle:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateArticleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleData'
+      security:
+      - Bearer: []
+      summary: 修改文章内容
+      tags:
+      - 文章模块
+  /knowledgeBase/createArticle:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateArticleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.CreateArticleResponseData'
+      security:
+      - Bearer: []
+      summary: 新建文章
+      tags:
+      - 文章模块
+  /knowledgeBase/getArticle:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Article ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleData'
+      security:
+      - Bearer: []
+      summary: 获取文章详细
+      tags:
+      - 文章模块
+  /knowledgeBase/getArticleListByEs:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetArticleListByEsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.SearchArticleResp'
+      security:
+      - Bearer: []
+      summary: es文章查询
+      tags:
+      - 文章模块
+  /knowledgeBase/getUserArticleList:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetUserArticleListReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleList'
+      security:
+      - Bearer: []
+      summary: 获取个人文章列表
+      tags:
+      - 文章模块
   /passwordLogin:
     post:
       consumes:
@@ -743,6 +1065,261 @@ paths:
       summary: 用户注册
       tags:
       - 用户模块
+  /team/addTeamMember:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.AddTeamMemberReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 添加团队成员
+      tags:
+      - 团队模块
+  /team/createTeam:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.CreateTeamResp'
+      security:
+      - Bearer: []
+      summary: 新建团队
+      tags:
+      - 团队模块
+  /team/deleteTeam:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DeleteTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 删除团队
+      tags:
+      - 团队模块
+  /team/deleteTeamMember:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DeleteTeamMemberReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 删除团队成员
+      tags:
+      - 团队模块
+  /team/getTeamInfo:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Team ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.GetTeamInfoResp'
+      security:
+      - Bearer: []
+      summary: 获取团队详细
+      tags:
+      - 团队模块
+  /team/getTeamList:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetTeamListReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.GetTeamListResp'
+      security:
+      - Bearer: []
+      summary: 获取团队列表
+      tags:
+      - 团队模块
+  /team/getTeamMemberList:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Team ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.GetTeamMemberListResp'
+      security:
+      - Bearer: []
+      summary: 获取团队成员列表
+      tags:
+      - 团队模块
+  /team/getUserTeamList:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page Index
+        in: query
+        name: pageIndex
+        required: true
+        type: integer
+      - description: Page Size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.GetUserTeamListResp'
+      security:
+      - Bearer: []
+      summary: 获取个人团队列表
+      tags:
+      - 团队模块
+  /team/quitTeam:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.QuitTeamReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 退出团队
+      tags:
+      - 团队模块
+  /team/updateTeam:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateTeamRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 更新团队
+      tags:
+      - 团队模块
+  /team/updateTeamMemberRole:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateTeamMemberRoleReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 更新团队成员角色
+      tags:
+      - 团队模块
   /user/getCollege:
     get:
       consumes:
@@ -860,6 +1437,234 @@ paths:
       summary: 用户认证
       tags:
       - 用户模块
+  /v1/createCategory:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateCategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 新建知识库分类
+      tags:
+      - 知识库模块
+  /v1/createKB:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateKBRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.CreateKBResp'
+      security:
+      - Bearer: []
+      summary: 新建团队知识库
+      tags:
+      - 知识库模块
+  /v1/deleteCategory:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DeleteCategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 删除知识库分类
+      tags:
+      - 知识库模块
+  /v1/deleteKB:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DeleteKBReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 删除知识库
+      tags:
+      - 知识库模块
+  /v1/getCategoryListByKB:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 知识库ID
+        in: query
+        name: kb_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.CategoryData'
+      security:
+      - Bearer: []
+      summary: 获取知识库分类列表
+      tags:
+      - 知识库模块
+  /v1/getKBInfo:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 知识库ID
+        in: query
+        name: kb_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.GetKBInfoResp'
+      security:
+      - Bearer: []
+      summary: 获取知识库信息
+      tags:
+      - 知识库模块
+  /v1/getKBListByTeamId:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetKBListByTeamIdReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.GetKBListByTeamIdResp'
+      security:
+      - Bearer: []
+      summary: 获取团队知识库列表
+      tags:
+      - 知识库模块
+  /v1/getKBListByType:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetKBListByTypeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.KBList'
+      security:
+      - Bearer: []
+      summary: 获取知识库列表(私人知识库、公共知识库)
+      tags:
+      - 知识库模块
+  /v1/updateCategory:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateCategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 更新知识库分类
+      tags:
+      - 知识库模块
+  /v1/updateKBName:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateKBNameReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 更新知识库名称
+      tags:
+      - 知识库模块
 securityDefinitions:
   Bearer:
     in: header

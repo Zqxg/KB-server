@@ -7,6 +7,7 @@ import (
 	"projectName/internal/model"
 	"projectName/internal/repository"
 	"projectName/internal/service"
+	"strconv"
 )
 
 type TeamService interface {
@@ -16,7 +17,7 @@ type TeamService interface {
 	GetTeamList(ctx *gin.Context, req *v1.GetTeamListReq) (*v1.GetTeamListResp, error)
 	GetTeamInfo(ctx *gin.Context, teamId int) (*v1.GetTeamInfoResp, error)
 	GetUserTeamList(ctx *gin.Context, userId string, pageIndex, pageSize int) (*v1.GetUserTeamListResp, error)
-	GetTeamMemberList(ctx *gin.Context, teamId int) ([]*model.Member, error)
+	GetTeamMemberList(ctx *gin.Context, teamId int) ([]*v1.MemberData, error)
 	AddTeamMember(ctx *gin.Context, userID string, req *v1.AddTeamMemberReq) error
 	DeleteTeamMember(ctx *gin.Context, userID string, req *v1.DeleteTeamMemberReq) error
 	UpdateTeamMemberRole(ctx *gin.Context, userID string, req *v1.UpdateTeamMemberRoleReq) error
@@ -26,19 +27,22 @@ type TeamService interface {
 func NewTeamService(
 	service *service.Service,
 	userRepository repository.UserRepository,
+	articleRepository repository.ArticleRepository,
 	teamRepository repository.TeamRepository,
 ) TeamService {
 	return &teamService{
-		Service:        service,
-		userRepository: userRepository,
-		teamRepository: teamRepository,
+		Service:           service,
+		userRepository:    userRepository,
+		teamRepository:    teamRepository,
+		articleRepository: articleRepository,
 	}
 }
 
 type teamService struct {
 	*service.Service
-	userRepository repository.UserRepository
-	teamRepository repository.TeamRepository
+	userRepository    repository.UserRepository
+	teamRepository    repository.TeamRepository
+	articleRepository repository.ArticleRepository
 }
 
 func (s *teamService) CreateTeam(ctx *gin.Context, userId string, req *v1.CreateTeamRequest) (uint, error) {
@@ -89,6 +93,12 @@ func (s *teamService) DeleteTeam(ctx *gin.Context, userId string, teamId uint) e
 	if !s.isTeamLeaderOrAdmin(ctx, teamId, userId) {
 		return v1.ErrPermissionDenied
 	}
+	// 删除es索引团队
+	index := enums.Team_knowledge_index + strconv.Itoa(int(teamId))
+	err := s.articleRepository.DeleteEsIndex(ctx, index)
+	if err != nil {
+		return v1.ErrDeleteEsIndexFailed
+	}
 	// 删除团队
 	if err := s.teamRepository.DeleteTeam(ctx, teamId); err != nil {
 		return v1.ErrDeleteTeamFailed
@@ -118,10 +128,21 @@ func (s *teamService) GetTeamList(ctx *gin.Context, req *v1.GetTeamListReq) (*v1
 	if err != nil {
 		return nil, err
 	}
-
+	var teamList []v1.TeamData
+	// 转换团队信息
+	for _, team := range teams {
+		teamList = append(teamList, v1.TeamData{
+			TeamID:      team.TeamID,
+			TeamName:    team.TeamName,
+			Description: team.Description,
+			CreatedBy:   team.CreatedBy,
+			CreatedAt:   team.CreatedAt,
+			UpdatedAt:   team.UpdatedAt,
+		})
+	}
 	// 构建响应
 	return &v1.GetTeamListResp{
-		TeamList: teams,
+		TeamList: teamList,
 		PageResponse: v1.PageResponse{
 			TotalCount: totalCount, // 增加总数，方便前端分页
 			PageIndex:  pageIndex,
@@ -140,9 +161,33 @@ func (s *teamService) GetTeamInfo(ctx *gin.Context, teamId int) (*v1.GetTeamInfo
 		return nil, v1.ErrGetTeamMemberListFailed
 	}
 
+	// 构建响应
+	teamData := v1.TeamData{
+		TeamID:      team.TeamID,
+		TeamName:    team.TeamName,
+		Description: team.Description,
+		CreatedBy:   team.CreatedBy,
+		CreatedAt:   team.CreatedAt,
+		UpdatedAt:   team.UpdatedAt,
+	}
+	var membersData []*v1.MemberData
+	for _, member := range members {
+		user, err := s.userRepository.GetByUserId(ctx, member.UserID)
+		if err != nil {
+			return nil, v1.ErrMemberNotExist
+		}
+		membersData = append(membersData, &v1.MemberData{
+			MemberID:   member.MemberID,
+			UserID:     member.UserID,
+			RoleType:   member.Role,
+			JoinTime:   member.CreatedAt,
+			UpdateTime: member.UpdatedAt,
+			NickName:   user.Nickname,
+		})
+	}
 	return &v1.GetTeamInfoResp{
-		Team:   *team,
-		Member: members,
+		Team:   teamData,
+		Member: membersData,
 	}, nil
 
 }
@@ -153,8 +198,20 @@ func (s *teamService) GetUserTeamList(ctx *gin.Context, userId string, pageIndex
 	if err != nil {
 		return nil, v1.ErrGetTeamInfoFailed
 	}
+	var teamList []v1.TeamData
+	// 转换团队信息
+	for _, team := range teams {
+		teamList = append(teamList, v1.TeamData{
+			TeamID:      team.TeamID,
+			TeamName:    team.TeamName,
+			Description: team.Description,
+			CreatedBy:   team.CreatedBy,
+			CreatedAt:   team.CreatedAt,
+			UpdatedAt:   team.UpdatedAt,
+		})
+	}
 	return &v1.GetUserTeamListResp{
-		TeamList: teams,
+		TeamList: teamList,
 		PageResponse: v1.PageResponse{
 			TotalCount: total,
 			PageIndex:  index,
@@ -163,7 +220,7 @@ func (s *teamService) GetUserTeamList(ctx *gin.Context, userId string, pageIndex
 	}, nil
 }
 
-func (s *teamService) GetTeamMemberList(ctx *gin.Context, teamId int) ([]*model.Member, error) {
+func (s *teamService) GetTeamMemberList(ctx *gin.Context, teamId int) ([]*v1.MemberData, error) {
 	// 判断团队是否存在
 	team, err := s.teamRepository.GetTeamByID(ctx, uint(teamId))
 	if err != nil || team == nil {
@@ -174,7 +231,22 @@ func (s *teamService) GetTeamMemberList(ctx *gin.Context, teamId int) ([]*model.
 	if err != nil {
 		return nil, v1.ErrGetTeamMemberListFailed
 	}
-	return memberList, nil
+	var memberDataList []*v1.MemberData
+	for _, member := range memberList {
+		user, err := s.userRepository.GetByUserId(ctx, member.UserID)
+		if err != nil {
+			return nil, v1.ErrMemberNotExist
+		}
+		memberDataList = append(memberDataList, &v1.MemberData{
+			MemberID:   member.MemberID,
+			UserID:     member.UserID,
+			RoleType:   member.Role,
+			JoinTime:   member.CreatedAt,
+			UpdateTime: member.UpdatedAt,
+			NickName:   user.Nickname,
+		})
+	}
+	return memberDataList, nil
 }
 
 func (s *teamService) AddTeamMember(ctx *gin.Context, userID string, req *v1.AddTeamMemberReq) error {

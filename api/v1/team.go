@@ -1,6 +1,8 @@
 package v1
 
-import "projectName/internal/model"
+import (
+	"time"
+)
 
 type CreateTeamRequest struct {
 	TeamName    string `json:"team_name"`   // 团队名
@@ -25,24 +27,42 @@ type GetTeamListReq struct {
 	CreatedBy string `json:"created_by"` // 创建者ID
 	PageRequest
 }
+type TeamData struct {
+	TeamID      uint      `json:"team_id"`     // 团队ID
+	TeamName    string    `json:"team_name"`   // 团队名
+	Description string    `json:"description"` // 描述
+	CreatedBy   string    `json:"created_by"`  // 创建者ID
+	CreatedAt   time.Time `json:"created_at"`  // 创建时间
+	UpdatedAt   time.Time `json:"updated_at"`  // 更新时间
+}
+
+type MemberData struct {
+	MemberID   uint      `json:"member_id"`   // 成员ID
+	TeamID     uint      `json:"team_id"`     // 团队ID
+	UserID     string    `json:"member_name"` // 成员ID
+	NickName   string    `json:"nick_name"`   // 成员昵称
+	RoleType   string    `json:"role_type"`   // 角色类型
+	JoinTime   time.Time `json:"join_time"`   // 加入时间
+	UpdateTime time.Time `json:"update_time"` // 更新时间
+}
 
 type GetTeamListResp struct {
-	TeamList []model.Team `json:"team_list"`
+	TeamList []TeamData `json:"team_list"`
 	PageResponse
 }
 
 type GetTeamInfoResp struct {
-	Team   model.Team      `json:"team"`
-	Member []*model.Member `json:"member"`
+	Team   TeamData      `json:"team"`
+	Member []*MemberData `json:"member"`
 }
 
 type GetUserTeamListResp struct {
-	TeamList []model.Team `json:"team_list"`
+	TeamList []TeamData `json:"team_list"`
 	PageResponse
 }
 
 type GetTeamMemberListResp struct {
-	MemberList []*model.Member `json:"member_list"`
+	MemberList []*MemberData `json:"member_list"`
 }
 
 type AddTeamMemberReq struct {

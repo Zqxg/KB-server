@@ -18,7 +18,7 @@ type User struct {
 	IsDeleted int `gorm:"default:0"`
 	CreatedAt time.Time
 	UpdatedAt time.Time
-	DeletedAt gorm.DeletedAt `gorm:"index"`
+	DeletedAt gorm.DeletedAt `gorm:"index" json:"-"`
 }
 
 func (u *User) TableName() string {

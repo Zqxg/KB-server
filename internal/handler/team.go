@@ -166,8 +166,8 @@ func (h *TeamHandler) GetTeamInfo(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param pageIndex query int true
-// @Param pageSize query int true
+// @Param pageIndex query int true "Page Index"
+// @Param pageSize query int true "Page Size"
 // @Success 200 {object} v1.GetUserTeamListResp
 // @Router /team/getUserTeamList [GET]
 func (h *TeamHandler) GetUserTeamList(ctx *gin.Context) {

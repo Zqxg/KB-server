@@ -23,6 +23,7 @@ func NewHTTPServer(
 	collegeHandler *handler.CollegeHandler,
 	articleHandler *handler.ArticleHandler,
 	teamHandler *handler.TeamHandler,
+	adminHandler *handler.AdminHandler,
 	knowledgeBaseHandler *handler.KnowledgeBaseHandler,
 
 ) *http.Server {
@@ -61,7 +62,7 @@ func NewHTTPServer(
 		// 无需权限路由组
 		noAuthRouter := v1.Group("/")
 		{
-			noAuthRouter.POST("/register", userHandler.Register) // todo es
+			noAuthRouter.POST("/register", userHandler.Register)
 			noAuthRouter.POST("/passwordLogin", userHandler.PasswordLogin)
 			noAuthRouter.GET("/getCaptcha", userHandler.GetCaptcha)
 		}
@@ -71,7 +72,7 @@ func NewHTTPServer(
 		{
 			// 用户模块
 			commonUserRouter.GET(enums.USER+"/logout", userHandler.Logout)                    // 退出
-			commonUserRouter.GET(enums.USER+"/cancel", userHandler.Cancel)                    // 注销 todo es
+			commonUserRouter.GET(enums.USER+"/cancel", userHandler.Cancel)                    // 注销
 			commonUserRouter.GET(enums.USER+"/getUserInfo", userHandler.GetUserInfo)          // 获取用户信息
 			commonUserRouter.POST(enums.USER+"/updateProfile", userHandler.UpdateProfile)     // 修改用户信息
 			commonUserRouter.GET(enums.USER+"/getCollege", collegeHandler.GetCollege)         // 获取学院信息
@@ -104,7 +105,7 @@ func NewHTTPServer(
 			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getArticleListByCategory", knowledgeBaseHandler.GetCategoryList) // 多种查询分类
 
 			// 团队模块
-			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)          // 新建团队 todo es
+			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)          // 新建团队
 			commonUserRouter.POST(enums.TEAM+"/updateTeam", teamHandler.UpdateTeam)          // 修改团队
 			commonUserRouter.POST(enums.TEAM+"/deleteTeam", teamHandler.DeleteTeam)          // 删除团队
 			commonUserRouter.GET(enums.TEAM+"/getTeamList", teamHandler.GetTeamList)         // 获取团队列表
@@ -118,20 +119,12 @@ func NewHTTPServer(
 			commonUserRouter.POST(enums.TEAM+"/quitTeam", teamHandler.QuitTeam)                         // 退出团队
 
 		}
-		//// 学生用户路由组
-		//studentUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUTDENT_USER))
-		//{
-		//
-		//}
-		// 学校管理员路由组
-		//schoolAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SCHOOL_ADMIN))
-		//{
-		//}
-		// 超级管理员路由组
-		//superAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUPER_ADMIN))
-		//{
-		//commonUserRouter.POST(enums.TEAM+"/deleteTeamList", teamHandler.DeleteTeamList)               // 管理员批量删除团队
-		//}
+		//超级管理员路由组
+		superAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUPER_ADMIN))
+		{
+			superAdminRouter.POST(enums.ROUTET_ADMIN+"/createPublicKB", adminHandler.CreatePublicKB) // 新增公共知识库
+
+		}
 	}
 
 	return s
