@@ -124,12 +124,12 @@ func (r *kbRepository) CreateCategory(ctx context.Context, category *model.Categ
 		r.logger.WithContext(ctx).Error("KBRepository.CreateCategory error", zap.Error(err))
 		return 0, err
 	}
-	return category.CId, nil
+	return category.CategoryId, nil
 }
 
 // UpdateCategory 更新分类
 func (r *kbRepository) UpdateCategory(ctx context.Context, category *model.Category) error {
-	if err := r.DB(ctx).Table("kb_category").Where("c_id =?", category.CId).Updates(&category).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_category").Where("c_id =?", category.CategoryId).Updates(&category).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.UpdateCategory error", zap.Error(err))
 		return err
 	}

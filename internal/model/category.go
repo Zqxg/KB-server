@@ -6,7 +6,7 @@ import (
 )
 
 type Category struct {
-	CId          uint   `gorm:"primaryKey;autoIncrement"`
+	CategoryId   uint   `gorm:"primaryKey;autoIncrement"`
 	CategoryName string `gorm:"type:varchar(255);not null"`
 	ParentId     uint   `gorm:"type:int;default:0"`
 	KbID         uint   `gorm:"not null"` // 所属知识库ID
