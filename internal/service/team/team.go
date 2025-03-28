@@ -349,6 +349,23 @@ func (s *teamService) QuitTeam(ctx *gin.Context, userID string, teamId uint) err
 	if err != nil {
 		return v1.ErrMemberNotExist
 	}
+	// 判断用户是否为团队负责人或者管理员
+	if member.Role == enums.LEADER || member.Role == enums.ADMIN {
+		// 判断团队下是否有其他管理员
+		members, err := s.teamRepository.GetTeamMemberListByTeamID(ctx, teamId)
+		if err != nil {
+			return v1.ErrGetTeamMemberListFailed
+		}
+		var adminCount int
+		for _, member := range members {
+			if member.Role == enums.ADMIN || member.Role == enums.LEADER {
+				adminCount++
+			}
+		}
+		if adminCount <= 1 {
+			return v1.ErrAtLeastOneAdmin
+		}
+	}
 	// 删除成员
 	err = s.teamRepository.DeleteTeamMember(ctx, member.MemberID)
 	if err != nil {

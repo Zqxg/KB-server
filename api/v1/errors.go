@@ -91,4 +91,6 @@ var (
 	ErrUserAuthFailed      = newError(20003, "用户认证失败")
 	ErrArticleAlreadyExist = newError(20004, "文章已存在")
 	ErrCreateArticleFailed = newError(20005, "创建文章失败")
+	// 团队成员
+	ErrAtLeastOneAdmin = newError(20006, "至少需要一个管理员")
 )
