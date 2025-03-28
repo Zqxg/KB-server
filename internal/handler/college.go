@@ -32,7 +32,7 @@ func NewCollegeHandler(
 // @Security Bearer
 // @Param request body v1.GetCollegeRequest true "params"
 // @Success 200 {object} v1.CollegeResponseData
-// @Router /user/getCollege [get]
+// @Router /v1/user/getCollege [get]
 func (h *CollegeHandler) GetCollege(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 	if userId == "" {
@@ -66,7 +66,7 @@ func (h *CollegeHandler) GetCollege(ctx *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Success 200 {object} v1.GetCollegeListDataResponse "返回学院信息列表"
-// @Router /user/getCollegeList [get]
+// @Router /v1/user/getCollegeList [get]
 func (h *CollegeHandler) GetCollegeList(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 	if userId == "" {

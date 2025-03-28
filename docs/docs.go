@@ -24,7 +24,7 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/admin/createPublicKB": {
+        "/v1/admin/createPublicKB": {
             "post": {
                 "security": [
                     {
@@ -62,34 +62,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/cancel": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "用户模块"
-                ],
-                "summary": "注销用户",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/getCaptcha": {
+        "/v1/getCaptcha": {
             "get": {
                 "description": "获取验证码生成所需的ID和图片URL",
                 "consumes": [
@@ -112,7 +85,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/knowledgeBase/DeleteArticle": {
+        "/v1/knowledgeBase/DeleteArticle": {
             "post": {
                 "security": [
                     {
@@ -150,7 +123,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/knowledgeBase/DeleteArticleList": {
+        "/v1/knowledgeBase/DeleteArticleList": {
             "post": {
                 "security": [
                     {
@@ -188,7 +161,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/knowledgeBase/UpdateArticle": {
+        "/v1/knowledgeBase/UpdateArticle": {
             "post": {
                 "security": [
                     {
@@ -226,7 +199,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/knowledgeBase/createArticle": {
+        "/v1/knowledgeBase/createArticle": {
             "post": {
                 "security": [
                     {
@@ -264,7 +237,159 @@ const docTemplate = `{
                 }
             }
         },
-        "/knowledgeBase/getArticle": {
+        "/v1/knowledgeBase/createCategory": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "新建知识库分类",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateCategoryReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/knowledgeBase/createKB": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "新建团队知识库",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateKBRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CreateKBResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/knowledgeBase/deleteCategory": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "删除知识库分类",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.DeleteCategoryReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/knowledgeBase/deleteKB": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "删除知识库",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.DeleteKBReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/knowledgeBase/getArticle": {
             "get": {
                 "security": [
                     {
@@ -300,7 +425,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/knowledgeBase/getArticleListByEs": {
+        "/v1/knowledgeBase/getArticleListByEs": {
             "post": {
                 "security": [
                     {
@@ -338,7 +463,155 @@ const docTemplate = `{
                 }
             }
         },
-        "/knowledgeBase/getUserArticleList": {
+        "/v1/knowledgeBase/getCategoryListByKB": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "获取知识库分类列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "知识库ID",
+                        "name": "kb_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CategoryData"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/knowledgeBase/getKBInfo": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "获取知识库信息",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "知识库ID",
+                        "name": "kb_id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetKBInfoResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/knowledgeBase/getKBListByTeamId": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "获取团队知识库列表",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetKBListByTeamIdReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetKBListByTeamIdResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/knowledgeBase/getKBListByType": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "获取知识库列表(私人知识库、公共知识库)",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetKBListByTypeReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.KBList"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/knowledgeBase/getUserArticleList": {
             "post": {
                 "security": [
                     {
@@ -376,7 +649,83 @@ const docTemplate = `{
                 }
             }
         },
-        "/passwordLogin": {
+        "/v1/knowledgeBase/updateCategory": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "更新知识库分类",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateCategoryReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/knowledgeBase/updateKBName": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "知识库模块"
+                ],
+                "summary": "更新知识库名称",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "req",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.UpdateKBNameReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/passwordLogin": {
             "post": {
                 "consumes": [
                     "application/json"
@@ -409,7 +758,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/register": {
+        "/v1/register": {
             "post": {
                 "description": "目前只支持邮箱登录",
                 "consumes": [
@@ -443,7 +792,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/addTeamMember": {
+        "/v1/team/addTeamMember": {
             "post": {
                 "security": [
                     {
@@ -481,7 +830,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/createTeam": {
+        "/v1/team/createTeam": {
             "post": {
                 "security": [
                     {
@@ -519,7 +868,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/deleteTeam": {
+        "/v1/team/deleteTeam": {
             "post": {
                 "security": [
                     {
@@ -557,7 +906,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/deleteTeamMember": {
+        "/v1/team/deleteTeamMember": {
             "post": {
                 "security": [
                     {
@@ -595,7 +944,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/getTeamInfo": {
+        "/v1/team/getTeamInfo": {
             "get": {
                 "security": [
                     {
@@ -631,7 +980,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/getTeamList": {
+        "/v1/team/getTeamList": {
             "get": {
                 "security": [
                     {
@@ -669,7 +1018,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/getTeamMemberList": {
+        "/v1/team/getTeamMemberList": {
             "get": {
                 "security": [
                     {
@@ -705,7 +1054,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/getUserTeamList": {
+        "/v1/team/getUserTeamList": {
             "get": {
                 "security": [
                     {
@@ -748,7 +1097,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/quitTeam": {
+        "/v1/team/quitTeam": {
             "post": {
                 "security": [
                     {
@@ -786,7 +1135,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/updateTeam": {
+        "/v1/team/updateTeam": {
             "post": {
                 "security": [
                     {
@@ -824,7 +1173,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/team/updateTeamMemberRole": {
+        "/v1/team/updateTeamMemberRole": {
             "post": {
                 "security": [
                     {
@@ -862,7 +1211,34 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/getCollege": {
+        "/v1/user/cancel": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "注销用户",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/user/getCollege": {
             "get": {
                 "security": [
                     {
@@ -900,7 +1276,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/getCollegeList": {
+        "/v1/user/getCollegeList": {
             "get": {
                 "security": [
                     {
@@ -927,7 +1303,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/getUserInfo": {
+        "/v1/user/getUserInfo": {
             "get": {
                 "security": [
                     {
@@ -954,7 +1330,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/logout": {
+        "/v1/user/logout": {
             "get": {
                 "security": [
                     {
@@ -981,7 +1357,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/updateProfile": {
+        "/v1/user/updateProfile": {
             "post": {
                 "security": [
                     {
@@ -1019,7 +1395,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/user/userAuth": {
+        "/v1/user/userAuth": {
             "post": {
                 "security": [
                     {
@@ -1044,382 +1420,6 @@ const docTemplate = `{
                         "required": true,
                         "schema": {
                             "$ref": "#/definitions/v1.UserAuthRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/createCategory": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "知识库模块"
-                ],
-                "summary": "新建知识库分类",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.CreateCategoryReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/createKB": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "知识库模块"
-                ],
-                "summary": "新建团队知识库",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.CreateKBRequest"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.CreateKBResp"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/deleteCategory": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "知识库模块"
-                ],
-                "summary": "删除知识库分类",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.DeleteCategoryReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/deleteKB": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "知识库模块"
-                ],
-                "summary": "删除知识库",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.DeleteKBReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/getCategoryListByKB": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "知识库模块"
-                ],
-                "summary": "获取知识库分类列表",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "知识库ID",
-                        "name": "kb_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.CategoryData"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/getKBInfo": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "知识库模块"
-                ],
-                "summary": "获取知识库信息",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "知识库ID",
-                        "name": "kb_id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetKBInfoResp"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/getKBListByTeamId": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "知识库模块"
-                ],
-                "summary": "获取团队知识库列表",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetKBListByTeamIdReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetKBListByTeamIdResp"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/getKBListByType": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "知识库模块"
-                ],
-                "summary": "获取知识库列表(私人知识库、公共知识库)",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetKBListByTypeReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.KBList"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/updateCategory": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "知识库模块"
-                ],
-                "summary": "更新知识库分类",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.UpdateCategoryReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.Response"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/updateKBName": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "知识库模块"
-                ],
-                "summary": "更新知识库名称",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "req",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.UpdateKBNameReq"
                         }
                     }
                 ],

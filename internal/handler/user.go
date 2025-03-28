@@ -30,7 +30,7 @@ func NewUserHandler(handler *Handler, captchaService user.CaptchaService, userSe
 // @Accept json
 // @Produce json
 // @Success 200 {object} v1.CaptchaResponseData
-// @Router /getCaptcha [get]
+// @Router /v1/getCaptcha [get]
 func (h *UserHandler) GetCaptcha(ctx *gin.Context) {
 	captchaData, err := h.captchaService.GenerateCaptcha()
 	if err != nil {
@@ -51,7 +51,7 @@ func (h *UserHandler) GetCaptcha(ctx *gin.Context) {
 // @Produce json
 // @Param request body v1.RegisterRequest true "params"
 // @Success 200 {object} v1.Response
-// @Router /register [post]
+// @Router /v1/register [post]
 func (h *UserHandler) Register(ctx *gin.Context) {
 	req := new(v1.RegisterRequest)
 	if err := ctx.ShouldBindJSON(req); err != nil {
@@ -77,7 +77,7 @@ func (h *UserHandler) Register(ctx *gin.Context) {
 // @Produce json
 // @Param request body v1.PasswordLoginRequest true "params"
 // @Success 200 {object} v1.LoginResponseData
-// @Router /passwordLogin [post]
+// @Router /v1/passwordLogin [post]
 func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
 	var req v1.PasswordLoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -104,7 +104,7 @@ func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Success 200 {object} v1.GetUserInfoResponseData
-// @Router /user/getUserInfo [get]
+// @Router /v1/user/getUserInfo [get]
 func (h *UserHandler) GetUserInfo(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 	if userId == "" {
@@ -139,7 +139,7 @@ func (h *UserHandler) GetUserInfo(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.UpdateProfileRequest true "params"
 // @Success 200 {object} v1.Response
-// @Router /user/updateProfile [post]
+// @Router /v1/user/updateProfile [post]
 func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 
@@ -166,7 +166,7 @@ func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Success 200 {object} v1.Response
-// @Router /user/logout [get]
+// @Router /v1/user/logout [get]
 func (h *UserHandler) Logout(ctx *gin.Context) {
 	userId, roleTpye := GetUserIdAndRoleTypeFromCtx(ctx)
 	if err := h.userService.Logout(ctx, userId, roleTpye); err != nil {
@@ -185,7 +185,7 @@ func (h *UserHandler) Logout(ctx *gin.Context) {
 // @Produce json
 // @Security Bearer
 // @Success 200 {object} v1.Response
-// @Router /cancel [get]
+// @Router /v1/user/cancel [get]
 func (h *UserHandler) Cancel(ctx *gin.Context) {
 	userId, roleTpye := GetUserIdAndRoleTypeFromCtx(ctx)
 	// 退出
@@ -211,7 +211,7 @@ func (h *UserHandler) Cancel(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.UserAuthRequest true "params"
 // @Success 200 {object} v1.Response
-// @Router /user/userAuth [post]
+// @Router /v1/user/userAuth [post]
 func (h *UserHandler) UserAuth(ctx *gin.Context) {
 	userId, roleTpye := GetUserIdAndRoleTypeFromCtx(ctx)
 	var req v1.UserAuthRequest

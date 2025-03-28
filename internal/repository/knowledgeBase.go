@@ -39,7 +39,7 @@ type kbRepository struct {
 }
 
 func (r *kbRepository) CreateKB(ctx context.Context, knowledge *model.KnowledgeBase) (uint, error) {
-	if err := r.DB(ctx).Table("kb_knowledge").Create(&knowledge).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_knowledgeBase").Create(&knowledge).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.CreateKB error", zap.Error(err))
 		return 0, err
 	}
@@ -47,7 +47,7 @@ func (r *kbRepository) CreateKB(ctx context.Context, knowledge *model.KnowledgeB
 }
 
 func (r *kbRepository) UpdateKB(ctx context.Context, knowledge *model.KnowledgeBase) error {
-	if err := r.DB(ctx).Table("kb_knowledge").Where("kb_id = ?", knowledge.KbID).Updates(&knowledge).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("kb_id = ?", knowledge.KbID).Updates(&knowledge).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.UpdateKB error", zap.Error(err))
 		return err
 	}
@@ -55,7 +55,7 @@ func (r *kbRepository) UpdateKB(ctx context.Context, knowledge *model.KnowledgeB
 }
 
 func (r *kbRepository) DeleteKB(ctx context.Context, id uint) error {
-	if err := r.DB(ctx).Table("kb_knowledge").Where("kb_id =?", id).Delete(&model.KnowledgeBase{}).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("kb_id =?", id).Delete(&model.KnowledgeBase{}).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.DeleteKB error", zap.Error(err))
 		return err
 	}
@@ -63,7 +63,7 @@ func (r *kbRepository) DeleteKB(ctx context.Context, id uint) error {
 }
 
 func (r *kbRepository) DeleteKBByUserId(ctx context.Context, userId string) error {
-	if err := r.DB(ctx).Table("kb_knowledge").Where("user_id =?", userId).Delete(&model.KnowledgeBase{}).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("user_id =?", userId).Delete(&model.KnowledgeBase{}).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.DeleteKB error", zap.Error(err))
 		return err
 	}
@@ -71,7 +71,7 @@ func (r *kbRepository) DeleteKBByUserId(ctx context.Context, userId string) erro
 }
 func (r *kbRepository) GetKBById(ctx context.Context, id uint) (*model.KnowledgeBase, error) {
 	var knowledge model.KnowledgeBase
-	if err := r.DB(ctx).Table("kb_knowledge").Where("kb_id =?", id).First(&knowledge).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("kb_id =?", id).First(&knowledge).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.GetKB error", zap.Error(err))
 		return nil, err
 	}

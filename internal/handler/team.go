@@ -33,7 +33,7 @@ func NewTeamHandler(
 // @Security Bearer
 // @Param request body v1.CreateTeamRequest true "params"
 // @Success 200 {object} v1.CreateTeamResp
-// @Router /team/createTeam [post]
+// @Router /v1/team/createTeam [post]
 func (h *TeamHandler) CreateTeam(ctx *gin.Context) {
 	var req v1.CreateTeamRequest
 	userId := GetUserIdFromCtx(ctx)
@@ -61,7 +61,7 @@ func (h *TeamHandler) CreateTeam(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.UpdateTeamRequest true "params"
 // @Success 200 {object} v1.Response
-// @Router /team/updateTeam [post]
+// @Router /v1/team/updateTeam [post]
 func (h *TeamHandler) UpdateTeam(ctx *gin.Context) {
 	var req v1.UpdateTeamRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -87,7 +87,7 @@ func (h *TeamHandler) UpdateTeam(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.DeleteTeamRequest true "params"
 // @Success 200 {object} v1.Response
-// @Router /team/deleteTeam [post]
+// @Router /v1/team/deleteTeam [post]
 func (h *TeamHandler) DeleteTeam(ctx *gin.Context) {
 	var req v1.DeleteTeamRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -113,7 +113,7 @@ func (h *TeamHandler) DeleteTeam(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.GetTeamListReq true "params"
 // @Success 200 {object} v1.GetTeamListResp
-// @Router /team/getTeamList [get]
+// @Router /v1/team/getTeamList [get]
 func (h *TeamHandler) GetTeamList(ctx *gin.Context) {
 	var req v1.GetTeamListReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -138,7 +138,7 @@ func (h *TeamHandler) GetTeamList(ctx *gin.Context) {
 // @Security Bearer
 // @Param id query int true "Team ID"
 // @Success 200 {object} v1.GetTeamInfoResp
-// @Router /team/getTeamInfo [get]
+// @Router /v1/team/getTeamInfo [get]
 func (h *TeamHandler) GetTeamInfo(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	if !utils.IsNumeric(ctx.Query("id")) {
@@ -169,7 +169,7 @@ func (h *TeamHandler) GetTeamInfo(ctx *gin.Context) {
 // @Param pageIndex query int true "Page Index"
 // @Param pageSize query int true "Page Size"
 // @Success 200 {object} v1.GetUserTeamListResp
-// @Router /team/getUserTeamList [GET]
+// @Router /v1/team/getUserTeamList [GET]
 func (h *TeamHandler) GetUserTeamList(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	if !utils.IsNumeric(ctx.Query("pageIndex")) || !utils.IsNumeric(ctx.Query("pageSize")) {
@@ -201,7 +201,7 @@ func (h *TeamHandler) GetUserTeamList(ctx *gin.Context) {
 // @Security Bearer
 // @Param id query int true "Team ID"
 // @Success 200 {object} v1.GetTeamMemberListResp
-// @Router /team/getTeamMemberList [get]
+// @Router /v1/team/getTeamMemberList [get]
 func (h *TeamHandler) GetTeamMemberList(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	if !utils.IsNumeric(ctx.Query("id")) {
@@ -234,7 +234,7 @@ func (h *TeamHandler) GetTeamMemberList(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.AddTeamMemberReq true "params"
 // @Success 200 {object} v1.Response
-// @Router /team/addTeamMember [post]
+// @Router /v1/team/addTeamMember [post]
 func (h *TeamHandler) AddTeamMember(ctx *gin.Context) {
 	var req v1.AddTeamMemberReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -260,7 +260,7 @@ func (h *TeamHandler) AddTeamMember(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.DeleteTeamMemberReq true "params"
 // @Success 200 {object} v1.Response
-// @Router /team/deleteTeamMember [post]
+// @Router /v1/team/deleteTeamMember [post]
 func (h *TeamHandler) DeleteTeamMember(ctx *gin.Context) {
 	var req v1.DeleteTeamMemberReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -286,7 +286,7 @@ func (h *TeamHandler) DeleteTeamMember(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.UpdateTeamMemberRoleReq true "params"
 // @Success 200 {object} v1.Response
-// @Router /team/updateTeamMemberRole [post]
+// @Router /v1/team/updateTeamMemberRole [post]
 func (h *TeamHandler) UpdateTeamMemberRole(ctx *gin.Context) {
 	var req v1.UpdateTeamMemberRoleReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -312,7 +312,7 @@ func (h *TeamHandler) UpdateTeamMemberRole(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.QuitTeamReq true "params"
 // @Success 200 {object} v1.Response
-// @Router /team/quitTeam [post]
+// @Router /v1/team/quitTeam [post]
 func (h *TeamHandler) QuitTeam(ctx *gin.Context) {
 	var req v1.QuitTeamReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {

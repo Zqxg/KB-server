@@ -808,7 +808,7 @@ info:
   title: Nunu Example API
   version: 1.0.0
 paths:
-  /admin/createPublicKB:
+  /v1/admin/createPublicKB:
     post:
       consumes:
       - application/json
@@ -831,23 +831,7 @@ paths:
       summary: 创建公共知识库
       tags:
       - 管理员模块
-  /cancel:
-    get:
-      consumes:
-      - application/json
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.Response'
-      security:
-      - Bearer: []
-      summary: 注销用户
-      tags:
-      - 用户模块
-  /getCaptcha:
+  /v1/getCaptcha:
     get:
       consumes:
       - application/json
@@ -862,7 +846,7 @@ paths:
       summary: 获取验证码
       tags:
       - 用户模块
-  /knowledgeBase/DeleteArticle:
+  /v1/knowledgeBase/DeleteArticle:
     post:
       consumes:
       - application/json
@@ -885,7 +869,7 @@ paths:
       summary: 删除文章
       tags:
       - 文章模块
-  /knowledgeBase/DeleteArticleList:
+  /v1/knowledgeBase/DeleteArticleList:
     post:
       consumes:
       - application/json
@@ -908,7 +892,7 @@ paths:
       summary: 批量删除文章
       tags:
       - 文章模块
-  /knowledgeBase/UpdateArticle:
+  /v1/knowledgeBase/UpdateArticle:
     post:
       consumes:
       - application/json
@@ -931,7 +915,7 @@ paths:
       summary: 修改文章内容
       tags:
       - 文章模块
-  /knowledgeBase/createArticle:
+  /v1/knowledgeBase/createArticle:
     post:
       consumes:
       - application/json
@@ -954,7 +938,99 @@ paths:
       summary: 新建文章
       tags:
       - 文章模块
-  /knowledgeBase/getArticle:
+  /v1/knowledgeBase/createCategory:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateCategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 新建知识库分类
+      tags:
+      - 知识库模块
+  /v1/knowledgeBase/createKB:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateKBRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.CreateKBResp'
+      security:
+      - Bearer: []
+      summary: 新建团队知识库
+      tags:
+      - 知识库模块
+  /v1/knowledgeBase/deleteCategory:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DeleteCategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 删除知识库分类
+      tags:
+      - 知识库模块
+  /v1/knowledgeBase/deleteKB:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DeleteKBReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 删除知识库
+      tags:
+      - 知识库模块
+  /v1/knowledgeBase/getArticle:
     get:
       consumes:
       - application/json
@@ -976,7 +1052,7 @@ paths:
       summary: 获取文章详细
       tags:
       - 文章模块
-  /knowledgeBase/getArticleListByEs:
+  /v1/knowledgeBase/getArticleListByEs:
     post:
       consumes:
       - application/json
@@ -999,7 +1075,97 @@ paths:
       summary: es文章查询
       tags:
       - 文章模块
-  /knowledgeBase/getUserArticleList:
+  /v1/knowledgeBase/getCategoryListByKB:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 知识库ID
+        in: query
+        name: kb_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.CategoryData'
+      security:
+      - Bearer: []
+      summary: 获取知识库分类列表
+      tags:
+      - 知识库模块
+  /v1/knowledgeBase/getKBInfo:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: 知识库ID
+        in: query
+        name: kb_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.GetKBInfoResp'
+      security:
+      - Bearer: []
+      summary: 获取知识库信息
+      tags:
+      - 知识库模块
+  /v1/knowledgeBase/getKBListByTeamId:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetKBListByTeamIdReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.GetKBListByTeamIdResp'
+      security:
+      - Bearer: []
+      summary: 获取团队知识库列表
+      tags:
+      - 知识库模块
+  /v1/knowledgeBase/getKBListByType:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetKBListByTypeReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.KBList'
+      security:
+      - Bearer: []
+      summary: 获取知识库列表(私人知识库、公共知识库)
+      tags:
+      - 知识库模块
+  /v1/knowledgeBase/getUserArticleList:
     post:
       consumes:
       - application/json
@@ -1022,7 +1188,53 @@ paths:
       summary: 获取个人文章列表
       tags:
       - 文章模块
-  /passwordLogin:
+  /v1/knowledgeBase/updateCategory:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateCategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 更新知识库分类
+      tags:
+      - 知识库模块
+  /v1/knowledgeBase/updateKBName:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: req
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateKBNameReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 更新知识库名称
+      tags:
+      - 知识库模块
+  /v1/passwordLogin:
     post:
       consumes:
       - application/json
@@ -1043,7 +1255,7 @@ paths:
       summary: 账号密码登录
       tags:
       - 用户模块
-  /register:
+  /v1/register:
     post:
       consumes:
       - application/json
@@ -1065,7 +1277,7 @@ paths:
       summary: 用户注册
       tags:
       - 用户模块
-  /team/addTeamMember:
+  /v1/team/addTeamMember:
     post:
       consumes:
       - application/json
@@ -1088,7 +1300,7 @@ paths:
       summary: 添加团队成员
       tags:
       - 团队模块
-  /team/createTeam:
+  /v1/team/createTeam:
     post:
       consumes:
       - application/json
@@ -1111,7 +1323,7 @@ paths:
       summary: 新建团队
       tags:
       - 团队模块
-  /team/deleteTeam:
+  /v1/team/deleteTeam:
     post:
       consumes:
       - application/json
@@ -1134,7 +1346,7 @@ paths:
       summary: 删除团队
       tags:
       - 团队模块
-  /team/deleteTeamMember:
+  /v1/team/deleteTeamMember:
     post:
       consumes:
       - application/json
@@ -1157,7 +1369,7 @@ paths:
       summary: 删除团队成员
       tags:
       - 团队模块
-  /team/getTeamInfo:
+  /v1/team/getTeamInfo:
     get:
       consumes:
       - application/json
@@ -1179,7 +1391,7 @@ paths:
       summary: 获取团队详细
       tags:
       - 团队模块
-  /team/getTeamList:
+  /v1/team/getTeamList:
     get:
       consumes:
       - application/json
@@ -1202,7 +1414,7 @@ paths:
       summary: 获取团队列表
       tags:
       - 团队模块
-  /team/getTeamMemberList:
+  /v1/team/getTeamMemberList:
     get:
       consumes:
       - application/json
@@ -1224,7 +1436,7 @@ paths:
       summary: 获取团队成员列表
       tags:
       - 团队模块
-  /team/getUserTeamList:
+  /v1/team/getUserTeamList:
     get:
       consumes:
       - application/json
@@ -1251,7 +1463,7 @@ paths:
       summary: 获取个人团队列表
       tags:
       - 团队模块
-  /team/quitTeam:
+  /v1/team/quitTeam:
     post:
       consumes:
       - application/json
@@ -1274,7 +1486,7 @@ paths:
       summary: 退出团队
       tags:
       - 团队模块
-  /team/updateTeam:
+  /v1/team/updateTeam:
     post:
       consumes:
       - application/json
@@ -1297,7 +1509,7 @@ paths:
       summary: 更新团队
       tags:
       - 团队模块
-  /team/updateTeamMemberRole:
+  /v1/team/updateTeamMemberRole:
     post:
       consumes:
       - application/json
@@ -1320,7 +1532,23 @@ paths:
       summary: 更新团队成员角色
       tags:
       - 团队模块
-  /user/getCollege:
+  /v1/user/cancel:
+    get:
+      consumes:
+      - application/json
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 注销用户
+      tags:
+      - 用户模块
+  /v1/user/getCollege:
     get:
       consumes:
       - application/json
@@ -1343,7 +1571,7 @@ paths:
       summary: 获取学院信息
       tags:
       - 用户模块
-  /user/getCollegeList:
+  /v1/user/getCollegeList:
     get:
       consumes:
       - application/json
@@ -1359,7 +1587,7 @@ paths:
       summary: 获取学院列表
       tags:
       - 用户模块
-  /user/getUserInfo:
+  /v1/user/getUserInfo:
     get:
       consumes:
       - application/json
@@ -1375,7 +1603,7 @@ paths:
       summary: 获取用户信息
       tags:
       - 用户模块
-  /user/logout:
+  /v1/user/logout:
     get:
       consumes:
       - application/json
@@ -1391,7 +1619,7 @@ paths:
       summary: 退出用户
       tags:
       - 用户模块
-  /user/updateProfile:
+  /v1/user/updateProfile:
     post:
       consumes:
       - application/json
@@ -1414,7 +1642,7 @@ paths:
       summary: 修改用户信息
       tags:
       - 用户模块
-  /user/userAuth:
+  /v1/user/userAuth:
     post:
       consumes:
       - application/json
@@ -1437,234 +1665,6 @@ paths:
       summary: 用户认证
       tags:
       - 用户模块
-  /v1/createCategory:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/v1.CreateCategoryReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.Response'
-      security:
-      - Bearer: []
-      summary: 新建知识库分类
-      tags:
-      - 知识库模块
-  /v1/createKB:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/v1.CreateKBRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.CreateKBResp'
-      security:
-      - Bearer: []
-      summary: 新建团队知识库
-      tags:
-      - 知识库模块
-  /v1/deleteCategory:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/v1.DeleteCategoryReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.Response'
-      security:
-      - Bearer: []
-      summary: 删除知识库分类
-      tags:
-      - 知识库模块
-  /v1/deleteKB:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/v1.DeleteKBReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.Response'
-      security:
-      - Bearer: []
-      summary: 删除知识库
-      tags:
-      - 知识库模块
-  /v1/getCategoryListByKB:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: 知识库ID
-        in: query
-        name: kb_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.CategoryData'
-      security:
-      - Bearer: []
-      summary: 获取知识库分类列表
-      tags:
-      - 知识库模块
-  /v1/getKBInfo:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: 知识库ID
-        in: query
-        name: kb_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.GetKBInfoResp'
-      security:
-      - Bearer: []
-      summary: 获取知识库信息
-      tags:
-      - 知识库模块
-  /v1/getKBListByTeamId:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetKBListByTeamIdReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.GetKBListByTeamIdResp'
-      security:
-      - Bearer: []
-      summary: 获取团队知识库列表
-      tags:
-      - 知识库模块
-  /v1/getKBListByType:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetKBListByTypeReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.KBList'
-      security:
-      - Bearer: []
-      summary: 获取知识库列表(私人知识库、公共知识库)
-      tags:
-      - 知识库模块
-  /v1/updateCategory:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/v1.UpdateCategoryReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.Response'
-      security:
-      - Bearer: []
-      summary: 更新知识库分类
-      tags:
-      - 知识库模块
-  /v1/updateKBName:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: req
-        required: true
-        schema:
-          $ref: '#/definitions/v1.UpdateKBNameReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.Response'
-      security:
-      - Bearer: []
-      summary: 更新知识库名称
-      tags:
-      - 知识库模块
 securityDefinitions:
   Bearer:
     in: header

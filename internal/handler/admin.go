@@ -37,7 +37,7 @@ func NewAdminHandler(
 // @Security Bearer
 // @Param request body v1.CreateKBRequest true "params"
 // @Success 200 {object} v1.CreateKBResp
-// @Router /admin/createPublicKB [post]
+// @Router /v1/admin/createPublicKB [post]
 func (h *AdminHandler) CreatePublicKB(ctx *gin.Context) {
 	var req v1.CreateKBRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -49,7 +49,7 @@ func (h *AdminHandler) CreatePublicKB(ctx *gin.Context) {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrPermissionDenied, nil)
 	}
 	kbId, err := h.kbService.CreatePublicKB(ctx, userId, &req)
-	if kbId == -1 || err != nil {
+	if err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
 		return
 	}

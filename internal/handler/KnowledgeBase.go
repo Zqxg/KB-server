@@ -33,7 +33,7 @@ func NewKnowledgeBaseHandler(
 // @Security Bearer
 // @Param req body v1.CreateKBRequest true "params"
 // @Success 200 {object} v1.CreateKBResp
-// @Router /v1/createKB [post]
+// @Router /v1/knowledgeBase/createKB [post]
 func (h *KnowledgeBaseHandler) CreateKB(ctx *gin.Context) {
 	var req v1.CreateKBRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -62,7 +62,7 @@ func (h *KnowledgeBaseHandler) CreateKB(ctx *gin.Context) {
 // @Security Bearer
 // @Param req body v1.UpdateKBNameReq true "params"
 // @Success 200 {object} v1.Response
-// @Router /v1/updateKBName [post]
+// @Router /v1/knowledgeBase/updateKBName [post]
 func (h *KnowledgeBaseHandler) UpdateKBName(ctx *gin.Context) {
 	var req v1.UpdateKBNameReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -88,7 +88,7 @@ func (h *KnowledgeBaseHandler) UpdateKBName(ctx *gin.Context) {
 // @Security Bearer
 // @Param req body v1.DeleteKBReq true "params"
 // @Success 200 {object} v1.Response
-// @Router /v1/deleteKB [POST]
+// @Router /v1/knowledgeBase/deleteKB [POST]
 func (h *KnowledgeBaseHandler) DeleteKB(ctx *gin.Context) {
 	var req v1.DeleteKBReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -114,7 +114,7 @@ func (h *KnowledgeBaseHandler) DeleteKB(ctx *gin.Context) {
 // @Security Bearer
 // @Param kb_id query uint true "知识库ID"
 // @Success 200 {object} v1.GetKBInfoResp
-// @Router /v1/getKBInfo [GET]
+// @Router /v1/knowledgeBase/getKBInfo [GET]
 func (h *KnowledgeBaseHandler) GetKBInfo(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	if !utils.IsNumeric(ctx.Query("kb_id")) {
@@ -144,7 +144,7 @@ func (h *KnowledgeBaseHandler) GetKBInfo(ctx *gin.Context) {
 // @Security Bearer
 // @Param req body v1.GetKBListByTeamIdReq true "params"
 // @Success 200 {object} v1.GetKBListByTeamIdResp
-// @Router /v1/getKBListByTeamId [post]
+// @Router /v1/knowledgeBase/getKBListByTeamId [post]
 func (h *KnowledgeBaseHandler) GetKBListByTeamId(ctx *gin.Context) {
 	var req v1.GetKBListByTeamIdReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -169,7 +169,7 @@ func (h *KnowledgeBaseHandler) GetKBListByTeamId(ctx *gin.Context) {
 // @Security Bearer
 // @Param req body v1.CreateCategoryReq true "params"
 // @Success 200 {object} v1.Response
-// @Router /v1/createCategory [post]
+// @Router /v1/knowledgeBase/createCategory [post]
 func (h *KnowledgeBaseHandler) CreateCategory(ctx *gin.Context) {
 	var req v1.CreateCategoryReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -195,7 +195,7 @@ func (h *KnowledgeBaseHandler) CreateCategory(ctx *gin.Context) {
 // @Security Bearer
 // @Param req body v1.UpdateCategoryReq true "params"
 // @Success 200 {object} v1.Response
-// @Router /v1/updateCategory [post]
+// @Router /v1/knowledgeBase/updateCategory [post]
 func (h *KnowledgeBaseHandler) UpdateCategory(ctx *gin.Context) {
 	var req v1.UpdateCategoryReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -221,7 +221,7 @@ func (h *KnowledgeBaseHandler) UpdateCategory(ctx *gin.Context) {
 // @Security Bearer
 // @Param req body v1.DeleteCategoryReq true "params"
 // @Success 200 {object} v1.Response
-// @Router /v1/deleteCategory [POST]
+// @Router /v1/knowledgeBase/deleteCategory [POST]
 func (h *KnowledgeBaseHandler) DeleteCategory(ctx *gin.Context) {
 	var req v1.DeleteCategoryReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -247,7 +247,7 @@ func (h *KnowledgeBaseHandler) DeleteCategory(ctx *gin.Context) {
 // @Security Bearer
 // @Param kb_id query uint true "知识库ID"
 // @Success 200 {object} v1.CategoryData
-// @Router /v1/getCategoryListByKB [GET]
+// @Router /v1/knowledgeBase/getCategoryListByKB [GET]
 func (h *KnowledgeBaseHandler) GetCategoryListByKB(ctx *gin.Context) {
 	kbId, _ := utils.ToUint(ctx.Query("kb_id")) // 获取 kb_id 参数
 	if kbId < 0 {
@@ -272,7 +272,7 @@ func (h *KnowledgeBaseHandler) GetCategoryListByKB(ctx *gin.Context) {
 // @Security Bearer
 // @Param req body v1.GetKBListByTypeReq true "params"
 // @Success 200 {object} v1.KBList
-// @Router /v1/getKBListByType [post]
+// @Router /v1/knowledgeBase/getKBListByType [post]
 func (h *KnowledgeBaseHandler) GetKBListByType(ctx *gin.Context) {
 	var req v1.GetKBListByTypeReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {

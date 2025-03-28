@@ -90,23 +90,19 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 		Nickname: randomname.GenerateName(), //随机生成用户昵称
 		RoleType: enums.COMMON_USER,         // 未认证前为普通用户
 	}
-	// Transaction demo
-	err = s.Tm.Transaction(ctx, func(ctx context.Context) error {
-		// Create a user
-		if err = s.userRepo.Create(ctx, user); err != nil {
-			return err
-		}
-		// 新增私人知识库
-		kb := &model.KnowledgeBase{
-			KbName:   "私人知识库",
-			UserID:   &user.UserId,
-			IsPublic: false,
-		}
-		if _, err = s.kbRepo.CreateKB(ctx, kb); err != nil {
-			return err
-		}
-		return nil
-	})
+	// Create a user
+	if err = s.userRepo.Create(ctx, user); err != nil {
+		return err
+	}
+	// 新增私人知识库
+	kb := &model.KnowledgeBase{
+		KbName:   "私人知识库",
+		UserID:   &user.UserId,
+		IsPublic: false,
+	}
+	if _, err = s.kbRepo.CreateKB(ctx, kb); err != nil {
+		return err
+	}
 	// 新增es索引 私人知识库
 	index := enums.Private_knowledge_index + user.UserId
 	if err = s.articleRepo.CreateEsIndex(ctx, index); err != nil {
