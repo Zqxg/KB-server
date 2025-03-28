@@ -52,7 +52,7 @@ func NewWire(viperViper *viper.Viper, logger *log.Logger) (*app.App, func(), err
 	teamRepository := repository.NewTeamRepository(repositoryRepository)
 	articleService := knowledgeBase.NewArticleService(serviceService, articleRepository, userRepository, kbRepository, teamRepository)
 	articleHandler := handler.NewArticleHandler(handlerHandler, articleService)
-	teamService := team.NewTeamService(serviceService, userRepository, articleRepository, teamRepository)
+	teamService := team.NewTeamService(serviceService, userRepository, articleRepository, kbRepository, teamRepository)
 	teamHandler := handler.NewTeamHandler(handlerHandler, teamService)
 	adminService := admin.NewAdminService(serviceService, userRepository, articleRepository, teamRepository, kbRepository)
 	knowledgeBaseService := knowledgeBase.NewKnowledgeBaseService(serviceService, kbRepository, teamRepository, userRepository)

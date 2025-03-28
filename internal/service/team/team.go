@@ -28,6 +28,7 @@ func NewTeamService(
 	service *service.Service,
 	userRepository repository.UserRepository,
 	articleRepository repository.ArticleRepository,
+	kbRepository repository.KBRepository,
 	teamRepository repository.TeamRepository,
 ) TeamService {
 	return &teamService{
@@ -35,6 +36,7 @@ func NewTeamService(
 		userRepository:    userRepository,
 		teamRepository:    teamRepository,
 		articleRepository: articleRepository,
+		kbRepository:      kbRepository,
 	}
 }
 
@@ -43,6 +45,7 @@ type teamService struct {
 	userRepository    repository.UserRepository
 	teamRepository    repository.TeamRepository
 	articleRepository repository.ArticleRepository
+	kbRepository      repository.KBRepository
 }
 
 func (s *teamService) CreateTeam(ctx *gin.Context, userId string, req *v1.CreateTeamRequest) (uint, error) {
@@ -66,6 +69,12 @@ func (s *teamService) CreateTeam(ctx *gin.Context, userId string, req *v1.Create
 		err = s.teamRepository.CreateTeamMember(ctx, teamMember)
 		if err != nil {
 			return 0, v1.ErrCreateTeamFailed
+		}
+		// 创建es索引
+		index := enums.Team_knowledge_index + strconv.Itoa(int(teamId))
+		err = s.articleRepository.CreateEsIndex(ctx, index)
+		if err != nil {
+			return 0, v1.ErrCreateEsIndexFailed
 		}
 	}
 	return teamId, nil
@@ -93,9 +102,20 @@ func (s *teamService) DeleteTeam(ctx *gin.Context, userId string, teamId uint) e
 	if !s.isTeamLeaderOrAdmin(ctx, teamId, userId) {
 		return v1.ErrPermissionDenied
 	}
+	// 判断团队下是否有知识库
+	_, total, err := s.kbRepository.GetKBListByTeamId(ctx, teamId, 1, 200)
+	if err != nil {
+		return v1.ErrGetCategoryListFailed
+	}
+	if total > 0 {
+		// 删除知识库
+		if err := s.kbRepository.DeleteKBByTeamID(ctx, teamId); err != nil {
+			return v1.ErrDeleteKnowledgeFailed
+		}
+	}
 	// 删除es索引团队
 	index := enums.Team_knowledge_index + strconv.Itoa(int(teamId))
-	err := s.articleRepository.DeleteEsIndex(ctx, index)
+	err = s.articleRepository.DeleteEsIndex(ctx, index)
 	if err != nil {
 		return v1.ErrDeleteEsIndexFailed
 	}

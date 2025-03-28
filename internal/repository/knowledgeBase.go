@@ -11,6 +11,7 @@ type KBRepository interface {
 	CreateKB(ctx context.Context, knowledge *model.KnowledgeBase) (uint, error)
 	UpdateKB(ctx context.Context, knowledge *model.KnowledgeBase) error
 	DeleteKB(ctx context.Context, id uint) error
+	DeleteKBByTeamID(ctx context.Context, teamID uint) error
 	DeleteKBByUserId(ctx context.Context, userId string) error
 	GetKBById(ctx context.Context, id uint) (*model.KnowledgeBase, error)
 	GetKBViewById(ctx context.Context, id uint) (*vo.KbKnowledgeBaseView, error)
@@ -56,6 +57,14 @@ func (r *kbRepository) UpdateKB(ctx context.Context, knowledge *model.KnowledgeB
 
 func (r *kbRepository) DeleteKB(ctx context.Context, id uint) error {
 	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("kb_id =?", id).Delete(&model.KnowledgeBase{}).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.DeleteKB error", zap.Error(err))
+		return err
+	}
+	return nil
+}
+
+func (r *kbRepository) DeleteKBByTeamID(ctx context.Context, teamID uint) error {
+	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("team_id =?", teamID).Delete(&model.KnowledgeBase{}).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.DeleteKB error", zap.Error(err))
 		return err
 	}
