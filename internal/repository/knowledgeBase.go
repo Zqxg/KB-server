@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"projectName/internal/model"
 	"projectName/internal/model/vo"
 )
@@ -55,29 +56,55 @@ func (r *kbRepository) UpdateKB(ctx context.Context, knowledge *model.KnowledgeB
 	return nil
 }
 
+// 公共删除方法
+func (r *kbRepository) deleteKBs(ctx context.Context, kbIDs []uint) error {
+	if len(kbIDs) == 0 {
+		return nil
+	}
+
+	// 事务保证数据一致性
+	return r.DB(ctx).Transaction(func(tx *gorm.DB) error {
+		// 1. 删除知识库
+		if err := tx.Table("kb_knowledgeBase").Where("kb_id IN ?", kbIDs).Delete(&model.KnowledgeBase{}).Error; err != nil {
+			return err
+		}
+		// 2. 删除分类
+		if err := tx.Table("kb_category").Where("kb_id IN ?", kbIDs).Delete(&model.Category{}).Error; err != nil {
+			return err
+		}
+		// 3. 删除文章
+		if err := tx.Table("kb_article").Where("kb_id IN ?", kbIDs).Delete(&model.Article{}).Error; err != nil {
+			return err
+		}
+		return nil
+	})
+}
+
+// DeleteKB 根据 kb_id 删除单个知识库
 func (r *kbRepository) DeleteKB(ctx context.Context, id uint) error {
-	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("kb_id =?", id).Delete(&model.KnowledgeBase{}).Error; err != nil {
-		r.logger.WithContext(ctx).Error("KBRepository.DeleteKB error", zap.Error(err))
-		return err
-	}
-	return nil
+	return r.deleteKBs(ctx, []uint{id})
 }
 
+// DeleteKBByTeamID 根据 team_id 删除该团队下的所有知识库
 func (r *kbRepository) DeleteKBByTeamID(ctx context.Context, teamID uint) error {
-	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("team_id =?", teamID).Delete(&model.KnowledgeBase{}).Error; err != nil {
-		r.logger.WithContext(ctx).Error("KBRepository.DeleteKB error", zap.Error(err))
+	var kbIDs []uint
+	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("team_id = ?", teamID).Pluck("kb_id", &kbIDs).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.GetKBIDs error", zap.Error(err))
 		return err
 	}
-	return nil
+	return r.deleteKBs(ctx, kbIDs)
 }
 
+// DeleteKBByUserId 根据 user_id 删除该用户创建的所有知识库
 func (r *kbRepository) DeleteKBByUserId(ctx context.Context, userId string) error {
-	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("user_id =?", userId).Delete(&model.KnowledgeBase{}).Error; err != nil {
-		r.logger.WithContext(ctx).Error("KBRepository.DeleteKB error", zap.Error(err))
+	var kbIDs []uint
+	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("user_id = ?", userId).Pluck("kb_id", &kbIDs).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.GetKBIDs error", zap.Error(err))
 		return err
 	}
-	return nil
+	return r.deleteKBs(ctx, kbIDs)
 }
+
 func (r *kbRepository) GetKBById(ctx context.Context, id uint) (*model.KnowledgeBase, error) {
 	var knowledge model.KnowledgeBase
 	if err := r.DB(ctx).Table("kb_knowledgeBase").Where("kb_id =?", id).First(&knowledge).Error; err != nil {
