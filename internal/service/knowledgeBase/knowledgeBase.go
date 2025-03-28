@@ -8,6 +8,7 @@ import (
 	"projectName/internal/model/vo"
 	"projectName/internal/repository"
 	"projectName/internal/service"
+	"strconv"
 )
 
 type KnowledgeBaseService interface {
@@ -34,21 +35,24 @@ func NewKnowledgeBaseService(
 	service *service.Service,
 	kbRepository repository.KBRepository,
 	teamRepository repository.TeamRepository,
+	articleRepository repository.ArticleRepository,
 	userRepository repository.UserRepository,
 ) KnowledgeBaseService {
 	return &knowledgeBaseService{
-		Service:        service,
-		kbRepository:   kbRepository,
-		teamRepository: teamRepository,
-		userRepository: userRepository,
+		Service:           service,
+		kbRepository:      kbRepository,
+		teamRepository:    teamRepository,
+		userRepository:    userRepository,
+		articleRepository: articleRepository,
 	}
 }
 
 type knowledgeBaseService struct {
 	*service.Service
-	kbRepository   repository.KBRepository
-	teamRepository repository.TeamRepository
-	userRepository repository.UserRepository
+	kbRepository      repository.KBRepository
+	teamRepository    repository.TeamRepository
+	userRepository    repository.UserRepository
+	articleRepository repository.ArticleRepository
 }
 
 func (s *knowledgeBaseService) CreateKnowledgeBase(ctx *gin.Context, userId string, req *v1.CreateKBRequest) (uint, error) {
@@ -290,6 +294,12 @@ func (s *knowledgeBaseService) CreatePublicKB(ctx *gin.Context, userId string, r
 	if err != nil {
 		return 0, err
 	}
+	// 新增ES索引 公共知识库
+	index := enums.Public_knowledge_index + strconv.Itoa(int(kbId))
+	err = s.articleRepository.CreateEsIndex(ctx, index)
+	if err != nil {
+		return 0, v1.ErrCreateEsIndexFailed
+	}
 	return kbId, nil
 }
 
@@ -313,6 +323,12 @@ func (s *knowledgeBaseService) DeletePublicKB(ctx *gin.Context, kbId uint) error
 	_, err := s.kbRepository.GetKBById(ctx, kbId)
 	if err != nil {
 		return v1.ErrKnowledgeNotExist
+	}
+	// 删除ES索引
+	index := enums.Public_knowledge_index + strconv.Itoa(int(kbId))
+	err = s.articleRepository.DeleteEsIndex(ctx, index)
+	if err != nil {
+		return v1.ErrDeleteEsIndexFailed
 	}
 	// 删除知识库
 	err = s.kbRepository.DeleteKB(ctx, kbId)

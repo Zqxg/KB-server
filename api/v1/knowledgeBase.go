@@ -6,7 +6,7 @@ import (
 )
 
 type CreateKBRequest struct {
-	TeamID uint   `json:"teamID" binding:"required"`
+	TeamID uint   `json:"team_id" binding:"required"`
 	Name   string `json:"name" binding:"required"`
 }
 

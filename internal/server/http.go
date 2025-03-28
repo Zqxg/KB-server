@@ -115,7 +115,7 @@ func NewHTTPServer(
 			commonUserRouter.GET(enums.TEAM+"/getTeamMemberList", teamHandler.GetTeamMemberList)        // 获取团队成员列表
 			commonUserRouter.POST(enums.TEAM+"/addTeamMember", teamHandler.AddTeamMember)               // 添加团队成员
 			commonUserRouter.POST(enums.TEAM+"/deleteTeamMember", teamHandler.DeleteTeamMember)         // 删除团队成员
-			commonUserRouter.POST(enums.TEAM+"/UpdateTeamMemberRole", teamHandler.UpdateTeamMemberRole) // 修改团队成员角色
+			commonUserRouter.POST(enums.TEAM+"/updateTeamMemberRole", teamHandler.UpdateTeamMemberRole) // 修改团队成员角色
 			commonUserRouter.POST(enums.TEAM+"/quitTeam", teamHandler.QuitTeam)                         // 退出团队
 
 		}
@@ -123,6 +123,8 @@ func NewHTTPServer(
 		superAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUPER_ADMIN))
 		{
 			superAdminRouter.POST(enums.ROUTET_ADMIN+"/createPublicKB", adminHandler.CreatePublicKB) // 新增公共知识库
+			superAdminRouter.POST(enums.ROUTET_ADMIN+"/updatePublicKB", adminHandler.UpdatePublicKB) // 更新公共知识库
+			superAdminRouter.POST(enums.ROUTET_ADMIN+"/deletePublicKB", adminHandler.DeletePublicKB) // 删除公共知识库
 
 		}
 	}
