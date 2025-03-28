@@ -84,7 +84,7 @@ func (s *articleService) GetArticle(ctx context.Context, userId string, id uint)
 			return nil, v1.ErrPermissionDenied
 		}
 		// 判断当前文章团队id是否在团队列表中
-		if !utils.ContainsString(teamIds, strconv.Itoa(int(*kb.TeamID))) {
+		if !utils.ContainsString(teamIds, strconv.Itoa(int(kb.TeamID))) {
 			return nil, v1.ErrPermissionDenied
 		}
 	}
@@ -295,7 +295,7 @@ func (s *articleService) DeleteArticle(ctx context.Context, id uint) (int, error
 		index = enums.Public_knowledge_index + strconv.Itoa(int(article.KBID))
 	}
 	if kb.KBType == enums.KBTypeTeam {
-		index = enums.Team_knowledge_index + strconv.Itoa(int(*kb.TeamID))
+		index = enums.Team_knowledge_index + strconv.Itoa(int(kb.TeamID))
 	}
 	// 删除文章
 	deletedCount, err := s.articleRepository.DeleteArticle(ctx, article.ArticleID)
@@ -572,7 +572,7 @@ func (s *articleService) GetESIndex(ctx context.Context, userId string, kbid uin
 		index = enums.Public_knowledge_index + strconv.Itoa(int(kb.KBID))
 	}
 	if kb.KBType == enums.KBTypeTeam {
-		index = enums.Team_knowledge_index + strconv.Itoa(int(*kb.TeamID))
+		index = enums.Team_knowledge_index + strconv.Itoa(int(kb.TeamID))
 	}
 	return index
 }

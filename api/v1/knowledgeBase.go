@@ -26,10 +26,10 @@ type DeleteKBReq struct {
 type GetKBInfoResp struct {
 	KBID      uint      `json:"kb_id"`
 	KbName    string    `json:"kb_name"`
-	TeamID    *uint     `json:"team_id"`
-	UserID    *string   `json:"user_id"`
-	TeamName  *string   `json:"team_name"`
-	UserName  *string   `json:"user_name"`
+	TeamID    uint      `json:"team_id"`
+	UserID    string    `json:"user_id"`
+	TeamName  string    `json:"team_name"`
+	UserName  string    `json:"user_name"`
 	IsPublic  bool      `json:"is_public"`
 	KBType    string    `json:"kb_type"`
 	CreatedAt time.Time `json:"created_at"`

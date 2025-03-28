@@ -97,7 +97,7 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 	// 新增私人知识库
 	kb := &model.KnowledgeBase{
 		KbName:   "私人知识库",
-		UserID:   &user.UserId,
+		UserID:   user.UserId,
 		IsPublic: false,
 	}
 	if _, err = s.kbRepo.CreateKB(ctx, kb); err != nil {
