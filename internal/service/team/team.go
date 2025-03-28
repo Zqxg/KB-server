@@ -1,7 +1,9 @@
 package team
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
+	"gorm.io/gorm"
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
 	"projectName/internal/model"
@@ -279,11 +281,18 @@ func (s *teamService) AddTeamMember(ctx *gin.Context, userID string, req *v1.Add
 	if err != nil {
 		return v1.ErrUserNotExist
 	}
+
 	// 判断用户是否已经在团队中
 	_, err = s.teamRepository.GetMemberByTeamIDAndUserID(ctx, req.TeamID, req.MemberID)
-	if err != nil {
+	if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+		// 发生其他错误（不是"未找到记录"的错误），直接返回
+		return err
+	}
+	if err == nil {
+		// 查询成功，说明用户已在团队中
 		return v1.ErrMemberExist
 	}
+
 	// 构建成员表
 	teamMember := &model.Member{
 		TeamID: req.TeamID,
