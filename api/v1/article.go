@@ -6,16 +6,16 @@ import (
 
 // CreateArticleRequest 用于接收创建文章请求的数据
 type CreateArticleRequest struct {
-	Title           string       `json:"title" binding:"required"`      // 文章标题
-	Content         string       `json:"content" binding:"required"`    // 文章内容
-	ContentShort    string       `json:"content_short"`                 // 文章摘要
-	AuthorID        string       `json:"article_id" binding:"required"` // 作者ID
-	KBID            uint         `json:"kb_id"`                         // 知识库ID
-	CategoryID      uint         `json:"category_id"`                   // 文章分类ID
-	Importance      int          `json:"importance"`                    // 文章重要性
-	CommentDisabled bool         `json:"comment_disabled"`              // 是否禁用评论
-	SourceURI       string       `json:"sourceu_ri"`                    // 文章外链
-	UploadedFiles   []FileUpload `json:"uploaded_files"`                // 上传的文件列表
+	Title           string       `json:"title" binding:"required"`     // 文章标题
+	Content         string       `json:"content" binding:"required"`   // 文章内容
+	ContentShort    string       `json:"content_short"`                // 文章摘要
+	AuthorID        string       `json:"author_id" binding:"required"` // 作者ID
+	KBID            uint         `json:"kb_id"`                        // 知识库ID
+	CategoryID      uint         `json:"category_id"`                  // 文章分类ID
+	Importance      int          `json:"importance"`                   // 文章重要性
+	CommentDisabled bool         `json:"comment_disabled"`             // 是否禁用评论
+	SourceURI       string       `json:"source_uri"`                   // 文章外链
+	UploadedFiles   []FileUpload `json:"uploaded_files"`               // 上传的文件列表
 }
 
 // FileUpload 用于接收上传文件的信息
