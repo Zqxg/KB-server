@@ -106,7 +106,11 @@ func (s *userService) Register(ctx context.Context, req *v1.RegisterRequest) err
 	}
 	// 新增es索引 私人知识库
 	index := enums.Private_knowledge_index + user.UserId
-	if err = s.articleRepo.CreateEsIndex(ctx, index); err != nil {
+	esMapper, err := service.GenerateEsMapping(model.EsArticle{})
+	if err != nil {
+		return v1.ErrCreateEsMapperFailed
+	}
+	if err = s.articleRepo.CreateEsIndex(ctx, index, esMapper); err != nil {
 		s.Logger.Error("add es index failed", zap.Error(err))
 		return v1.ErrCreateEsIndexFailed
 	}

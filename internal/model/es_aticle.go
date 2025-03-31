@@ -16,7 +16,7 @@ type EsArticle struct {
 	Importance      int       `json:"importance"`
 	CommentDisabled bool      `json:"comment_disabled"`
 	SourceURI       string    `json:"source_uri"`
-	Status          int       `json:"status"`
+	Status          int       `json:"status"` // 发布 or 草稿
 	UploadedFile    bool      `json:"uploaded_file"`
 	CreatedAt       time.Time `json:"created_at"` // 使用 sql.NullTime
 	UpdatedAt       time.Time `json:"updated_at"` // 使用 sql.NullTime

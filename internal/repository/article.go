@@ -26,8 +26,8 @@ type ArticleRepository interface {
 	CreateEsArticle(ctx context.Context, index string, article *model.EsArticle) error
 	UpdateEsArticle(ctx context.Context, index string, article *model.EsArticle) error
 	DeleteEsArticle(ctx context.Context, index string, articleId uint) error
-	CreateEsIndex(ctx context.Context, index string) error // 新增es索引
-	DeleteEsIndex(ctx context.Context, index string) error // 删除es索引
+	CreateEsIndex(ctx context.Context, index string, mapping string) error // 新增es索引
+	DeleteEsIndex(ctx context.Context, index string) error                 // 删除es索引
 }
 
 func NewArticleRepository(
@@ -66,7 +66,7 @@ func (r *articleRepository) CreateArticle(ctx context.Context, article *model.Ar
 func (r *articleRepository) GetArticleByTitleAndUserId(ctx context.Context, title string, authorID string) (*model.Article, error) {
 	var article model.Article
 	result := r.db.WithContext(ctx).
-		Where("title = ? AND author_id = ?", title, authorID).
+		Where("title = ? AND user_id = ?", title, authorID).
 		First(&article)
 	if result.Error != nil {
 		if errors.Is(result.Error, gorm.ErrRecordNotFound) {
@@ -267,7 +267,9 @@ func (r *Repository) DeleteEsArticle(ctx context.Context, index string, articleI
 	return nil
 }
 
-func (r *Repository) CreateEsIndex(ctx context.Context, index string) error {
+func (r *Repository) CreateEsIndex(ctx context.Context, index string, mapping string) error {
+	// mapping
+	r.logger.WithContext(ctx).Info("ES mapping", zap.Any("mapping", mapping))
 	// 创建索引
 	createIndex, err := r.esClient.CreateIndex(index).Do(ctx)
 	if err != nil {

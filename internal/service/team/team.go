@@ -74,7 +74,11 @@ func (s *teamService) CreateTeam(ctx *gin.Context, userId string, req *v1.Create
 		}
 		// 创建es索引
 		index := enums.Team_knowledge_index + strconv.Itoa(int(teamId))
-		err = s.articleRepository.CreateEsIndex(ctx, index)
+		esMapper, err := service.GenerateEsMapping(model.EsArticle{})
+		if err != nil {
+			return 0, v1.ErrCreateEsMapperFailed
+		}
+		err = s.articleRepository.CreateEsIndex(ctx, index, esMapper)
 		if err != nil {
 			return 0, v1.ErrCreateEsIndexFailed
 		}

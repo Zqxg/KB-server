@@ -143,10 +143,13 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 		CommentDisabled: req.CommentDisabled,
 		SourceURI:       req.SourceURI,
 		UploadedFiles:   uploadedFilesData,
-		Status:          enums.StatusPublished, // todo：后续设置审核开关
+		Status:          req.Status, // 后续设置审核开关
 	}
 	// 创建新文章
 	articleId, err := s.articleRepository.CreateArticle(ctx, article)
+	if err != nil {
+		return -1, v1.ErrCreateArticleFailed
+	}
 	// 判断知识库类型，选择es索引
 	esIndex := s.GetESIndex(ctx, article.UserID, req.KBID)
 	if esIndex == "" {
@@ -173,7 +176,6 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 	if article.UploadedFiles != nil {
 		esArticle.UploadedFile = true
 	}
-
 	// 创建es文档
 	if err = s.articleRepository.CreateEsArticle(ctx, esIndex, esArticle); err != nil {
 		return -1, v1.ErrCreateEsArticleFailed
@@ -192,6 +194,7 @@ func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticl
 		return nil, v1.ErrArticleNotExist
 	}
 	oldKBID := oldArticle.KBID
+	oldStatus := oldArticle.Status
 
 	// 更新文章内容
 	oldArticle.Title = req.Title
@@ -202,7 +205,7 @@ func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticl
 	oldArticle.KBID = req.KBID // ⚠️ 这里可能改了 KBID
 	oldArticle.CommentDisabled = req.CommentDisabled
 	oldArticle.SourceURI = req.SourceURI
-	oldArticle.Status = enums.StatusPublished // todo：后续设置审核开关
+	oldArticle.Status = req.Status
 
 	// 更新数据库
 	updatedArticle, err := s.articleRepository.UpdateArticle(ctx, oldArticle)
@@ -274,7 +277,13 @@ func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticl
 			return nil, v1.ErrUpdateEsArticleFailed
 		}
 	} else {
-		// KB未变，直接更新
+		// KB未变,判断status
+		if oldStatus == enums.StatusDraft && updatedArticle.Status == enums.StatusPublished {
+			// 新增到新索引
+			if err = s.articleRepository.CreateEsArticle(ctx, newIndex, esArticle); err != nil {
+				return nil, v1.ErrUpdateEsArticleFailed
+			}
+		}
 		if err = s.articleRepository.UpdateEsArticle(ctx, newIndex, esArticle); err != nil {
 			return nil, v1.ErrUpdateEsArticleFailed
 		}
@@ -523,6 +532,9 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, userId string, 
 		if err := json.Unmarshal(hit.Source, &esArticle); err != nil {
 			continue
 		}
+		kb, _ := s.kbRepository.GetKBViewById(ctx, esArticle.KBID)
+		user, _ := s.userRepo.GetByUserId(ctx, esArticle.UserID)
+		category, _ := s.kbRepository.GetCategoryById(ctx, esArticle.CategoryID)
 
 		article := v1.ArticleSearchInfo{
 			Title:           esArticle.Title,
@@ -530,6 +542,10 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, userId string, 
 			ContentShort:    esArticle.ContentShort,
 			UploadedFile:    esArticle.UploadedFile,
 			Status:          esArticle.Status,
+			Author:          user.Nickname,
+			KBName:          kb.KbName,
+			TeamName:        kb.TeamName,
+			Category:        category.CategoryName,
 			ArticleID:       esArticle.ArticleID,
 			CreatedAt:       esArticle.CreatedAt,
 			UpdatedAt:       esArticle.UpdatedAt,
@@ -537,11 +553,6 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, userId string, 
 			CommentDisabled: esArticle.CommentDisabled,
 			SourceURI:       esArticle.SourceURI,
 		}
-
-		user, _ := s.userRepo.GetByUserId(ctx, esArticle.UserID)
-		article.Author = user.Nickname
-		category, _ := s.kbRepository.GetCategoryById(ctx, esArticle.CategoryID)
-		article.Category = category.CategoryName
 		article.Score = *hit.Score
 
 		if highlightFields, ok := hit.Highlight["content"]; ok {

@@ -167,7 +167,9 @@ func (r *teamRepository) GetMemberByTeamIDAndUserID(ctx context.Context, teamID 
 
 func (r *teamRepository) GetTeamListByUserID(ctx context.Context, userID string) ([]string, error) {
 	var teamIDs []string
-	if err := r.DB(ctx).Table("sys_member").Where("user_id =?", userID).Pluck("team_id", &teamIDs).Error; err != nil {
+	if err := r.DB(ctx).Table("sys_member").
+		Where("user_id = ? AND deleted_at IS NULL", userID).
+		Pluck("team_id", &teamIDs).Error; err != nil {
 		r.logger.WithContext(ctx).Error("TeamRepository.GetTeamListByUserID error", zap.Error(err))
 		return nil, err
 	}

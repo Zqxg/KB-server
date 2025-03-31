@@ -345,11 +345,16 @@ func (s *knowledgeBaseService) CreatePublicKB(ctx *gin.Context, userId string, r
 	}
 	kbId, err := s.kbRepository.CreateKB(ctx, knowledgeBase)
 	if err != nil {
-		return 0, err
+		return 0, v1.ErrCreateKnowledgeFailed
 	}
 	// 新增ES索引 公共知识库
 	index := enums.Public_knowledge_index + strconv.Itoa(int(kbId))
-	err = s.articleRepository.CreateEsIndex(ctx, index)
+	// 自动生成映射的方法
+	esMapper, err := service.GenerateEsMapping(model.EsArticle{})
+	if err != nil {
+		return 0, v1.ErrCreateEsMapperFailed
+	}
+	err = s.articleRepository.CreateEsIndex(ctx, index, esMapper)
 	if err != nil {
 		return 0, v1.ErrCreateEsIndexFailed
 	}

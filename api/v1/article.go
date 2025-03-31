@@ -13,6 +13,7 @@ type CreateArticleRequest struct {
 	KBID            uint         `json:"kb_id"`                        // 知识库ID
 	CategoryID      uint         `json:"category_id"`                  // 文章分类ID
 	Importance      int          `json:"importance"`                   // 文章重要性
+	Status          int          `json:"status"`                       // 文章状态
 	CommentDisabled bool         `json:"comment_disabled"`             // 是否禁用评论
 	SourceURI       string       `json:"source_uri"`                   // 文章外链
 	UploadedFiles   []FileUpload `json:"uploaded_files"`               // 上传的文件列表
@@ -115,6 +116,8 @@ type ArticleSearchInfo struct {
 	ContentShort    string    `json:"content_short"`
 	Author          string    `json:"author"`
 	Category        string    `json:"category"`
+	KBName          string    `json:"kb_name"`
+	TeamName        string    `json:"team_name"`
 	Importance      int       `json:"importance"`
 	CommentDisabled bool      `json:"comment_disabled"`
 	SourceURI       string    `json:"source_uri"`

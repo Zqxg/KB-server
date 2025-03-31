@@ -83,8 +83,9 @@ var (
 	ErrUpdateEsArticleFailed = newError(4001, "更新es文章失败")
 	ErrDeleteEsArticleFailed = newError(4002, "删除es文章失败")
 	//ErrQueryEsArticleFailed  = newError(4003, "查询es文章失败")
-	ErrCreateEsIndexFailed = newError(4004, "创建es索引失败")
-	ErrDeleteEsIndexFailed = newError(4005, "删除es索引失败")
+	ErrCreateEsIndexFailed  = newError(4004, "创建es索引失败")
+	ErrDeleteEsIndexFailed  = newError(4005, "删除es索引失败")
+	ErrCreateEsMapperFailed = newError(4006, "创建es映射失败")
 
 	// 20000 业务逻辑错误
 	ErrParamEmpty          = newError(20000, "参数为空")
