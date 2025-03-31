@@ -8,3 +8,7 @@ type CategoryView struct {
 	Level        int            `json:"level" gorm:"column:level"`                // 层级
 	Children     []CategoryView `json:"children" gorm:"-"`                        // 子分类
 }
+
+func (CategoryView) TableName() string {
+	return "kb_category_view"
+}

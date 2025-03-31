@@ -178,7 +178,7 @@ func (r *kbRepository) CreateCategory(ctx context.Context, category *model.Categ
 
 // UpdateCategory 更新分类
 func (r *kbRepository) UpdateCategory(ctx context.Context, category *model.Category) error {
-	if err := r.DB(ctx).Table("kb_category").Where("c_id =?", category.CategoryId).Updates(&category).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_category").Where("category_id =?", category.CategoryId).Updates(&category).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.UpdateCategory error", zap.Error(err))
 		return err
 	}
@@ -187,7 +187,7 @@ func (r *kbRepository) UpdateCategory(ctx context.Context, category *model.Categ
 
 // DeleteCategory 删除分类
 func (r *kbRepository) DeleteCategory(ctx context.Context, id uint) error {
-	if err := r.DB(ctx).Table("kb_category").Where("c_id =?", id).Delete(&model.Category{}).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_category").Where("category_id =?", id).Delete(&model.Category{}).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.DeleteCategory error", zap.Error(err))
 		return err
 	}
@@ -207,8 +207,9 @@ func (r *kbRepository) GetCategoryList(ctx context.Context, kbId uint) ([]*model
 // GetCategoryById 获取分类信息
 func (r *kbRepository) GetCategoryById(ctx context.Context, id uint) (*model.Category, error) {
 	var category model.Category
-	if err := r.DB(ctx).Table("kb_category").Where("c_id =?", id).First(&category).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_category").Where("category_id =?", id).First(&category).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.GetCategoryById error", zap.Error(err))
+		return nil, err
 	}
 	return &category, nil
 }
