@@ -165,6 +165,9 @@ func (r *articleRepository) GetUserArticleList(ctx context.Context, userId strin
 	if req.CategoryID != 0 {
 		query = query.Where("category_id = ?", req.CategoryID)
 	}
+	if req.KBID != 0 {
+		query = query.Where("kb_id =?", req.KBID)
+	}
 	if req.Status != -1 {
 		query = query.Where("status =?", req.Status)
 	}

@@ -80,10 +80,10 @@ type ArticleList struct {
 	PageResponse
 }
 
-// todo 增加字段
 type GetUserArticleListReq struct {
 	Title      string `json:"title"`       // 文章标题
 	CategoryID uint   `json:"category_id"` // 文章分类ID
+	KBID       uint   `json:"kb_id"`       // 知识库ID
 	CreatedAt  string `json:"created_at"`  // 文章创建时间
 	CreatedEnd string `json:"created_end"` // 文章结束时间
 	Status     int    `json:"status"`      // 文章状态

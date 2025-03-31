@@ -99,6 +99,8 @@ definitions:
         type: string
       importance:
         type: integer
+      kb_name:
+        type: string
       score:
         description: 评分（例如：基于ES的相关度评分）
         type: number
@@ -106,6 +108,8 @@ definitions:
         type: string
       status:
         type: integer
+      team_name:
+        type: string
       title:
         type: string
       updated_at:
@@ -139,7 +143,7 @@ definitions:
     type: object
   v1.CreateArticleRequest:
     properties:
-      article_id:
+      author_id:
         description: 作者ID
         type: string
       category_id:
@@ -160,9 +164,12 @@ definitions:
       kb_id:
         description: 知识库ID
         type: integer
-      sourceu_ri:
+      source_uri:
         description: 文章外链
         type: string
+      status:
+        description: 文章状态
+        type: integer
       title:
         description: 文章标题
         type: string
@@ -172,8 +179,9 @@ definitions:
           $ref: '#/definitions/v1.FileUpload'
         type: array
     required:
-    - article_id
+    - author_id
     - content
+    - status
     - title
     type: object
   v1.CreateArticleResponseData:
@@ -284,7 +292,7 @@ definitions:
     type: object
   v1.GetArticleListByEsReq:
     properties:
-      advSearch:
+      adv_search:
         description: 是否启用高级搜索
         type: boolean
       categories:
@@ -298,10 +306,10 @@ definitions:
       content:
         description: 搜索的内容关键词
         type: string
-      createTimeEnd:
+      create_time_end:
         description: 文章结束时间
         type: string
-      createTimeStart:
+      create_time_start:
         description: 文章创建时间
         type: string
       importance:
@@ -321,7 +329,7 @@ definitions:
       page_size:
         description: 每页大小
         type: integer
-      phraseMatch:
+      phrase_match:
         description: 是否启用短语匹配
         type: boolean
       title:
@@ -446,15 +454,18 @@ definitions:
     type: object
   v1.GetUserArticleListReq:
     properties:
-      CreatedEnd:
-        description: 文章结束时间
-        type: string
-      categoryId:
+      category_id:
         description: 文章分类ID
         type: integer
-      createdAt:
+      created_at:
         description: 文章创建时间
         type: string
+      created_end:
+        description: 文章结束时间
+        type: string
+      kb_id:
+        description: 知识库ID
+        type: integer
       page_index:
         description: 当前页码
         type: integer
@@ -635,6 +646,9 @@ definitions:
   v1.UpdateArticleRequest:
     properties:
       article_id:
+        description: 文章ID
+        type: integer
+      author_id:
         description: 作者ID
         type: string
       category_id:
@@ -655,9 +669,12 @@ definitions:
       kb_id:
         description: 知识库ID
         type: integer
-      sourceu_ri:
+      source_uri:
         description: 文章外链
         type: string
+      status:
+        description: 文章状态
+        type: integer
       title:
         description: 文章标题
         type: string
@@ -667,8 +684,9 @@ definitions:
           $ref: '#/definitions/v1.FileUpload'
         type: array
     required:
-    - article_id
+    - author_id
     - content
+    - status
     - title
     type: object
   v1.UpdateCategoryReq:
@@ -938,7 +956,30 @@ paths:
       summary: 修改公共知识库
       tags:
       - 管理员模块
-  /v1/article/DeleteArticle:
+  /v1/article/createArticle:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateArticleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.CreateArticleResponseData'
+      security:
+      - Bearer: []
+      summary: 新建文章
+      tags:
+      - 文章模块
+  /v1/article/deleteArticle:
     post:
       consumes:
       - application/json
@@ -961,7 +1002,7 @@ paths:
       summary: 删除文章
       tags:
       - 文章模块
-  /v1/article/DeleteArticleList:
+  /v1/article/deleteArticleList:
     post:
       consumes:
       - application/json
@@ -982,52 +1023,6 @@ paths:
       security:
       - Bearer: []
       summary: 批量删除文章
-      tags:
-      - 文章模块
-  /v1/article/UpdateArticle:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.UpdateArticleRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.ArticleData'
-      security:
-      - Bearer: []
-      summary: 修改文章内容
-      tags:
-      - 文章模块
-  /v1/article/createArticle:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.CreateArticleRequest'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.CreateArticleResponseData'
-      security:
-      - Bearer: []
-      summary: 新建文章
       tags:
       - 文章模块
   /v1/article/getArticle:
@@ -1096,6 +1091,29 @@ paths:
       security:
       - Bearer: []
       summary: 获取个人文章列表
+      tags:
+      - 文章模块
+  /v1/article/updateArticle:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateArticleRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleData'
+      security:
+      - Bearer: []
+      summary: 修改文章内容
       tags:
       - 文章模块
   /v1/getCaptcha:
