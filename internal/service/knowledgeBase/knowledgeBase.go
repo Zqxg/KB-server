@@ -1,6 +1,7 @@
 package knowledgeBase
 
 import (
+	"errors"
 	"github.com/gin-gonic/gin"
 	v1 "projectName/api/v1"
 	"projectName/internal/enums"
@@ -81,6 +82,9 @@ func (s *knowledgeBaseService) CreateKnowledgeBase(ctx *gin.Context, userId stri
 	}
 	kbId, err := s.kbRepository.CreateKB(ctx, knowledgeBase)
 	if err != nil {
+		if errors.Is(err, v1.ErrDuplicateKey) {
+			return 0, v1.ErrKnowledgeExist // 自定义错误码
+		}
 		return 0, v1.ErrCreateKnowledgeFailed
 	}
 	return kbId, nil
@@ -122,7 +126,10 @@ func (s *knowledgeBaseService) DeleteKB(ctx *gin.Context, userId string, role in
 	}
 	// superAdmin可以直接删除知识库
 	err = s.kbRepository.DeleteKB(ctx, kbId)
-	return v1.ErrDeleteKnowledgeFailed
+	if err != nil {
+		return v1.ErrDeleteKnowledgeFailed
+	}
+	return nil
 }
 
 func (s *knowledgeBaseService) GetKBInfo(ctx *gin.Context, kbId uint) (*v1.GetKBInfoResp, error) {

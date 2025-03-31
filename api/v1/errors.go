@@ -33,7 +33,7 @@ var (
 
 	// 2100 知识库
 	ErrKnowledgeNotExist = newError(2100, "知识库不存在")
-	//ErrKnowledgeExist    = newError(2101, "知识库已存在")
+	ErrKnowledgeExist    = newError(2101, "知识库已存在")
 	//ErrKnowledgeEmpty    = newError(2102, "知识库为空")
 	// 知识库删除错误
 	ErrDeleteKnowledgeFailed = newError(2103, "删除知识库失败")
@@ -76,6 +76,7 @@ var (
 	ErrUpdateFailed = newError(3002, "更新失败")
 	ErrDeleteFailed = newError(3003, "删除失败")
 	ErrQueryFailed  = newError(3004, "查询失败")
+	ErrDuplicateKey = newError(3005, "唯一键冲突")
 
 	// 4000 es
 	ErrCreateEsArticleFailed = newError(4000, "创建es文章失败")

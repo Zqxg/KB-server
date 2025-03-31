@@ -2,8 +2,10 @@ package repository
 
 import (
 	"context"
+	"errors"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
+	v1 "projectName/api/v1"
 	"projectName/internal/model"
 	"projectName/internal/model/vo"
 )
@@ -41,8 +43,19 @@ type kbRepository struct {
 }
 
 func (r *kbRepository) CreateKB(ctx context.Context, knowledge *model.KnowledgeBase) (uint, error) {
+	var existing model.KnowledgeBase
+	err := r.DB(ctx).Table("kb_knowledgeBase").
+		Where("kb_name = ? AND user_id = ? AND deleted_at IS NULL", knowledge.KbName, knowledge.UserID).
+		First(&existing).Error
+
+	if err == nil {
+		return 0, v1.ErrDuplicateKey // 说明已存在未删除的记录
+	} else if !errors.Is(err, gorm.ErrRecordNotFound) {
+		return 0, err // 其他数据库错误
+	}
+
+	// 继续插入新记录
 	if err := r.DB(ctx).Table("kb_knowledgeBase").Create(&knowledge).Error; err != nil {
-		r.logger.WithContext(ctx).Error("KBRepository.CreateKB error", zap.Error(err))
 		return 0, err
 	}
 	return knowledge.KbID, nil
