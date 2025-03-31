@@ -91,17 +91,17 @@ type GetUserArticleListReq struct {
 
 type GetArticleListByEsReq struct {
 	PageRequest
-	Content         string   `json:"content"`         // 搜索的内容关键词
-	Title           string   `json:"title"`           // 搜索的标题
-	Keywords        []string `json:"keywords"`        // 搜索的关键字数组
-	PhraseMatch     bool     `json:"phraseMatch"`     // 是否启用短语匹配
-	AdvSearch       bool     `json:"advSearch"`       // 是否启用高级搜索
-	Column          string   `json:"column"`          // 排序字段，通常是 "_score"
-	Order           string   `json:"order"`           // 排序方式，"asc" 或 "desc"
-	Importance      string   `json:"importance"`      // 文章重要性
-	CreateTimeStart string   `json:"createTimeStart"` // 文章创建时间
-	CreateTimeEnd   string   `json:"createTimeEnd"`   // 文章结束时间
-	Categories      []int    `json:"categories"`      // 分类id，用于筛选
+	Content         string   `json:"content"`           // 搜索的内容关键词
+	Title           string   `json:"title"`             // 搜索的标题
+	Keywords        []string `json:"keywords"`          // 搜索的关键字数组
+	PhraseMatch     bool     `json:"phrase_match"`      // 是否启用短语匹配
+	AdvSearch       bool     `json:"adv_search"`        // 是否启用高级搜索
+	Column          string   `json:"column"`            // 排序字段，通常是 "_score"
+	Order           string   `json:"order"`             // 排序方式，"asc" 或 "desc"
+	Importance      string   `json:"importance"`        // 文章重要性
+	CreateTimeStart string   `json:"create_time_start"` // 文章创建时间
+	CreateTimeEnd   string   `json:"create_time_end"`   // 文章结束时间
+	Categories      []int    `json:"categories"`        // 分类id，用于筛选
 }
 
 type SearchArticleResp struct {
