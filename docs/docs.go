@@ -252,30 +252,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/getCaptcha": {
-            "get": {
-                "description": "获取验证码生成所需的ID和图片URL",
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "用户模块"
-                ],
-                "summary": "获取验证码",
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.CaptchaResponseData"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/knowledgeBase/DeleteArticle": {
+        "/v1/article/DeleteArticle": {
             "post": {
                 "security": [
                     {
@@ -313,7 +290,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/knowledgeBase/DeleteArticleList": {
+        "/v1/article/DeleteArticleList": {
             "post": {
                 "security": [
                     {
@@ -351,7 +328,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/knowledgeBase/UpdateArticle": {
+        "/v1/article/UpdateArticle": {
             "post": {
                 "security": [
                     {
@@ -389,7 +366,7 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/knowledgeBase/createArticle": {
+        "/v1/article/createArticle": {
             "post": {
                 "security": [
                     {
@@ -422,6 +399,141 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/v1.CreateArticleResponseData"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/article/getArticle": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "获取文章详细",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Article ID",
+                        "name": "id",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.ArticleData"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/article/getArticleListByEs": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "es文章查询",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetArticleListByEsReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.SearchArticleResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/article/getUserArticleList": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "获取个人文章列表",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetUserArticleListReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.ArticleList"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/getCaptcha": {
+            "get": {
+                "description": "获取验证码生成所需的ID和图片URL",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "获取验证码",
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.CaptchaResponseData"
                         }
                     }
                 }
@@ -579,80 +691,6 @@ const docTemplate = `{
                 }
             }
         },
-        "/v1/knowledgeBase/getArticle": {
-            "get": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "文章模块"
-                ],
-                "summary": "获取文章详细",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Article ID",
-                        "name": "id",
-                        "in": "query",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ArticleData"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/knowledgeBase/getArticleListByEs": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "文章模块"
-                ],
-                "summary": "es文章查询",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetArticleListByEsReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.SearchArticleResp"
-                        }
-                    }
-                }
-            }
-        },
         "/v1/knowledgeBase/getCategoryListByKB": {
             "get": {
                 "security": [
@@ -796,44 +834,6 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/v1.KBList"
-                        }
-                    }
-                }
-            }
-        },
-        "/v1/knowledgeBase/getUserArticleList": {
-            "post": {
-                "security": [
-                    {
-                        "Bearer": []
-                    }
-                ],
-                "consumes": [
-                    "application/json"
-                ],
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "文章模块"
-                ],
-                "summary": "获取个人文章列表",
-                "parameters": [
-                    {
-                        "description": "params",
-                        "name": "request",
-                        "in": "body",
-                        "required": true,
-                        "schema": {
-                            "$ref": "#/definitions/v1.GetUserArticleListReq"
-                        }
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "OK",
-                        "schema": {
-                            "$ref": "#/definitions/v1.ArticleList"
                         }
                     }
                 }
@@ -1645,7 +1645,7 @@ const docTemplate = `{
         "v1.ArticleData": {
             "type": "object",
             "properties": {
-                "articleId": {
+                "article_id": {
                     "description": "文章id",
                     "type": "integer"
                 },
@@ -1657,11 +1657,11 @@ const docTemplate = `{
                     "description": "文章分类",
                     "type": "string"
                 },
-                "categoryId": {
+                "category_id": {
                     "description": "文章分类ID",
                     "type": "integer"
                 },
-                "commentDisabled": {
+                "comment_disabled": {
                     "description": "是否禁用评论",
                     "type": "boolean"
                 },
@@ -1669,11 +1669,11 @@ const docTemplate = `{
                     "description": "文章内容",
                     "type": "string"
                 },
-                "contentShort": {
+                "content_short": {
                     "description": "文章摘要",
                     "type": "string"
                 },
-                "createdAt": {
+                "created_at": {
                     "description": "文章创建时间",
                     "type": "string"
                 },
@@ -1681,11 +1681,15 @@ const docTemplate = `{
                     "description": "文章重要性",
                     "type": "integer"
                 },
-                "kbId": {
+                "kb_id": {
                     "description": "知识库ID",
                     "type": "integer"
                 },
-                "sourceUri": {
+                "kb_name": {
+                    "description": "知识库名称",
+                    "type": "string"
+                },
+                "source_uri": {
                     "description": "文章外链",
                     "type": "string"
                 },
@@ -1697,11 +1701,11 @@ const docTemplate = `{
                     "description": "文章标题",
                     "type": "string"
                 },
-                "updateAt": {
+                "update_at": {
                     "description": "文章更新时间",
                     "type": "string"
                 },
-                "uploadedFiles": {
+                "uploaded_files": {
                     "description": "上传的文件列表",
                     "type": "array",
                     "items": {
@@ -1719,15 +1723,15 @@ const docTemplate = `{
                         "$ref": "#/definitions/v1.ArticleData"
                     }
                 },
-                "pageIndex": {
+                "page_index": {
                     "description": "当前页码",
                     "type": "integer"
                 },
-                "pageSize": {
+                "page_size": {
                     "description": "每页大小",
                     "type": "integer"
                 },
-                "totalCount": {
+                "total_count": {
                     "description": "总记录数",
                     "type": "integer"
                 }
@@ -1786,10 +1790,10 @@ const docTemplate = `{
         "v1.CaptchaResponseData": {
             "type": "object",
             "properties": {
-                "CaptchaBase64": {
+                "Captcha_base64": {
                     "type": "string"
                 },
-                "captchaId": {
+                "captcha_id": {
                     "type": "string"
                 }
             }
@@ -1822,21 +1826,20 @@ const docTemplate = `{
         "v1.CreateArticleRequest": {
             "type": "object",
             "required": [
-                "authorId",
+                "article_id",
                 "content",
-                "title",
-                "visibleRange"
+                "title"
             ],
             "properties": {
-                "authorId": {
+                "article_id": {
                     "description": "作者ID",
                     "type": "string"
                 },
-                "categoryId": {
+                "category_id": {
                     "description": "文章分类ID",
                     "type": "integer"
                 },
-                "commentDisabled": {
+                "comment_disabled": {
                     "description": "是否禁用评论",
                     "type": "boolean"
                 },
@@ -1844,7 +1847,7 @@ const docTemplate = `{
                     "description": "文章内容",
                     "type": "string"
                 },
-                "contentShort": {
+                "content_short": {
                     "description": "文章摘要",
                     "type": "string"
                 },
@@ -1852,11 +1855,11 @@ const docTemplate = `{
                     "description": "文章重要性",
                     "type": "integer"
                 },
-                "kbId": {
+                "kb_id": {
                     "description": "知识库ID",
                     "type": "integer"
                 },
-                "sourceUri": {
+                "sourceu_ri": {
                     "description": "文章外链",
                     "type": "string"
                 },
@@ -1864,23 +1867,19 @@ const docTemplate = `{
                     "description": "文章标题",
                     "type": "string"
                 },
-                "uploadedFiles": {
+                "uploaded_files": {
                     "description": "上传的文件列表",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/v1.FileUpload"
                     }
-                },
-                "visibleRange": {
-                    "description": "可见范围",
-                    "type": "string"
                 }
             }
         },
         "v1.CreateArticleResponseData": {
             "type": "object",
             "properties": {
-                "articleId": {
+                "article_id": {
                     "description": "文章ID",
                     "type": "integer"
                 }
@@ -1952,7 +1951,7 @@ const docTemplate = `{
         "v1.DelArticleListReq": {
             "type": "object",
             "properties": {
-                "articleIDList": {
+                "article_id_List": {
                     "description": "文章ID列表",
                     "type": "array",
                     "items": {
@@ -1964,7 +1963,7 @@ const docTemplate = `{
         "v1.DeleteArticleRequest": {
             "type": "object",
             "properties": {
-                "articleId": {
+                "article_id": {
                     "description": "文章ID",
                     "type": "integer"
                 }
@@ -1973,7 +1972,7 @@ const docTemplate = `{
         "v1.DeleteArticleResponseData": {
             "type": "object",
             "properties": {
-                "deletedCount": {
+                "deleted_count": {
                     "description": "删除的文章数量",
                     "type": "integer"
                 }
@@ -2026,11 +2025,11 @@ const docTemplate = `{
         "v1.FileUpload": {
             "type": "object",
             "properties": {
-                "fileName": {
+                "file_name": {
                     "description": "文件名",
                     "type": "string"
                 },
-                "fileUrl": {
+                "file_url": {
                     "description": "文件URL",
                     "type": "string"
                 }
@@ -2081,11 +2080,11 @@ const docTemplate = `{
                     "description": "排序方式，\"asc\" 或 \"desc\"",
                     "type": "string"
                 },
-                "pageIndex": {
+                "page_index": {
                     "description": "当前页码",
                     "type": "integer"
                 },
-                "pageSize": {
+                "page_size": {
                     "description": "每页大小",
                     "type": "integer"
                 },
@@ -2159,11 +2158,11 @@ const docTemplate = `{
                 "team_id"
             ],
             "properties": {
-                "pageIndex": {
+                "page_index": {
                     "description": "当前页码",
                     "type": "integer"
                 },
-                "pageSize": {
+                "page_size": {
                     "description": "每页大小",
                     "type": "integer"
                 },
@@ -2181,15 +2180,15 @@ const docTemplate = `{
                         "$ref": "#/definitions/v1.GetKBInfoResp"
                     }
                 },
-                "pageIndex": {
+                "page_index": {
                     "description": "当前页码",
                     "type": "integer"
                 },
-                "pageSize": {
+                "page_size": {
                     "description": "每页大小",
                     "type": "integer"
                 },
-                "totalCount": {
+                "total_count": {
                     "description": "总记录数",
                     "type": "integer"
                 }
@@ -2224,11 +2223,11 @@ const docTemplate = `{
                     "description": "创建者ID",
                     "type": "string"
                 },
-                "pageIndex": {
+                "page_index": {
                     "description": "当前页码",
                     "type": "integer"
                 },
-                "pageSize": {
+                "page_size": {
                     "description": "每页大小",
                     "type": "integer"
                 },
@@ -2241,11 +2240,11 @@ const docTemplate = `{
         "v1.GetTeamListResp": {
             "type": "object",
             "properties": {
-                "pageIndex": {
+                "page_index": {
                     "description": "当前页码",
                     "type": "integer"
                 },
-                "pageSize": {
+                "page_size": {
                     "description": "每页大小",
                     "type": "integer"
                 },
@@ -2255,7 +2254,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/v1.TeamData"
                     }
                 },
-                "totalCount": {
+                "total_count": {
                     "description": "总记录数",
                     "type": "integer"
                 }
@@ -2287,11 +2286,11 @@ const docTemplate = `{
                     "description": "文章创建时间",
                     "type": "string"
                 },
-                "pageIndex": {
+                "page_index": {
                     "description": "当前页码",
                     "type": "integer"
                 },
-                "pageSize": {
+                "page_size": {
                     "description": "每页大小",
                     "type": "integer"
                 },
@@ -2308,13 +2307,13 @@ const docTemplate = `{
         "v1.GetUserInfoResponseData": {
             "type": "object",
             "properties": {
-                "collegeId": {
+                "college_id": {
                     "type": "integer"
                 },
                 "email": {
                     "type": "string"
                 },
-                "nickname": {
+                "nick_name": {
                     "type": "string",
                     "example": "alan"
                 },
@@ -2322,14 +2321,14 @@ const docTemplate = `{
                     "type": "string",
                     "example": "10012239028"
                 },
-                "roleType": {
+                "role_type": {
                     "type": "integer",
                     "example": 0
                 },
-                "studentId": {
+                "student_id": {
                     "type": "string"
                 },
-                "userId": {
+                "user_id": {
                     "type": "string"
                 }
             }
@@ -2337,11 +2336,11 @@ const docTemplate = `{
         "v1.GetUserTeamListResp": {
             "type": "object",
             "properties": {
-                "pageIndex": {
+                "page_index": {
                     "description": "当前页码",
                     "type": "integer"
                 },
-                "pageSize": {
+                "page_size": {
                     "description": "每页大小",
                     "type": "integer"
                 },
@@ -2351,7 +2350,7 @@ const docTemplate = `{
                         "$ref": "#/definitions/v1.TeamData"
                     }
                 },
-                "totalCount": {
+                "total_count": {
                     "description": "总记录数",
                     "type": "integer"
                 }
@@ -2371,7 +2370,7 @@ const docTemplate = `{
         "v1.LoginResponseData": {
             "type": "object",
             "properties": {
-                "accessToken": {
+                "access_token": {
                     "type": "string"
                 }
             }
@@ -2412,17 +2411,17 @@ const docTemplate = `{
         "v1.PasswordLoginRequest": {
             "type": "object",
             "required": [
-                "captchaAnswer",
-                "captchaId",
+                "captcha_answer",
+                "captcha_id",
                 "password",
                 "phone"
             ],
             "properties": {
-                "captchaAnswer": {
+                "captcha_answer": {
                     "description": "验证码字段",
                     "type": "string"
                 },
-                "captchaId": {
+                "captcha_id": {
                     "description": "验证码ID字段",
                     "type": "string"
                 },
@@ -2448,17 +2447,17 @@ const docTemplate = `{
         "v1.RegisterRequest": {
             "type": "object",
             "required": [
-                "captchaAnswer",
-                "captchaId",
+                "captcha_answer",
+                "captcha_id",
                 "password",
                 "phone"
             ],
             "properties": {
-                "captchaAnswer": {
+                "captcha_answer": {
                     "description": "验证码字段",
                     "type": "string"
                 },
-                "captchaId": {
+                "captcha_id": {
                     "description": "验证码ID字段",
                     "type": "string"
                 },
@@ -2494,15 +2493,15 @@ const docTemplate = `{
                         "$ref": "#/definitions/v1.ArticleSearchInfo"
                     }
                 },
-                "pageIndex": {
+                "page_index": {
                     "description": "当前页码",
                     "type": "integer"
                 },
-                "pageSize": {
+                "page_size": {
                     "description": "每页大小",
                     "type": "integer"
                 },
-                "totalCount": {
+                "total_count": {
                     "description": "总记录数",
                     "type": "integer"
                 }
@@ -2540,25 +2539,20 @@ const docTemplate = `{
         "v1.UpdateArticleRequest": {
             "type": "object",
             "required": [
-                "authorId",
+                "article_id",
                 "content",
-                "title",
-                "visibleRange"
+                "title"
             ],
             "properties": {
-                "articleId": {
-                    "description": "文章ID",
-                    "type": "integer"
-                },
-                "authorId": {
+                "article_id": {
                     "description": "作者ID",
                     "type": "string"
                 },
-                "categoryId": {
+                "category_id": {
                     "description": "文章分类ID",
                     "type": "integer"
                 },
-                "commentDisabled": {
+                "comment_disabled": {
                     "description": "是否禁用评论",
                     "type": "boolean"
                 },
@@ -2566,7 +2560,7 @@ const docTemplate = `{
                     "description": "文章内容",
                     "type": "string"
                 },
-                "contentShort": {
+                "content_short": {
                     "description": "文章摘要",
                     "type": "string"
                 },
@@ -2574,11 +2568,11 @@ const docTemplate = `{
                     "description": "文章重要性",
                     "type": "integer"
                 },
-                "kbId": {
+                "kb_id": {
                     "description": "知识库ID",
                     "type": "integer"
                 },
-                "sourceUri": {
+                "sourceu_ri": {
                     "description": "文章外链",
                     "type": "string"
                 },
@@ -2586,16 +2580,12 @@ const docTemplate = `{
                     "description": "文章标题",
                     "type": "string"
                 },
-                "uploadedFiles": {
+                "uploaded_files": {
                     "description": "上传的文件列表",
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/v1.FileUpload"
                     }
-                },
-                "visibleRange": {
-                    "description": "可见范围",
-                    "type": "string"
                 }
             }
         },
@@ -2636,7 +2626,7 @@ const docTemplate = `{
                     "type": "string",
                     "example": "1234@gmail.com"
                 },
-                "nickname": {
+                "nick_name": {
                     "type": "string",
                     "example": "alan"
                 }
@@ -2679,13 +2669,13 @@ const docTemplate = `{
         "v1.UserAuthRequest": {
             "type": "object",
             "properties": {
-                "collegeId": {
+                "college_id": {
                     "type": "integer"
                 },
                 "remarks": {
                     "type": "string"
                 },
-                "studentId": {
+                "student_id": {
                     "type": "string"
                 }
             }

@@ -34,7 +34,7 @@ func NewArticleHandler(
 // @Security Bearer
 // @Param request body v1.CreateArticleRequest true "params"
 // @Success 200 {object} v1.CreateArticleResponseData
-// @Router /v1/knowledgeBase/createArticle [post]
+// @Router /v1/article/createArticle [post]
 func (h *ArticleHandler) CreateArticle(ctx *gin.Context) {
 	var req v1.CreateArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -62,7 +62,7 @@ func (h *ArticleHandler) CreateArticle(ctx *gin.Context) {
 // @Security Bearer
 // @Param id query int true "Article ID"
 // @Success 200 {object} v1.ArticleData
-// @Router /v1/knowledgeBase/getArticle [get]
+// @Router /v1/article/getArticle [get]
 func (h *ArticleHandler) GetArticle(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	if !utils.IsNumeric(ctx.Query("id")) {
@@ -93,7 +93,7 @@ func (h *ArticleHandler) GetArticle(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.UpdateArticleRequest true "params"
 // @Success 200 {object} v1.ArticleData
-// @Router /v1/knowledgeBase/UpdateArticle [post]
+// @Router /v1/article/UpdateArticle [post]
 func (h *ArticleHandler) UpdateArticle(ctx *gin.Context) {
 	var req v1.UpdateArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -124,7 +124,7 @@ func (h *ArticleHandler) UpdateArticle(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.DelArticleListReq true "params"
 // @Success 200 {object} v1.DeleteArticleResponseData
-// @Router /v1/knowledgeBase/DeleteArticleList [post]
+// @Router /v1/article/DeleteArticleList [post]
 func (h *ArticleHandler) DeleteArticleList(ctx *gin.Context) {
 	var req v1.DelArticleListReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -157,7 +157,7 @@ func (h *ArticleHandler) DeleteArticleList(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.DeleteArticleRequest true "params"
 // @Success 200 {object} v1.DeleteArticleResponseData
-// @Router /v1/knowledgeBase/DeleteArticle [post]
+// @Router /v1/article/DeleteArticle [post]
 func (h *ArticleHandler) DeleteArticle(ctx *gin.Context) {
 	var req v1.DeleteArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -195,7 +195,7 @@ func (h *ArticleHandler) DeleteArticle(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.GetUserArticleListReq true "params"
 // @Success 200 {object} v1.ArticleList
-// @Router /v1/knowledgeBase/getUserArticleList [post]
+// @Router /v1/article/getUserArticleList [post]
 func (h *ArticleHandler) GetUserArticleList(ctx *gin.Context) {
 	var req v1.GetUserArticleListReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -221,7 +221,7 @@ func (h *ArticleHandler) GetUserArticleList(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.GetArticleListByEsReq true "params"
 // @Success 200 {object} v1.SearchArticleResp
-// @Router /v1/knowledgeBase/getArticleListByEs [post]
+// @Router /v1/article/getArticleListByEs [post]
 func (h *ArticleHandler) GetArticleListByEs(ctx *gin.Context) {
 	var req v1.GetArticleListByEsReq
 

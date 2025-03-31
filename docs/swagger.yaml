@@ -13,7 +13,7 @@ definitions:
     type: object
   v1.ArticleData:
     properties:
-      articleId:
+      article_id:
         description: 文章id
         type: integer
       author:
@@ -22,28 +22,31 @@ definitions:
       category:
         description: 文章分类
         type: string
-      categoryId:
+      category_id:
         description: 文章分类ID
         type: integer
-      commentDisabled:
+      comment_disabled:
         description: 是否禁用评论
         type: boolean
       content:
         description: 文章内容
         type: string
-      contentShort:
+      content_short:
         description: 文章摘要
         type: string
-      createdAt:
+      created_at:
         description: 文章创建时间
         type: string
       importance:
         description: 文章重要性
         type: integer
-      kbId:
+      kb_id:
         description: 知识库ID
         type: integer
-      sourceUri:
+      kb_name:
+        description: 知识库名称
+        type: string
+      source_uri:
         description: 文章外链
         type: string
       status:
@@ -52,10 +55,10 @@ definitions:
       title:
         description: 文章标题
         type: string
-      updateAt:
+      update_at:
         description: 文章更新时间
         type: string
-      uploadedFiles:
+      uploaded_files:
         description: 上传的文件列表
         items:
           $ref: '#/definitions/v1.FileUpload'
@@ -67,13 +70,13 @@ definitions:
         items:
           $ref: '#/definitions/v1.ArticleData'
         type: array
-      pageIndex:
+      page_index:
         description: 当前页码
         type: integer
-      pageSize:
+      page_size:
         description: 每页大小
         type: integer
-      totalCount:
+      total_count:
         description: 总记录数
         type: integer
     type: object
@@ -113,9 +116,9 @@ definitions:
     type: object
   v1.CaptchaResponseData:
     properties:
-      CaptchaBase64:
+      Captcha_base64:
         type: string
-      captchaId:
+      captcha_id:
         type: string
     type: object
   v1.CategoryData:
@@ -136,50 +139,46 @@ definitions:
     type: object
   v1.CreateArticleRequest:
     properties:
-      authorId:
+      article_id:
         description: 作者ID
         type: string
-      categoryId:
+      category_id:
         description: 文章分类ID
         type: integer
-      commentDisabled:
+      comment_disabled:
         description: 是否禁用评论
         type: boolean
       content:
         description: 文章内容
         type: string
-      contentShort:
+      content_short:
         description: 文章摘要
         type: string
       importance:
         description: 文章重要性
         type: integer
-      kbId:
+      kb_id:
         description: 知识库ID
         type: integer
-      sourceUri:
+      sourceu_ri:
         description: 文章外链
         type: string
       title:
         description: 文章标题
         type: string
-      uploadedFiles:
+      uploaded_files:
         description: 上传的文件列表
         items:
           $ref: '#/definitions/v1.FileUpload'
         type: array
-      visibleRange:
-        description: 可见范围
-        type: string
     required:
-    - authorId
+    - article_id
     - content
     - title
-    - visibleRange
     type: object
   v1.CreateArticleResponseData:
     properties:
-      articleId:
+      article_id:
         description: 文章ID
         type: integer
     type: object
@@ -227,7 +226,7 @@ definitions:
     type: object
   v1.DelArticleListReq:
     properties:
-      articleIDList:
+      article_id_List:
         description: 文章ID列表
         items:
           type: integer
@@ -235,13 +234,13 @@ definitions:
     type: object
   v1.DeleteArticleRequest:
     properties:
-      articleId:
+      article_id:
         description: 文章ID
         type: integer
     type: object
   v1.DeleteArticleResponseData:
     properties:
-      deletedCount:
+      deleted_count:
         description: 删除的文章数量
         type: integer
     type: object
@@ -276,10 +275,10 @@ definitions:
     type: object
   v1.FileUpload:
     properties:
-      fileName:
+      file_name:
         description: 文件名
         type: string
-      fileUrl:
+      file_url:
         description: 文件URL
         type: string
     type: object
@@ -316,10 +315,10 @@ definitions:
       order:
         description: 排序方式，"asc" 或 "desc"
         type: string
-      pageIndex:
+      page_index:
         description: 当前页码
         type: integer
-      pageSize:
+      page_size:
         description: 每页大小
         type: integer
       phraseMatch:
@@ -366,10 +365,10 @@ definitions:
     type: object
   v1.GetKBListByTeamIdReq:
     properties:
-      pageIndex:
+      page_index:
         description: 当前页码
         type: integer
-      pageSize:
+      page_size:
         description: 每页大小
         type: integer
       team_id:
@@ -383,13 +382,13 @@ definitions:
         items:
           $ref: '#/definitions/v1.GetKBInfoResp'
         type: array
-      pageIndex:
+      page_index:
         description: 当前页码
         type: integer
-      pageSize:
+      page_size:
         description: 每页大小
         type: integer
-      totalCount:
+      total_count:
         description: 总记录数
         type: integer
     type: object
@@ -412,10 +411,10 @@ definitions:
       created_by:
         description: 创建者ID
         type: string
-      pageIndex:
+      page_index:
         description: 当前页码
         type: integer
-      pageSize:
+      page_size:
         description: 每页大小
         type: integer
       team_name:
@@ -424,17 +423,17 @@ definitions:
     type: object
   v1.GetTeamListResp:
     properties:
-      pageIndex:
+      page_index:
         description: 当前页码
         type: integer
-      pageSize:
+      page_size:
         description: 每页大小
         type: integer
       team_list:
         items:
           $ref: '#/definitions/v1.TeamData'
         type: array
-      totalCount:
+      total_count:
         description: 总记录数
         type: integer
     type: object
@@ -456,10 +455,10 @@ definitions:
       createdAt:
         description: 文章创建时间
         type: string
-      pageIndex:
+      page_index:
         description: 当前页码
         type: integer
-      pageSize:
+      page_size:
         description: 每页大小
         type: integer
       status:
@@ -471,37 +470,37 @@ definitions:
     type: object
   v1.GetUserInfoResponseData:
     properties:
-      collegeId:
+      college_id:
         type: integer
       email:
         type: string
-      nickname:
+      nick_name:
         example: alan
         type: string
       phone:
         example: "10012239028"
         type: string
-      roleType:
+      role_type:
         example: 0
         type: integer
-      studentId:
+      student_id:
         type: string
-      userId:
+      user_id:
         type: string
     type: object
   v1.GetUserTeamListResp:
     properties:
-      pageIndex:
+      page_index:
         description: 当前页码
         type: integer
-      pageSize:
+      page_size:
         description: 每页大小
         type: integer
       team_list:
         items:
           $ref: '#/definitions/v1.TeamData'
         type: array
-      totalCount:
+      total_count:
         description: 总记录数
         type: integer
     type: object
@@ -514,7 +513,7 @@ definitions:
     type: object
   v1.LoginResponseData:
     properties:
-      accessToken:
+      access_token:
         type: string
     type: object
   v1.MemberData:
@@ -543,10 +542,10 @@ definitions:
     type: object
   v1.PasswordLoginRequest:
     properties:
-      captchaAnswer:
+      captcha_answer:
         description: 验证码字段
         type: string
-      captchaId:
+      captcha_id:
         description: 验证码ID字段
         type: string
       password:
@@ -556,8 +555,8 @@ definitions:
         example: "10012239028"
         type: string
     required:
-    - captchaAnswer
-    - captchaId
+    - captcha_answer
+    - captcha_id
     - password
     - phone
     type: object
@@ -569,10 +568,10 @@ definitions:
     type: object
   v1.RegisterRequest:
     properties:
-      captchaAnswer:
+      captcha_answer:
         description: 验证码字段
         type: string
-      captchaId:
+      captcha_id:
         description: 验证码ID字段
         type: string
       password:
@@ -582,8 +581,8 @@ definitions:
         example: "10012239028"
         type: string
     required:
-    - captchaAnswer
-    - captchaId
+    - captcha_answer
+    - captcha_id
     - password
     - phone
     type: object
@@ -602,13 +601,13 @@ definitions:
         items:
           $ref: '#/definitions/v1.ArticleSearchInfo'
         type: array
-      pageIndex:
+      page_index:
         description: 当前页码
         type: integer
-      pageSize:
+      page_size:
         description: 每页大小
         type: integer
-      totalCount:
+      total_count:
         description: 总记录数
         type: integer
     type: object
@@ -635,49 +634,42 @@ definitions:
     type: object
   v1.UpdateArticleRequest:
     properties:
-      articleId:
-        description: 文章ID
-        type: integer
-      authorId:
+      article_id:
         description: 作者ID
         type: string
-      categoryId:
+      category_id:
         description: 文章分类ID
         type: integer
-      commentDisabled:
+      comment_disabled:
         description: 是否禁用评论
         type: boolean
       content:
         description: 文章内容
         type: string
-      contentShort:
+      content_short:
         description: 文章摘要
         type: string
       importance:
         description: 文章重要性
         type: integer
-      kbId:
+      kb_id:
         description: 知识库ID
         type: integer
-      sourceUri:
+      sourceu_ri:
         description: 文章外链
         type: string
       title:
         description: 文章标题
         type: string
-      uploadedFiles:
+      uploaded_files:
         description: 上传的文件列表
         items:
           $ref: '#/definitions/v1.FileUpload'
         type: array
-      visibleRange:
-        description: 可见范围
-        type: string
     required:
-    - authorId
+    - article_id
     - content
     - title
-    - visibleRange
     type: object
   v1.UpdateCategoryReq:
     properties:
@@ -704,7 +696,7 @@ definitions:
       email:
         example: 1234@gmail.com
         type: string
-      nickname:
+      nick_name:
         example: alan
         type: string
     type: object
@@ -734,11 +726,11 @@ definitions:
     type: object
   v1.UserAuthRequest:
     properties:
-      collegeId:
+      college_id:
         type: integer
       remarks:
         type: string
-      studentId:
+      student_id:
         type: string
     type: object
   vo.CategoryView:
@@ -946,22 +938,7 @@ paths:
       summary: 修改公共知识库
       tags:
       - 管理员模块
-  /v1/getCaptcha:
-    get:
-      consumes:
-      - application/json
-      description: 获取验证码生成所需的ID和图片URL
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.CaptchaResponseData'
-      summary: 获取验证码
-      tags:
-      - 用户模块
-  /v1/knowledgeBase/DeleteArticle:
+  /v1/article/DeleteArticle:
     post:
       consumes:
       - application/json
@@ -984,7 +961,7 @@ paths:
       summary: 删除文章
       tags:
       - 文章模块
-  /v1/knowledgeBase/DeleteArticleList:
+  /v1/article/DeleteArticleList:
     post:
       consumes:
       - application/json
@@ -1007,7 +984,7 @@ paths:
       summary: 批量删除文章
       tags:
       - 文章模块
-  /v1/knowledgeBase/UpdateArticle:
+  /v1/article/UpdateArticle:
     post:
       consumes:
       - application/json
@@ -1030,7 +1007,7 @@ paths:
       summary: 修改文章内容
       tags:
       - 文章模块
-  /v1/knowledgeBase/createArticle:
+  /v1/article/createArticle:
     post:
       consumes:
       - application/json
@@ -1053,6 +1030,89 @@ paths:
       summary: 新建文章
       tags:
       - 文章模块
+  /v1/article/getArticle:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Article ID
+        in: query
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleData'
+      security:
+      - Bearer: []
+      summary: 获取文章详细
+      tags:
+      - 文章模块
+  /v1/article/getArticleListByEs:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetArticleListByEsReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.SearchArticleResp'
+      security:
+      - Bearer: []
+      summary: es文章查询
+      tags:
+      - 文章模块
+  /v1/article/getUserArticleList:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetUserArticleListReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleList'
+      security:
+      - Bearer: []
+      summary: 获取个人文章列表
+      tags:
+      - 文章模块
+  /v1/getCaptcha:
+    get:
+      consumes:
+      - application/json
+      description: 获取验证码生成所需的ID和图片URL
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.CaptchaResponseData'
+      summary: 获取验证码
+      tags:
+      - 用户模块
   /v1/knowledgeBase/createCategory:
     post:
       consumes:
@@ -1145,51 +1205,6 @@ paths:
       summary: 删除知识库
       tags:
       - 知识库模块
-  /v1/knowledgeBase/getArticle:
-    get:
-      consumes:
-      - application/json
-      parameters:
-      - description: Article ID
-        in: query
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.ArticleData'
-      security:
-      - Bearer: []
-      summary: 获取文章详细
-      tags:
-      - 文章模块
-  /v1/knowledgeBase/getArticleListByEs:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetArticleListByEsReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.SearchArticleResp'
-      security:
-      - Bearer: []
-      summary: es文章查询
-      tags:
-      - 文章模块
   /v1/knowledgeBase/getCategoryListByKB:
     get:
       consumes:
@@ -1280,29 +1295,6 @@ paths:
       summary: 获取知识库列表(私人知识库、公共知识库)
       tags:
       - 知识库模块
-  /v1/knowledgeBase/getUserArticleList:
-    post:
-      consumes:
-      - application/json
-      parameters:
-      - description: params
-        in: body
-        name: request
-        required: true
-        schema:
-          $ref: '#/definitions/v1.GetUserArticleListReq'
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: OK
-          schema:
-            $ref: '#/definitions/v1.ArticleList'
-      security:
-      - Bearer: []
-      summary: 获取个人文章列表
-      tags:
-      - 文章模块
   /v1/knowledgeBase/updateCategory:
     post:
       consumes:

@@ -84,7 +84,7 @@ func NewHTTPServer(
 			commonUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle) // 获取文章详细
 			//commonUserRouter.GET(enums.ARTICLE+"/getArticleListByCategory", articleHandler.GetArticleListByCategory) // 分类获取公开文章列表
 			commonUserRouter.POST(enums.ARTICLE+"/getArticleListByEs", articleHandler.GetArticleListByEs) // es文章查询
-			commonUserRouter.POST(enums.ARTICLE+"/create", articleHandler.CreateArticle)                  // 新建文章
+			commonUserRouter.POST(enums.ARTICLE+"/createArticle", articleHandler.CreateArticle)           // 新建文章
 			commonUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)           // 修改文章
 			commonUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)           // 删除文章
 			commonUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)   // 批量删除文章
