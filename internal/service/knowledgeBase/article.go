@@ -128,6 +128,11 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 	if article != nil {
 		return -1, v1.ErrArticleAlreadyExist
 	}
+	// 判断分类是否存在
+	category, _ := s.kbRepository.GetCategoryById(ctx, req.CategoryID)
+	if category == nil {
+		return -1, v1.ErrCategoryNotExist
+	}
 	uploadedFilesData, err := json.Marshal(req.UploadedFiles)
 	if err != nil {
 		return -1, v1.ErrUploadFileFailed
@@ -143,46 +148,45 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 		CommentDisabled: req.CommentDisabled,
 		SourceURI:       req.SourceURI,
 		UploadedFiles:   uploadedFilesData,
-		Status:          req.Status, // 后续设置审核开关
+		Status:          req.Status,
 	}
 	// 创建新文章
 	articleId, err := s.articleRepository.CreateArticle(ctx, article)
 	if err != nil {
 		return -1, v1.ErrCreateArticleFailed
 	}
-	// 判断知识库类型，选择es索引
-	esIndex := s.GetESIndex(ctx, article.UserID, req.KBID)
-	if esIndex == "" {
-		return -1, v1.ErrCreateEsIndexFailed
-	}
-	// 创建es文档
-	esArticle := &model.EsArticle{
-		ArticleID:       uint(articleId),
-		Title:           article.Title,
-		Content:         article.Content,
-		ContentShort:    article.ContentShort,
-		KBID:            article.KBID,
-		CategoryID:      article.CategoryID,
-		UserID:          article.UserID,
-		Importance:      article.Importance,
-		CommentDisabled: article.CommentDisabled,
-		SourceURI:       article.SourceURI,
-		Status:          article.Status,
-		UploadedFile:    false,
-		CreatedAt:       article.CreatedAt,
-		UpdatedAt:       article.UpdatedAt,
-	}
-	esArticle.ArticleID = uint(articleId)
-	if article.UploadedFiles != nil {
-		esArticle.UploadedFile = true
-	}
-	// 创建es文档
-	if err = s.articleRepository.CreateEsArticle(ctx, esIndex, esArticle); err != nil {
-		return -1, v1.ErrCreateEsArticleFailed
-	}
-
-	if err != nil {
-		return -1, v1.ErrCreateArticleFailed
+	// 判断文章状态
+	if article.Status == enums.StatusPublished {
+		// 判断知识库类型，选择es索引
+		esIndex := s.GetESIndex(ctx, article.UserID, req.KBID)
+		if esIndex == "" {
+			return -1, v1.ErrCreateEsIndexFailed
+		}
+		// 创建es文档
+		esArticle := &model.EsArticle{
+			ArticleID:       uint(articleId),
+			Title:           article.Title,
+			Content:         article.Content,
+			ContentShort:    article.ContentShort,
+			KBID:            article.KBID,
+			CategoryID:      article.CategoryID,
+			UserID:          article.UserID,
+			Importance:      article.Importance,
+			CommentDisabled: article.CommentDisabled,
+			SourceURI:       article.SourceURI,
+			Status:          article.Status,
+			UploadedFile:    false,
+			CreatedAt:       article.CreatedAt,
+			UpdatedAt:       article.UpdatedAt,
+		}
+		esArticle.ArticleID = uint(articleId)
+		if article.UploadedFiles != nil {
+			esArticle.UploadedFile = true
+		}
+		// 创建es文档
+		if err = s.articleRepository.CreateEsArticle(ctx, esIndex, esArticle); err != nil {
+			return -1, v1.ErrCreateEsArticleFailed
+		}
 	}
 	return articleId, nil
 }
@@ -298,30 +302,35 @@ func (s *articleService) DeleteArticle(ctx context.Context, id uint) (int, error
 	if err != nil {
 		return -1, v1.ErrArticleNotExist
 	}
-	// 判断知识库类型，选择es索引
-	kb, _ := s.kbRepository.GetKBViewById(ctx, article.KBID)
-	index := ""
-	if kb.KBType == enums.KBTypePrivate {
-		index = enums.Private_knowledge_index + article.UserID
-	}
-	if kb.KBType == enums.KBTypePublic {
-		index = enums.Public_knowledge_index + strconv.Itoa(int(article.KBID))
-	}
-	if kb.KBType == enums.KBTypeTeam {
-		index = enums.Team_knowledge_index + strconv.Itoa(int(kb.TeamID))
+	// 判断文章状态
+	if article.Status == enums.StatusPublished {
+		// 判断知识库类型，选择es索引
+		kb, _ := s.kbRepository.GetKBViewById(ctx, article.KBID)
+		index := ""
+		if kb.KBType == enums.KBTypePrivate {
+			index = enums.Private_knowledge_index + article.UserID
+		}
+		if kb.KBType == enums.KBTypePublic {
+			index = enums.Public_knowledge_index + strconv.Itoa(int(article.KBID))
+		}
+		if kb.KBType == enums.KBTypeTeam {
+			index = enums.Team_knowledge_index + strconv.Itoa(int(kb.TeamID))
+		}
+		// 删除es文档
+		if err = s.articleRepository.DeleteEsArticle(ctx, index, article.ArticleID); err != nil {
+			return -1, v1.ErrDeleteEsArticleFailed
+		}
 	}
 	// 删除文章
 	deletedCount, err := s.articleRepository.DeleteArticle(ctx, article.ArticleID)
 	if err != nil {
 		return -1, v1.ErrDeleteFailed
 	}
-	// 删除es文档
-	if err = s.articleRepository.DeleteEsArticle(ctx, index, article.ArticleID); err != nil {
-		return -1, v1.ErrDeleteEsArticleFailed
-	}
+
 	return deletedCount, nil
 }
 
+// 暂时废弃
 func (s *articleService) DeleteArticleList(ctx context.Context, req *v1.DelArticleListReq) (int, error) {
 	// 批量删除文章
 	deletedCount, err := s.articleRepository.DeleteArticleList(ctx, req.ArticleIDList)

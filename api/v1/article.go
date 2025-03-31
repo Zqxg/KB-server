@@ -13,7 +13,7 @@ type CreateArticleRequest struct {
 	KBID            uint         `json:"kb_id"`                        // 知识库ID
 	CategoryID      uint         `json:"category_id"`                  // 文章分类ID
 	Importance      int          `json:"importance"`                   // 文章重要性
-	Status          int          `json:"status"`                       // 文章状态
+	Status          int          `json:"status" binding:"required"`    // 文章状态
 	CommentDisabled bool         `json:"comment_disabled"`             // 是否禁用评论
 	SourceURI       string       `json:"source_uri"`                   // 文章外链
 	UploadedFiles   []FileUpload `json:"uploaded_files"`               // 上传的文件列表
@@ -80,12 +80,13 @@ type ArticleList struct {
 	PageResponse
 }
 
+// todo 增加字段
 type GetUserArticleListReq struct {
-	Title      string `json:"title"`      // 文章标题
-	CategoryID uint   `json:"categoryId"` // 文章分类ID
-	CreatedAt  string `json:"createdAt"`  // 文章创建时间
-	CreatedEnd string `json:"CreatedEnd"` // 文章结束时间
-	Status     int    `json:"status"`     // 文章状态
+	Title      string `json:"title"`       // 文章标题
+	CategoryID uint   `json:"category_id"` // 文章分类ID
+	CreatedAt  string `json:"created_at"`  // 文章创建时间
+	CreatedEnd string `json:"created_end"` // 文章结束时间
+	Status     int    `json:"status"`      // 文章状态
 	PageRequest
 }
 

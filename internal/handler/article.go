@@ -93,7 +93,7 @@ func (h *ArticleHandler) GetArticle(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.UpdateArticleRequest true "params"
 // @Success 200 {object} v1.ArticleData
-// @Router /v1/article/UpdateArticle [post]
+// @Router /v1/article/updateArticle [post]
 func (h *ArticleHandler) UpdateArticle(ctx *gin.Context) {
 	var req v1.UpdateArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -124,7 +124,7 @@ func (h *ArticleHandler) UpdateArticle(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.DelArticleListReq true "params"
 // @Success 200 {object} v1.DeleteArticleResponseData
-// @Router /v1/article/DeleteArticleList [post]
+// @Router /v1/article/deleteArticleList [post]
 func (h *ArticleHandler) DeleteArticleList(ctx *gin.Context) {
 	var req v1.DelArticleListReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -157,7 +157,7 @@ func (h *ArticleHandler) DeleteArticleList(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.DeleteArticleRequest true "params"
 // @Success 200 {object} v1.DeleteArticleResponseData
-// @Router /v1/article/DeleteArticle [post]
+// @Router /v1/article/deleteArticle [post]
 func (h *ArticleHandler) DeleteArticle(ctx *gin.Context) {
 	var req v1.DeleteArticleRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
