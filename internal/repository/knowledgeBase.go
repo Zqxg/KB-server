@@ -242,9 +242,16 @@ func buildCategoryTree(data []vo.CategoryView, parentId uint) []vo.CategoryView 
 
 func (r *kbRepository) GetKBListByTypeAndUserId(ctx context.Context, userId, kbType string) ([]*vo.KbKnowledgeBaseView, error) {
 	var kbList []*vo.KbKnowledgeBaseView
-	if err := r.DB(ctx).Table("kb_knowledgeBase_view").
-		Where("user_id = ? AND kb_type = ?", userId, kbType).
-		Find(&kbList).Error; err != nil {
+	query := r.DB(ctx).Table("kb_knowledgeBase_view").Where("kb_type = ?", kbType)
+
+	// 如果 userId 是空字符串，则查询 NULL
+	if userId == "" {
+		query = query.Where("user_id IS NULL")
+	} else {
+		query = query.Where("user_id = ?", userId)
+	}
+
+	if err := query.Find(&kbList).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.GetKBListByTypeAndUserId error", zap.Error(err))
 		return nil, err
 	}
