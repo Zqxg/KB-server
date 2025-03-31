@@ -107,7 +107,10 @@ func (s *knowledgeBaseService) UpdateKBName(ctx *gin.Context, userId string, rol
 	// superAdmin可以直接更新知识库名称
 	kb.KbName = req.Name
 	err = s.kbRepository.UpdateKB(ctx, kb)
-	return v1.ErrUpdateKnowledgeFailed
+	if err != nil {
+		return v1.ErrUpdateKnowledgeFailed
+	}
+	return nil
 }
 
 func (s *knowledgeBaseService) DeleteKB(ctx *gin.Context, userId string, role int, kbId uint) error {
