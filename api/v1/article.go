@@ -6,17 +6,16 @@ import (
 
 // CreateArticleRequest 用于接收创建文章请求的数据
 type CreateArticleRequest struct {
-	Title           string       `json:"title" binding:"required"`        // 文章标题
-	Content         string       `json:"content" binding:"required"`      // 文章内容
-	ContentShort    string       `json:"contentShort"`                    // 文章摘要
-	AuthorID        string       `json:"authorId" binding:"required"`     // 作者ID
-	KBID            uint         `json:"kbId"`                            // 知识库ID
-	CategoryID      uint         `json:"categoryId"`                      // 文章分类ID
-	Importance      int          `json:"importance"`                      // 文章重要性
-	VisibleRange    string       `json:"visibleRange" binding:"required"` // 可见范围
-	CommentDisabled bool         `json:"commentDisabled"`                 // 是否禁用评论
-	SourceURI       string       `json:"sourceUri"`                       // 文章外链
-	UploadedFiles   []FileUpload `json:"uploadedFiles"`                   // 上传的文件列表
+	Title           string       `json:"title" binding:"required"`    // 文章标题
+	Content         string       `json:"content" binding:"required"`  // 文章内容
+	ContentShort    string       `json:"contentShort"`                // 文章摘要
+	AuthorID        string       `json:"authorId" binding:"required"` // 作者ID
+	KBID            uint         `json:"kbId"`                        // 知识库ID
+	CategoryID      uint         `json:"categoryId"`                  // 文章分类ID
+	Importance      int          `json:"importance"`                  // 文章重要性
+	CommentDisabled bool         `json:"commentDisabled"`             // 是否禁用评论
+	SourceURI       string       `json:"sourceUri"`                   // 文章外链
+	UploadedFiles   []FileUpload `json:"uploadedFiles"`               // 上传的文件列表
 }
 
 // FileUpload 用于接收上传文件的信息
@@ -38,6 +37,7 @@ type ArticleData struct {
 	Category        string       `json:"category"`        // 文章分类
 	CategoryID      uint         `json:"categoryId"`      // 文章分类ID
 	KBID            uint         `json:"kbId"`            // 知识库ID
+	KBName          string       `json:"kbName"`          // 知识库名称
 	Importance      int          `json:"importance"`      // 文章重要性
 	CommentDisabled bool         `json:"commentDisabled"` // 是否禁用评论
 	SourceURI       string       `json:"sourceUri"`       // 文章外链
