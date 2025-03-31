@@ -69,8 +69,8 @@ func (h *KnowledgeBaseHandler) UpdateKBName(ctx *gin.Context) {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
 		return
 	}
-	userId := GetUserIdFromCtx(ctx)
-	err := h.knowledgeBaseService.UpdateKBName(ctx, userId, &req)
+	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
+	err := h.knowledgeBaseService.UpdateKBName(ctx, userId, role, &req)
 	if err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
 		return
@@ -95,8 +95,8 @@ func (h *KnowledgeBaseHandler) DeleteKB(ctx *gin.Context) {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
 		return
 	}
-	userId := GetUserIdFromCtx(ctx)
-	err := h.knowledgeBaseService.DeleteKB(ctx, userId, req.KBID)
+	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
+	err := h.knowledgeBaseService.DeleteKB(ctx, userId, role, req.KBID)
 	if err != nil {
 		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
 		return

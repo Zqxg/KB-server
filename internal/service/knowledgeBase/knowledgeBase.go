@@ -14,8 +14,8 @@ import (
 type KnowledgeBaseService interface {
 	// 知识库
 	CreateKnowledgeBase(ctx *gin.Context, userId string, req *v1.CreateKBRequest) (uint, error)
-	UpdateKBName(ctx *gin.Context, userId string, req *v1.UpdateKBNameReq) error
-	DeleteKB(ctx *gin.Context, userId string, kbId uint) error
+	UpdateKBName(ctx *gin.Context, userId string, role int, req *v1.UpdateKBNameReq) error
+	DeleteKB(ctx *gin.Context, userId string, role int, kbId uint) error
 	GetKBInfo(ctx *gin.Context, kbId uint) (*v1.GetKBInfoResp, error)
 	GetKBListByTeamId(ctx *gin.Context, req *v1.GetKBListByTeamIdReq) (*v1.GetKBListByTeamIdResp, error)
 	GetKBListByType(ctx *gin.Context, userId string, kbType string) ([]*vo.KbKnowledgeBaseView, error)
@@ -81,42 +81,46 @@ func (s *knowledgeBaseService) CreateKnowledgeBase(ctx *gin.Context, userId stri
 	}
 	kbId, err := s.kbRepository.CreateKB(ctx, knowledgeBase)
 	if err != nil {
-		return 0, err
+		return 0, v1.ErrCreateKnowledgeFailed
 	}
 	return kbId, nil
 }
 
-func (s *knowledgeBaseService) UpdateKBName(ctx *gin.Context, userId string, req *v1.UpdateKBNameReq) error {
+func (s *knowledgeBaseService) UpdateKBName(ctx *gin.Context, userId string, role int, req *v1.UpdateKBNameReq) error {
 	// 判断知识库是否存在
 	kb, err := s.kbRepository.GetKBById(ctx, req.KBID)
 	if err != nil {
 		return v1.ErrKnowledgeNotExist
 	}
-	// 获取用户角色
-	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, kb.TeamID, userId)
-	// 校验用户是否为团队leader或admin
-	if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
-		return v1.ErrPermissionDenied
+	if role == enums.COMMON_USER {
+		// 获取用户角色
+		member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, kb.TeamID, userId)
+		// 校验用户是否为团队leader或admin
+		if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
+			return v1.ErrPermissionDenied
+		}
 	}
-	// 更新知识库名称
+	// superAdmin可以直接更新知识库名称
 	kb.KbName = req.Name
 	err = s.kbRepository.UpdateKB(ctx, kb)
 	return v1.ErrUpdateKnowledgeFailed
 }
 
-func (s *knowledgeBaseService) DeleteKB(ctx *gin.Context, userId string, kbId uint) error {
+func (s *knowledgeBaseService) DeleteKB(ctx *gin.Context, userId string, role int, kbId uint) error {
 	// 判断知识库是否存在
 	kb, err := s.kbRepository.GetKBById(ctx, kbId)
 	if err != nil {
 		return v1.ErrKnowledgeNotExist
 	}
-	// 获取用户角色
-	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, kb.TeamID, userId)
-	// 校验用户是否为团队leader或admin
-	if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
-		return v1.ErrPermissionDenied
+	if role == enums.COMMON_USER {
+		// 获取用户角色
+		member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, kb.TeamID, userId)
+		// 校验用户是否为团队leader或admin
+		if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
+			return v1.ErrPermissionDenied
+		}
 	}
-	// 删除知识库
+	// superAdmin可以直接删除知识库
 	err = s.kbRepository.DeleteKB(ctx, kbId)
 	return v1.ErrDeleteKnowledgeFailed
 }
@@ -135,7 +139,7 @@ func (s *knowledgeBaseService) GetKBInfo(ctx *gin.Context, kbId uint) (*v1.GetKB
 		TeamID:    kb.TeamID,
 		TeamName:  kb.TeamName,
 		IsPublic:  kb.IsPublic,
-		UserID:    kb.UserID,
+		UserID:    kb.CreatedBy,
 		UserName:  kb.UserName,
 		KBType:    kb.KBType,
 		CreatedAt: kb.CreatedAt,

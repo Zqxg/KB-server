@@ -40,7 +40,7 @@ var (
 	//ErrDeleteKnowledgeExist  = newError(2104, "知识库存在文章")
 	//ErrDeleteKnowledgePublic = newError(2105, "公共知识库不能删除")
 	// 知识库创建错误
-	//ErrCreateKnowledgeFailed = newError(2106, "创建知识库失败")
+	ErrCreateKnowledgeFailed = newError(2106, "创建知识库失败")
 	//ErrCreateKnowledgeExist  = newError(2107, "知识库已存在")
 	//ErrCreateKnowledgePublic = newError(2108, "公共知识库不能创建")
 	// 知识库更新错误
