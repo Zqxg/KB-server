@@ -63,7 +63,7 @@ func (s *knowledgeBaseService) CreateKnowledgeBase(ctx *gin.Context, userId stri
 	// 校验团队是否存在
 	team, err := s.teamRepository.GetTeamByID(ctx, req.TeamID)
 	if err != nil {
-		return 0, err
+		return 0, v1.ErrTeamNotExist
 	}
 	// 获取用户角色
 	member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, req.TeamID, userId)
@@ -76,8 +76,8 @@ func (s *knowledgeBaseService) CreateKnowledgeBase(ctx *gin.Context, userId stri
 		TeamID:    team.TeamID,
 		KbName:    req.Name,
 		CreatedBy: userId,
-		UserID:    userId, //团队知识库的userID
-		IsPublic:  false,  //团队知识库
+		UserID:    "",    //团队知识库的userID为空
+		IsPublic:  false, //团队知识库
 	}
 	kbId, err := s.kbRepository.CreateKB(ctx, knowledgeBase)
 	if err != nil {
