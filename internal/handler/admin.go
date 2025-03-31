@@ -115,3 +115,89 @@ func (h *AdminHandler) DeletePublicKB(ctx *gin.Context) {
 	}
 	v1.HandleSuccess(ctx, nil)
 }
+
+// CreatePublicCategory godoc
+// @Summary 创建公共知识库分类
+// @Schemes
+// @Description
+// @Tags 管理员模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.CreateCategoryReq true "params"
+// @Success 200 {object} v1.Response	"resp"
+// @Router /v1/admin/createPublicCategory [post]
+func (h *AdminHandler) CreatePublicCategory(ctx *gin.Context) {
+	var req v1.CreateCategoryReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	role := GetRoleTypeFromCtx(ctx)
+	if role != enums.SUPER_ADMIN {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrPermissionDenied, nil)
+	}
+	err := h.kbService.CreatePublicCategory(ctx, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, nil)
+}
+
+// UpdatePublicCategory godoc
+// @Summary 修改公共知识库分类
+// @Schemes
+// @Description
+// @Tags 管理员模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.UpdateCategoryReq true "params"
+// @Success 200 {object} v1.Response
+// @Router /v1/admin/updatePublicCategory [post]
+func (h *AdminHandler) UpdatePublicCategory(ctx *gin.Context) {
+	var req v1.UpdateCategoryReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	role := GetRoleTypeFromCtx(ctx)
+	if role != enums.SUPER_ADMIN {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrPermissionDenied, nil)
+	}
+	err := h.kbService.UpdatePublicCategory(ctx, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+	}
+	v1.HandleSuccess(ctx, nil)
+}
+
+// DeletePublicCategory godoc
+// @Summary 删除公共知识库分类
+// @Schemes
+// @Description
+// @Tags 管理员模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.DeleteCategoryReq true "params"
+// @Success 200 {object} v1.Response
+// @Router /v1/admin/deletePublicCategory [post]
+func (h *AdminHandler) DeletePublicCategory(ctx *gin.Context) {
+	var req v1.DeleteCategoryReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	role := GetRoleTypeFromCtx(ctx)
+	if role != enums.SUPER_ADMIN {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrPermissionDenied, nil)
+	}
+	err := h.kbService.DeletePublicCategory(ctx, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, nil)
+}

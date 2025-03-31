@@ -90,18 +90,18 @@ func NewHTTPServer(
 			commonUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)   // 批量删除文章
 			commonUserRouter.POST(enums.ARTICLE+"/getUserArticleList", articleHandler.GetUserArticleList) // 获取个人文章列表
 
-			// 知识库模块
+			// 团队知识库模块
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKBListByTeamId", knowledgeBaseHandler.GetKBListByTeamId) // 团队id获取知识库列表
 			commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBListByType", knowledgeBaseHandler.GetKBListByType)      // 获取知识库列表(私人知识库、公共知识库)
 			commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBInfo", knowledgeBaseHandler.GetKBInfo)                  // 获取知识库详细
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createKB", knowledgeBaseHandler.CreateKB)                   // 新建团队知识库
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateKBName", knowledgeBaseHandler.UpdateKBName)           // 修改团队知识库名称
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteKB", knowledgeBaseHandler.DeleteKB)                   // 删除团队知识库
-			// 知识库分类模块
+			// 团队知识库分类模块
 			commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getCategoryListByKB", knowledgeBaseHandler.GetCategoryListByKB) // 获取知识库分类列表
-			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createCategory", knowledgeBaseHandler.CreateCategory)          // 新建知识库分类
-			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateCategory", knowledgeBaseHandler.UpdateCategory)          // 修改知识库分类
-			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteCategory", knowledgeBaseHandler.DeleteCategory)          // 删除知识库分类
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createCategory", knowledgeBaseHandler.CreateCategory)          // 新建知识库分类（私人/团队）
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateCategory", knowledgeBaseHandler.UpdateCategory)          // 修改知识库分类（私人/团队）
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteCategory", knowledgeBaseHandler.DeleteCategory)          // 删除知识库分类（私人/团队）
 			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getArticleListByCategory", knowledgeBaseHandler.GetCategoryList) // 多种查询分类
 
 			// 团队模块
@@ -122,9 +122,12 @@ func NewHTTPServer(
 		//超级管理员路由组
 		superAdminRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.SUPER_ADMIN))
 		{
-			superAdminRouter.POST(enums.ROUTET_ADMIN+"/createPublicKB", adminHandler.CreatePublicKB) // 新增公共知识库
-			superAdminRouter.POST(enums.ROUTET_ADMIN+"/updatePublicKB", adminHandler.UpdatePublicKB) // 更新公共知识库
-			superAdminRouter.POST(enums.ROUTET_ADMIN+"/deletePublicKB", adminHandler.DeletePublicKB) // 删除公共知识库
+			superAdminRouter.POST(enums.ROUTET_ADMIN+"/createPublicKB", adminHandler.CreatePublicKB)             // 新增公共知识库
+			superAdminRouter.POST(enums.ROUTET_ADMIN+"/updatePublicKB", adminHandler.UpdatePublicKB)             // 更新公共知识库
+			superAdminRouter.POST(enums.ROUTET_ADMIN+"/deletePublicKB", adminHandler.DeletePublicKB)             // 删除公共知识库
+			superAdminRouter.POST(enums.ROUTET_ADMIN+"/createPublicCategory", adminHandler.CreatePublicCategory) // 新增公共知识库分类
+			superAdminRouter.POST(enums.ROUTET_ADMIN+"/updatePublicCategory", adminHandler.UpdatePublicCategory) // 更新公共知识库分类
+			superAdminRouter.POST(enums.ROUTET_ADMIN+"/deletePublicCategory", adminHandler.DeletePublicCategory) // 删除公共知识库分类
 
 		}
 	}

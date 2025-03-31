@@ -46,6 +46,7 @@ var (
 	// 知识库更新错误
 	ErrUpdateKnowledgeFailed = newError(2109, "更新知识库失败")
 	//ErrUpdateKnowledgePublic = newError(2110, "公共知识库不能更新")
+	ErrNotPublicKnowledge = newError(2110, "非公共知识库")
 	// 2111 知识库分类
 	ErrCategoryNotExist      = newError(2111, "分类不存在")
 	ErrUpdateCategoryFailed  = newError(2112, "更新分类失败")

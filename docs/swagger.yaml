@@ -199,11 +199,11 @@ definitions:
     properties:
       name:
         type: string
-      teamID:
+      team_id:
         type: integer
     required:
     - name
-    - teamID
+    - team_id
     type: object
   v1.CreateKBResp:
     properties:
@@ -808,6 +808,29 @@ info:
   title: Nunu Example API
   version: 1.0.0
 paths:
+  /v1/admin/createPublicCategory:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.CreateCategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: resp
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 创建公共知识库分类
+      tags:
+      - 管理员模块
   /v1/admin/createPublicKB:
     post:
       consumes:
@@ -829,6 +852,98 @@ paths:
       security:
       - Bearer: []
       summary: 创建公共知识库
+      tags:
+      - 管理员模块
+  /v1/admin/deletePublicCategory:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DeleteCategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 删除公共知识库分类
+      tags:
+      - 管理员模块
+  /v1/admin/deletePublicKB:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.DeleteKBReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 删除公共知识库
+      tags:
+      - 管理员模块
+  /v1/admin/updatePublicCategory:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateCategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 修改公共知识库分类
+      tags:
+      - 管理员模块
+  /v1/admin/updatePublicKB:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.UpdateKBNameReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.Response'
+      security:
+      - Bearer: []
+      summary: 修改公共知识库
       tags:
       - 管理员模块
   /v1/getCaptcha:
