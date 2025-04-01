@@ -2,12 +2,12 @@ package v1
 
 type CaptchaData struct {
 	CaptchaId     string `json:"captcha_id"`
-	CaptchaBase64 string `json:"Captcha_base64"`
+	CaptchaBase64 string `json:"captcha_base64"`
 	CaptchaAnswer string `json:"captcha_answer"`
 }
 type CaptchaResponseData struct {
 	CaptchaId     string `json:"captcha_id"`
-	CaptchaBase64 string `json:"Captcha_base64"`
+	CaptchaBase64 string `json:"captcha_base64"`
 }
 
 type RegisterRequest struct {

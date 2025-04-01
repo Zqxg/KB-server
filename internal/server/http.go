@@ -92,7 +92,7 @@ func NewHTTPServer(
 
 			// 团队知识库模块
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKBListByTeamId", knowledgeBaseHandler.GetKBListByTeamId) // 团队id获取知识库列表
-			commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBListByType", knowledgeBaseHandler.GetKBListByType)      // 获取知识库列表(私人知识库、公共知识库)
+			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKBListByType", knowledgeBaseHandler.GetKBListByType)     // 获取知识库列表(私人知识库、公共知识库)
 			commonUserRouter.GET(enums.KNOWLEDGE_BASE+"/getKBInfo", knowledgeBaseHandler.GetKBInfo)                  // 获取知识库详细
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createKB", knowledgeBaseHandler.CreateKB)                   // 新建团队知识库
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateKBName", knowledgeBaseHandler.UpdateKBName)           // 修改团队知识库名称

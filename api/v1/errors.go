@@ -3,7 +3,7 @@ package v1
 var (
 	// common errors
 	ErrSuccess             = newError(0, "操作成功")
-	ErrBadRequest          = newError(400, "请求错误")
+	ErrBadRequest          = newError(400, "请求参数错误")
 	ErrUnauthorized        = newError(401, "未授权")
 	ErrPermissionDenied    = newError(403, "权限不足")
 	ErrNotFound            = newError(404, "未找到")

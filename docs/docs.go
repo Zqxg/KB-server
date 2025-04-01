@@ -1796,7 +1796,7 @@ const docTemplate = `{
         "v1.CaptchaResponseData": {
             "type": "object",
             "properties": {
-                "Captcha_base64": {
+                "captcha_base64": {
                     "type": "string"
                 },
                 "captcha_id": {

@@ -74,7 +74,7 @@ func (s *knowledgeBaseService) CreateKnowledgeBase(ctx *gin.Context, userId stri
 	}
 	// 创建知识库
 	knowledgeBase := &model.KnowledgeBase{
-		TeamID:    team.TeamID,
+		TeamID:    &team.TeamID,
 		KbName:    req.Name,
 		CreatedBy: userId,
 		UserID:    "",    //团队知识库的userID为空
@@ -98,7 +98,7 @@ func (s *knowledgeBaseService) UpdateKBName(ctx *gin.Context, userId string, rol
 	}
 	if role == enums.COMMON_USER {
 		// 获取用户角色
-		member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, kb.TeamID, userId)
+		member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, *kb.TeamID, userId)
 		// 校验用户是否为团队leader或admin
 		if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
 			return v1.ErrPermissionDenied
@@ -121,7 +121,7 @@ func (s *knowledgeBaseService) DeleteKB(ctx *gin.Context, userId string, role in
 	}
 	if role == enums.COMMON_USER {
 		// 获取用户角色
-		member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, kb.TeamID, userId)
+		member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, *kb.TeamID, userId)
 		// 校验用户是否为团队leader或admin
 		if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
 			return v1.ErrPermissionDenied

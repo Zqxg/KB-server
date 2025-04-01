@@ -9,7 +9,7 @@ import (
 type KnowledgeBase struct {
 	KbID      uint           `gorm:"primaryKey;autoIncrement"`   // 知识库ID
 	KbName    string         `gorm:"type:varchar(255);not null"` // 知识库名称
-	TeamID    uint           `gorm:"type:BIGINT"`                // 团队ID (NULL 表示公共知识库)
+	TeamID    *uint          `gorm:"type:BIGINT;default:NULL"`   // 团队ID (NULL 表示公共知识库)
 	UserID    string         `gorm:"type:varchar(255)"`          // 用户ID (NULL 表示非私人知识库)
 	IsPublic  bool           `gorm:"type:boolean;default:false"` // 是否为公共知识库
 	CreatedBy string         `gorm:"type:varchar(255)"`          // 创建者
@@ -19,5 +19,5 @@ type KnowledgeBase struct {
 }
 
 func (KnowledgeBase) TableName() string {
-	return "kb_knowledgeBase"
+	return "kb_knowledgebase"
 }
