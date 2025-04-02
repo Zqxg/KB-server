@@ -102,6 +102,7 @@ type GetArticleListByEsReq struct {
 	Importance      string   `json:"importance"`        // 文章重要性
 	CreateTimeStart string   `json:"create_time_start"` // 文章创建时间
 	CreateTimeEnd   string   `json:"create_time_end"`   // 文章结束时间
+	KBIDs           []int    `json:"kb_ids"`            // 知识库ID
 	Categories      []int    `json:"categories"`        // 分类id，用于筛选
 }
 

@@ -480,9 +480,9 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, userId string, 
 		if len(req.Keywords) > 0 {
 			for _, keyword := range req.Keywords {
 				if req.PhraseMatch {
-					query = query.Must(elastic.NewMatchPhraseQuery("contentShort", keyword))
+					query = query.Must(elastic.NewMatchPhraseQuery("content_short", keyword))
 				} else {
-					query = query.Should(elastic.NewMatchQuery("contentShort", keyword))
+					query = query.Should(elastic.NewMatchQuery("content_short", keyword))
 				}
 			}
 		}
@@ -498,14 +498,22 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, userId string, 
 				if req.PhraseMatch {
 					query = query.Must(elastic.NewMatchPhraseQuery("content", keyword)).
 						Must(elastic.NewMatchPhraseQuery("title", keyword)).
-						Must(elastic.NewMatchPhraseQuery("contentShort", keyword))
+						Must(elastic.NewMatchPhraseQuery("content_short", keyword))
 				} else {
 					query = query.Should(elastic.NewMatchQuery("content", keyword)).
 						Should(elastic.NewMatchQuery("title", keyword)).
-						Should(elastic.NewMatchQuery("contentShort", keyword))
+						Should(elastic.NewMatchQuery("content_short", keyword))
 				}
 			}
 		}
+	}
+	// 知识库过滤
+	if len(req.KBIDs) > 0 {
+		var kbIDs []interface{}
+		for _, kbID := range req.KBIDs {
+			kbIDs = append(kbIDs, kbID)
+		}
+		query = query.Filter(elastic.NewTermsQuery("kb_id", kbIDs...))
 	}
 
 	// 分类过滤
@@ -521,7 +529,7 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, userId string, 
 	highlight := elastic.NewHighlight().
 		Field("content").PreTags("<mark>").PostTags("</mark>").
 		Field("title").PreTags("<mark>").PostTags("</mark>").
-		Field("contentShort").PreTags("<mark>").PostTags("</mark>")
+		Field("content_short").PreTags("<mark>").PostTags("</mark>")
 
 	// 4. 计算分页
 	from := (pageNo - 1) * pageSize
@@ -580,7 +588,7 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, userId string, 
 		if highlightFields, ok := hit.Highlight["title"]; ok {
 			article.Title = strings.Join(highlightFields, "...")
 		}
-		if highlightFields, ok := hit.Highlight["contentShort"]; ok {
+		if highlightFields, ok := hit.Highlight["content_short"]; ok {
 			article.ContentShort = strings.Join(highlightFields, "...")
 		}
 
