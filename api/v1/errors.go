@@ -53,6 +53,7 @@ var (
 	ErrCreateCategoryFailed  = newError(2113, "创建分类失败")
 	ErrDeleteCategoryFailed  = newError(2114, "删除分类失败")
 	ErrGetCategoryListFailed = newError(2115, "获取分类列表失败")
+	ErrCategoryNotMatchKB    = newError(2116, "分类不属于该知识库")
 
 	// 2200 team
 	ErrTeamNotExist = newError(2200, "团队不存在")

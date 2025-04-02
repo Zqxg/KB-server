@@ -128,11 +128,21 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 	if article != nil {
 		return -1, v1.ErrArticleAlreadyExist
 	}
+	// 判断知识库是否存在
+	kb, _ := s.kbRepository.GetKBViewById(ctx, req.KBID)
+	if kb == nil {
+		return -1, v1.ErrKnowledgeNotExist
+	}
 	// 判断分类是否存在
 	category, _ := s.kbRepository.GetCategoryById(ctx, req.CategoryID)
 	if category == nil {
 		return -1, v1.ErrCategoryNotExist
 	}
+	// 分类ID与知识库ID不匹配
+	if category.KbID != req.KBID {
+		return -1, v1.ErrCategoryNotMatchKB
+	}
+
 	uploadedFilesData, err := json.Marshal(req.UploadedFiles)
 	if err != nil {
 		return -1, v1.ErrUploadFileFailed
