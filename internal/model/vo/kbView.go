@@ -18,5 +18,5 @@ type KbKnowledgeBaseView struct {
 
 // 指定表名（视图名）
 func (KbKnowledgeBaseView) TableName() string {
-	return "kb_knowledgeBase_view"
+	return "kb_knowledge_base_view"
 }

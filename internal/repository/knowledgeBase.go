@@ -129,7 +129,7 @@ func (r *kbRepository) GetKBById(ctx context.Context, id uint) (*model.Knowledge
 
 func (r *kbRepository) GetKBViewById(ctx context.Context, id uint) (*vo.KbKnowledgeBaseView, error) {
 	var knowledge vo.KbKnowledgeBaseView
-	if err := r.DB(ctx).Table("kb_knowledgeBase_view").Where("kb_id =?", id).First(&knowledge).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_knowledge_base_view").Where("kb_id =?", id).First(&knowledge).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.GetKB error", zap.Error(err))
 		return nil, err
 	}
@@ -137,7 +137,7 @@ func (r *kbRepository) GetKBViewById(ctx context.Context, id uint) (*vo.KbKnowle
 }
 func (r *kbRepository) GetKBTypeById(ctx context.Context, id uint) (string, error) {
 	var knowledgeView *vo.KbKnowledgeBaseView
-	if err := r.DB(ctx).Table("kb_knowledgeBase_view").Where("kb_id =?", id).First(&knowledgeView).Error; err != nil {
+	if err := r.DB(ctx).Table("kb_knowledge_base_view").Where("kb_id =?", id).First(&knowledgeView).Error; err != nil {
 		r.logger.WithContext(ctx).Error("KBRepository.GetKBTypeById error", zap.Error(err))
 		return "", err
 	}
@@ -149,7 +149,7 @@ func (r *kbRepository) GetKBListByTeamId(ctx context.Context, teamId uint, pageI
 	var kbList []*vo.KbKnowledgeBaseView
 	var total int64
 
-	db := r.DB(ctx).Table("kb_knowledgeBase_view").Where("team_id = ?", teamId)
+	db := r.DB(ctx).Table("kb_knowledge_base_view").Where("team_id = ?", teamId)
 
 	// 计算总数
 	if err := db.Count(&total).Error; err != nil {
@@ -243,7 +243,7 @@ func buildCategoryTree(data []vo.CategoryView, parentId uint) []vo.CategoryView 
 
 func (r *kbRepository) GetKBListByTypeAndUserId(ctx context.Context, userId, kbType string) ([]*vo.KbKnowledgeBaseView, error) {
 	var kbList []*vo.KbKnowledgeBaseView
-	query := r.DB(ctx).Table("kb_knowledgeBase_view").Where("kb_type = ?", kbType)
+	query := r.DB(ctx).Table("kb_knowledge_base_view").Where("kb_type = ?", kbType)
 
 	// 如果 userId 是空字符串，则查询 NULL
 	query = query.Where("user_id = ?", userId)

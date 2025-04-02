@@ -76,7 +76,7 @@ type GetArticleListByCategoryReq struct {
 }
 
 type ArticleList struct {
-	ArticleDataList []*ArticleData
+	ArticleDataList []*ArticleData `json:"article_data_list"`
 	PageResponse
 }
 

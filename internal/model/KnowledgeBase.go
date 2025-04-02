@@ -19,5 +19,5 @@ type KnowledgeBase struct {
 }
 
 func (KnowledgeBase) TableName() string {
-	return "kb_knowledgebase"
+	return "kb_knowledgeBase"
 }
