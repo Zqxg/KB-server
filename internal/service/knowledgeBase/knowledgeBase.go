@@ -202,7 +202,11 @@ func (s *knowledgeBaseService) CreateCategory(ctx *gin.Context, userId string, r
 	// 校验知识库是否存在
 	kbView, err := s.kbRepository.GetKBViewById(ctx, req.KBID)
 	if err != nil {
-		return v1.ErrKnowledgeNotExist
+		if errors.Is(err, v1.ErrDuplicateKey) {
+			return v1.ErrKnowledgeExist // 自定义错误码
+		} else {
+			return err
+		}
 	}
 	// 根据知识库类型新建分类
 	if kbView.KBType == enums.KBTypePrivate {

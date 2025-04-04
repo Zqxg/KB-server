@@ -172,12 +172,12 @@ func (h *TeamHandler) GetTeamInfo(ctx *gin.Context) {
 // @Router /v1/team/getUserTeamList [GET]
 func (h *TeamHandler) GetUserTeamList(ctx *gin.Context) {
 	// 从查询参数中获取参数
-	if !utils.IsNumeric(ctx.Query("pageIndex")) || !utils.IsNumeric(ctx.Query("pageSize")) {
+	if !utils.IsNumeric(ctx.Query("page_index")) || !utils.IsNumeric(ctx.Query("page_size")) {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
 		return
 	}
-	pageIndex, _ := utils.ToInt(ctx.Query("pageIndex")) // 获取参数
-	pageSize, _ := utils.ToInt(ctx.Query("pageSize"))   // 获取参数
+	pageIndex, _ := utils.ToInt(ctx.Query("page_index")) // 获取参数
+	pageSize, _ := utils.ToInt(ctx.Query("page_size"))   // 获取参数
 	if pageIndex < 0 || pageSize < 0 {
 		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
 		return

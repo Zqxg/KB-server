@@ -220,9 +220,20 @@ func (s *teamService) GetTeamInfo(ctx *gin.Context, teamId int) (*v1.GetTeamInfo
 
 func (s *teamService) GetUserTeamList(ctx *gin.Context, userId string, pageIndex, pageSize int) (*v1.GetUserTeamListResp, error) {
 	index, size := service.InitPage(pageIndex, pageSize)
-	teams, total, err := s.teamRepository.GetTeamList(ctx, "", userId, index, size)
+	// 根据用户ID查询团队成员列表
+	memberList, total, err := s.teamRepository.GetTeamMemberListByUserID(ctx, userId, index, size)
 	if err != nil {
-		return nil, v1.ErrGetTeamInfoFailed
+		return nil, v1.ErrGetTeamMemberListFailed
+	}
+	// 构建团队ID列表
+	var teamIds []uint
+	for _, member := range memberList {
+		teamIds = append(teamIds, member.TeamID)
+	}
+	// 查询团队列表，根据size切片查询
+	teams, err := s.teamRepository.GetTeamListByIDs(ctx, teamIds)
+	if err != nil {
+		return nil, v1.ErrGetTeamListFailed
 	}
 	var teamList []v1.TeamData
 	// 转换团队信息

@@ -9,6 +9,7 @@ import (
 type TeamRepository interface {
 	CreateTeam(ctx context.Context, team *model.Team) (uint, error)
 	GetTeamByID(ctx context.Context, teamID uint) (*model.Team, error)
+	GetTeamListByIDs(ctx context.Context, teamIDs []uint) ([]*model.Team, error)
 	GetTeamList(ctx context.Context, teamName, createdBy string, pageIndex, pageSize int) ([]model.Team, int64, error)
 	UpdateTeam(ctx context.Context, team *model.Team) error
 	DeleteTeam(ctx context.Context, teamID uint) error
@@ -19,9 +20,9 @@ type TeamRepository interface {
 	DeleteTeamMember(ctx context.Context, teamMemberID uint) error
 	UpdateTeamMemberRole(ctx context.Context, teamMemberID uint, role int) error
 	GetTeamMemberListByTeamID(ctx context.Context, teamID uint) ([]*model.Member, error)
-	GetTeamMemberListByUserID(ctx context.Context, userID string) ([]*model.Member, error)
+	GetTeamMemberListByUserID(ctx context.Context, userID string, pageIndex, pageSize int) ([]*model.Member, int64, error)
 	GetMemberByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.Member, error)
-	GetTeamListByUserID(ctx context.Context, userID string) ([]string, error)
+	GetTeamIdsByUserID(ctx context.Context, userID string) ([]string, error)
 }
 
 func NewTeamRepository(
@@ -51,6 +52,14 @@ func (r *teamRepository) GetTeamByID(ctx context.Context, teamID uint) (*model.T
 		return nil, err
 	}
 	return &team, nil
+}
+func (r *teamRepository) GetTeamListByIDs(ctx context.Context, teamIDs []uint) ([]*model.Team, error) {
+	var teams []*model.Team
+	if err := r.DB(ctx).Table("sys_team").Where("team_id IN ?", teamIDs).Find(&teams).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetTeamByIDs error", zap.Error(err))
+		return nil, err
+	}
+	return teams, nil
 }
 
 func (r *teamRepository) GetTeamList(ctx context.Context, teamName, createdBy string, pageIndex, pageSize int) ([]model.Team, int64, error) {
@@ -146,13 +155,31 @@ func (r *teamRepository) GetTeamMemberListByTeamID(ctx context.Context, teamID u
 	}
 	return teamMembers, nil
 }
-func (r *teamRepository) GetTeamMemberListByUserID(ctx context.Context, userID string) ([]*model.Member, error) {
+
+func (r *teamRepository) GetTeamMemberListByUserID(ctx context.Context, userID string, pageIndex, pageSize int) ([]*model.Member, int64, error) {
 	var teamMembers []*model.Member
-	if err := r.DB(ctx).Table("sys_member").Where("user_id =?", userID).Find(&teamMembers).Error; err != nil {
-		r.logger.WithContext(ctx).Error("TeamRepository.GetTeamMemberListByUserID error", zap.Error(err))
-		return nil, err
+	var total int64
+
+	// 计算总数
+	if err := r.DB(ctx).Table("sys_member").Where("user_id = ?", userID).Count(&total).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetTeamMemberListByUserID count error", zap.Error(err))
+		return nil, 0, err
 	}
-	return teamMembers, nil
+
+	db := r.DB(ctx).Table("sys_member").Where("user_id = ?", userID)
+
+	// 只有当 pageIndex 和 pageSize 都大于 0 时才进行分页
+	if pageIndex > 0 && pageSize > 0 {
+		db = db.Offset((pageIndex - 1) * pageSize).Limit(pageSize)
+	}
+
+	// 查询数据
+	if err := db.Find(&teamMembers).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetTeamMemberListByUserID query error", zap.Error(err))
+		return nil, 0, err
+	}
+
+	return teamMembers, total, nil
 }
 
 func (r *teamRepository) GetMemberByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.Member, error) {
@@ -165,7 +192,7 @@ func (r *teamRepository) GetMemberByTeamIDAndUserID(ctx context.Context, teamID 
 	return &teamMember, nil
 }
 
-func (r *teamRepository) GetTeamListByUserID(ctx context.Context, userID string) ([]string, error) {
+func (r *teamRepository) GetTeamIdsByUserID(ctx context.Context, userID string) ([]string, error) {
 	var teamIDs []string
 	if err := r.DB(ctx).Table("sys_member").
 		Where("user_id = ? AND deleted_at IS NULL", userID).

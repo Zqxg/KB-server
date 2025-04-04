@@ -63,6 +63,7 @@ var (
 	ErrCreateTeamFailed  = newError(2206, "创建团队失败")
 	ErrUpdateTeamFailed  = newError(2209, "更新团队失败")
 	ErrGetTeamInfoFailed = newError(2210, "获取团队信息失败")
+	ErrGetTeamListFailed = newError(2211, "获取团队列表失败")
 	// 2300 成员
 	ErrNoTeamAdminPermission   = newError(2304, "无团队管理员权限")
 	ErrMemberNotExist          = newError(2300, "成员不存在")

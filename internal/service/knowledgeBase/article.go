@@ -78,13 +78,18 @@ func (s *articleService) GetArticle(ctx context.Context, userId string, id uint)
 	}
 	// 团队知识库，团队成员可见
 	if kb.KBType == enums.KBTypeTeam {
-		// 获取当前用户所有团队IDs
-		teamIds, err := s.teamRepository.GetTeamListByUserID(ctx, userId)
+		// 获取当前团队成员列表
+		teamMembers, err := s.teamRepository.GetTeamMemberListByTeamID(ctx, kb.TeamID)
 		if err != nil {
-			return nil, v1.ErrPermissionDenied
+			return nil, v1.ErrTeamNotExist
 		}
-		// 判断当前文章团队id是否在团队列表中
-		if !utils.ContainsString(teamIds, strconv.Itoa(int(kb.TeamID))) {
+		// 检查用户是否为团队成员
+		var userIds []string
+		for _, member := range teamMembers {
+			userIds = append(userIds, member.UserID)
+		}
+		// 判断当前角色是否在团队成员列表中
+		if !utils.ContainsString(userIds, userId) {
 			return nil, v1.ErrPermissionDenied
 		}
 	}
@@ -540,8 +545,8 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, userId string, 
 	indices = append(indices, enums.Public_knowledge_index+"*")
 	// 私人知识库
 	indices = append(indices, enums.Private_knowledge_index+userId)
-	// 团队知识库（需要查用户所在的团队）
-	teamIds, _ := s.teamRepository.GetTeamListByUserID(ctx, userId)
+	// 团队知识库（需要查用户所在的团队ids）
+	teamIds, _ := s.teamRepository.GetTeamIdsByUserID(ctx, userId)
 	for _, teamId := range teamIds {
 		indices = append(indices, enums.Team_knowledge_index+teamId)
 	}
