@@ -81,14 +81,14 @@ func NewHTTPServer(
 
 			// 文章模块
 			//commonUserRouter.GET(enums.ARTICLE+"/getArticleCategory", articleHandler.GetArticleCategory)             // 获取文章分组
-			commonUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle) // 获取文章详细
-			//commonUserRouter.GET(enums.ARTICLE+"/getArticleListByCategory", articleHandler.GetArticleListByCategory) // 分类获取公开文章列表
-			commonUserRouter.POST(enums.ARTICLE+"/getArticleListByEs", articleHandler.GetArticleListByEs) // es文章查询
-			commonUserRouter.POST(enums.ARTICLE+"/createArticle", articleHandler.CreateArticle)           // 新建文章
-			commonUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)           // 修改文章
-			commonUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)           // 删除文章
-			commonUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)   // 批量删除文章
-			commonUserRouter.POST(enums.ARTICLE+"/getUserArticleList", articleHandler.GetUserArticleList) // 获取个人文章列表
+			commonUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle)                    // 获取文章详细
+			commonUserRouter.POST(enums.ARTICLE+"/getArticleListByCID", articleHandler.GetArticleListByCID) // 分类获取公开文章列表
+			commonUserRouter.POST(enums.ARTICLE+"/getArticleListByEs", articleHandler.GetArticleListByEs)   // es文章查询
+			commonUserRouter.POST(enums.ARTICLE+"/createArticle", articleHandler.CreateArticle)             // 新建文章
+			commonUserRouter.POST(enums.ARTICLE+"/updateArticle", articleHandler.UpdateArticle)             // 修改文章
+			commonUserRouter.POST(enums.ARTICLE+"/deleteArticle", articleHandler.DeleteArticle)             // 删除文章
+			commonUserRouter.POST(enums.ARTICLE+"/deleteArticleList", articleHandler.DeleteArticleList)     // 批量删除文章
+			commonUserRouter.POST(enums.ARTICLE+"/getUserArticleList", articleHandler.GetUserArticleList)   // 获取个人文章列表
 
 			// 团队知识库模块
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getKBListByTeamId", knowledgeBaseHandler.GetKBListByTeamId) // 团队id获取知识库列表

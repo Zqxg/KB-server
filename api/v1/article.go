@@ -45,7 +45,7 @@ type ArticleData struct {
 	UploadedFiles   []FileUpload `json:"uploaded_files"`   // 上传的文件列表
 	Status          int          `json:"status"`           // 文章状态
 	CreatedAt       string       `json:"created_at"`       // 文章创建时间
-	UpdatedAt       string       `json:"update_at"`        // 文章更新时间
+	UpdatedAt       string       `json:"updated_at"`       // 文章更新时间
 	//Tags            []Tags       `json:"tags"`            //todo：文章标签
 }
 
@@ -71,7 +71,7 @@ type DeleteArticleRequest struct {
 }
 
 type GetArticleListByCategoryReq struct {
-	CategoryID uint `json:"article_id"` // 文章分类ID
+	CategoryID uint `json:"category_id"` // 文章分类ID
 	PageRequest
 }
 
@@ -102,7 +102,7 @@ type GetArticleListByEsReq struct {
 	Importance      string   `json:"importance"`        // 文章重要性
 	CreateTimeStart string   `json:"create_time_start"` // 文章创建时间
 	CreateTimeEnd   string   `json:"create_time_end"`   // 文章结束时间
-	KBIDs           []int    `json:"kb_ids"`            // 知识库ID
+	KBID            int      `json:"kb_id"`             // 知识库ID
 	Categories      []int    `json:"categories"`        // 分类id，用于筛选
 }
 

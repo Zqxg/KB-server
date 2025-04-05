@@ -1717,7 +1717,7 @@ const docTemplate = `{
         "v1.ArticleList": {
             "type": "object",
             "properties": {
-                "articleDataList": {
+                "article_data_list": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/v1.ArticleData"
@@ -2079,6 +2079,10 @@ const docTemplate = `{
                 "importance": {
                     "description": "文章重要性",
                     "type": "string"
+                },
+                "kb_id": {
+                    "description": "知识库ID",
+                    "type": "integer"
                 },
                 "keywords": {
                     "description": "搜索的关键字数组",
@@ -2707,7 +2711,7 @@ const docTemplate = `{
         "vo.CategoryView": {
             "type": "object",
             "properties": {
-                "categoryName": {
+                "category_name": {
                     "description": "分类名",
                     "type": "string"
                 },
@@ -2722,7 +2726,7 @@ const docTemplate = `{
                     "description": "分类ID",
                     "type": "integer"
                 },
-                "kbId": {
+                "kb_id": {
                     "description": "知识库ID",
                     "type": "integer"
                 },
@@ -2730,7 +2734,7 @@ const docTemplate = `{
                     "description": "层级",
                     "type": "integer"
                 },
-                "parentId": {
+                "parent_id": {
                     "description": "父分类ID",
                     "type": "integer"
                 }

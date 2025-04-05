@@ -244,3 +244,34 @@ func (h *ArticleHandler) GetArticleListByEs(ctx *gin.Context) {
 	}
 	v1.HandleSuccess(ctx, articleList)
 }
+
+// GetArticleListByCID godoc
+// @Summary 分类获取公开文章列表
+// @Schemes
+// @Description
+// @Tags 文章模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.GetArticleListByCID true "params"
+// @Success 200 {object} v1.ArticleList
+// @Router /article/getArticleListByCID [post]
+func (h *ArticleHandler) GetArticleListByCID(ctx *gin.Context) {
+	var req v1.GetArticleListByCategoryReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	if req.CategoryID == 0 {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
+	articleList, err := h.articleService.GetArticleListByCategory(ctx, userId, role, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, articleList)
+
+}

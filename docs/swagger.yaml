@@ -66,7 +66,7 @@ definitions:
     type: object
   v1.ArticleList:
     properties:
-      articleDataList:
+      article_data_list:
         items:
           $ref: '#/definitions/v1.ArticleData'
         type: array
@@ -315,6 +315,9 @@ definitions:
       importance:
         description: 文章重要性
         type: string
+      kb_id:
+        description: 知识库ID
+        type: integer
       keywords:
         description: 搜索的关键字数组
         items:
@@ -753,7 +756,7 @@ definitions:
     type: object
   vo.CategoryView:
     properties:
-      categoryName:
+      category_name:
         description: 分类名
         type: string
       children:
@@ -764,13 +767,13 @@ definitions:
       cid:
         description: 分类ID
         type: integer
-      kbId:
+      kb_id:
         description: 知识库ID
         type: integer
       level:
         description: 层级
         type: integer
-      parentId:
+      parent_id:
         description: 父分类ID
         type: integer
     type: object

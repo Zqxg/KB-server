@@ -21,7 +21,7 @@ type ArticleService interface {
 	UpdateArticle(ctx context.Context, req *v1.UpdateArticleRequest) (*v1.ArticleData, error)
 	DeleteArticle(ctx context.Context, id uint) (int, error)
 	DeleteArticleList(ctx context.Context, req *v1.DelArticleListReq) (int, error)
-	GetArticleListByCategory(ctx context.Context, req *v1.GetArticleListByCategoryReq) (*v1.ArticleList, error)
+	GetArticleListByCategory(ctx context.Context, userID string, role int, req *v1.GetArticleListByCategoryReq) (*v1.ArticleList, error)
 	GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq) (*v1.ArticleList, error)
 	GetArticleListByEs(ctx context.Context, userId string, req *v1.GetArticleListByEsReq) (*v1.SearchArticleResp, error)
 }
@@ -355,9 +355,30 @@ func (s *articleService) DeleteArticleList(ctx context.Context, req *v1.DelArtic
 	return deletedCount, nil
 }
 
-func (s *articleService) GetArticleListByCategory(ctx context.Context, req *v1.GetArticleListByCategoryReq) (*v1.ArticleList, error) {
+func (s *articleService) GetArticleListByCategory(ctx context.Context, userID string, role int, req *v1.GetArticleListByCategoryReq) (*v1.ArticleList, error) {
 	// 查询文章列表及分页信息
 	pageIndex, pageSize := service.InitPage(req.PageIndex, req.PageSize)
+	// 判断分类是否存在
+	category, err := s.kbRepository.GetCategoryById(ctx, req.CategoryID)
+	if err != nil {
+		return nil, v1.ErrCategoryNotExist
+	}
+	// 获取知识库类型
+	kbView, err := s.kbRepository.GetKBViewById(ctx, category.KbID)
+	if err != nil {
+		return nil, v1.ErrKnowledgeNotExist
+	}
+	// 超级管理员可以查看所有文章
+	if role != enums.SUPER_ADMIN {
+		if kbView.KBType == enums.KBTypeTeam {
+			// 获取用户角色
+			member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, kbView.TeamID, userID)
+			// 校验用户是否为团队leader或admin
+			if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
+				return nil, v1.ErrPermissionDenied
+			}
+		}
+	}
 	articles, total, err := s.articleRepository.GetArticleListByCategory(ctx, req.CategoryID, pageIndex, pageSize)
 	if err != nil {
 		return nil, v1.ErrQueryFailed
@@ -497,6 +518,9 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, userId string, 
 		if importance, _ := utils.ToInt(req.Importance); importance > 0 {
 			query = query.Filter(elastic.NewTermsQuery("importance", importance))
 		}
+		if req.KBID > 0 {
+			query = query.Filter(elastic.NewTermsQuery("kb_id", req.KBID))
+		}
 	} else { // 普通搜索
 		if len(req.Keywords) > 0 {
 			for _, keyword := range req.Keywords {
@@ -512,15 +536,6 @@ func (s *articleService) GetArticleListByEs(ctx context.Context, userId string, 
 			}
 		}
 	}
-	// 知识库过滤
-	if len(req.KBIDs) > 0 {
-		var kbIDs []interface{}
-		for _, kbID := range req.KBIDs {
-			kbIDs = append(kbIDs, kbID)
-		}
-		query = query.Filter(elastic.NewTermsQuery("kb_id", kbIDs...))
-	}
-
 	// 分类过滤
 	if len(req.Categories) > 0 {
 		var categories []interface{}
