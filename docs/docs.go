@@ -24,6 +24,44 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
+        "/article/getArticleListByCID": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "文章模块"
+                ],
+                "summary": "分类获取公开文章列表",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetArticleListByCategoryReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.ArticleList"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/admin/createPublicCategory": {
             "post": {
                 "security": [
@@ -1020,6 +1058,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/team/applyJoinTeam": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "申请加入团队",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.ApplyJoinTeamReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.ApplyJoinTeamResp"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/team/createTeam": {
             "post": {
                 "security": [
@@ -1171,7 +1247,7 @@ const docTemplate = `{
             }
         },
         "/v1/team/getTeamList": {
-            "get": {
+            "post": {
                 "security": [
                     {
                         "Bearer": []
@@ -1642,6 +1718,28 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.ApplyJoinTeamReq": {
+            "type": "object",
+            "properties": {
+                "reason": {
+                    "description": "申请理由",
+                    "type": "string"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.ApplyJoinTeamResp": {
+            "type": "object",
+            "properties": {
+                "apply_id": {
+                    "description": "申请ID",
+                    "type": "integer"
+                }
+            }
+        },
         "v1.ArticleData": {
             "type": "object",
             "properties": {
@@ -1701,7 +1799,7 @@ const docTemplate = `{
                     "description": "文章标题",
                     "type": "string"
                 },
-                "update_at": {
+                "updated_at": {
                     "description": "文章更新时间",
                     "type": "string"
                 },
@@ -2043,6 +2141,23 @@ const docTemplate = `{
                 "file_url": {
                     "description": "文件URL",
                     "type": "string"
+                }
+            }
+        },
+        "v1.GetArticleListByCategoryReq": {
+            "type": "object",
+            "properties": {
+                "category_id": {
+                    "description": "文章分类ID",
+                    "type": "integer"
+                },
+                "page_index": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "每页大小",
+                    "type": "integer"
                 }
             }
         },

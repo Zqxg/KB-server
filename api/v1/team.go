@@ -85,3 +85,11 @@ type UpdateTeamMemberRoleReq struct {
 type QuitTeamReq struct {
 	TeamID uint `json:"team_id"` // 团队ID
 }
+
+type ApplyJoinTeamReq struct {
+	TeamID uint   `json:"team_id"` // 团队ID
+	Reason string `json:"reason"`  // 申请理由
+}
+type ApplyJoinTeamResp struct {
+	ApplyID uint `json:"apply_id"` // 申请ID
+}

@@ -71,6 +71,10 @@ var (
 	ErrDeleteMemberFailed      = newError(2303, "删除成员失败")
 	ErrUpdateMemberFailed      = newError(2304, "更新成员失败")
 	ErrGetTeamMemberListFailed = newError(2305, "获取团队成员列表失败")
+	ErrTeamNameTooShort        = newError(2306, "添加团队成员失败")
+	// 团队申请
+	ErrApplyExisted = newError(2400, "申请已存在")
+	ErrApplyFailed  = newError(2401, "申请失败")
 
 	// 3000 数据库
 	ErrDatabase = newError(3000, "数据库错误")

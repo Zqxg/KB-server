@@ -11,6 +11,21 @@ definitions:
         description: 团队ID
         type: integer
     type: object
+  v1.ApplyJoinTeamReq:
+    properties:
+      reason:
+        description: 申请理由
+        type: string
+      team_id:
+        description: 团队ID
+        type: integer
+    type: object
+  v1.ApplyJoinTeamResp:
+    properties:
+      apply_id:
+        description: 申请ID
+        type: integer
+    type: object
   v1.ArticleData:
     properties:
       article_id:
@@ -55,7 +70,7 @@ definitions:
       title:
         description: 文章标题
         type: string
-      update_at:
+      updated_at:
         description: 文章更新时间
         type: string
       uploaded_files:
@@ -289,6 +304,18 @@ definitions:
       file_url:
         description: 文件URL
         type: string
+    type: object
+  v1.GetArticleListByCategoryReq:
+    properties:
+      category_id:
+        description: 文章分类ID
+        type: integer
+      page_index:
+        description: 当前页码
+        type: integer
+      page_size:
+        description: 每页大小
+        type: integer
     type: object
   v1.GetArticleListByEsReq:
     properties:
@@ -821,6 +848,29 @@ info:
   title: Nunu Example API
   version: 1.0.0
 paths:
+  /article/getArticleListByCID:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.GetArticleListByCategoryReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ArticleList'
+      security:
+      - Bearer: []
+      summary: 分类获取公开文章列表
+      tags:
+      - 文章模块
   /v1/admin/createPublicCategory:
     post:
       consumes:
@@ -1428,6 +1478,29 @@ paths:
       summary: 添加团队成员
       tags:
       - 团队模块
+  /v1/team/applyJoinTeam:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.ApplyJoinTeamReq'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.ApplyJoinTeamResp'
+      security:
+      - Bearer: []
+      summary: 申请加入团队
+      tags:
+      - 团队模块
   /v1/team/createTeam:
     post:
       consumes:
@@ -1520,7 +1593,7 @@ paths:
       tags:
       - 团队模块
   /v1/team/getTeamList:
-    get:
+    post:
       consumes:
       - application/json
       parameters:

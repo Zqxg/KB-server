@@ -108,12 +108,13 @@ func NewHTTPServer(
 			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)          // 新建团队
 			commonUserRouter.POST(enums.TEAM+"/updateTeam", teamHandler.UpdateTeam)          // 修改团队
 			commonUserRouter.POST(enums.TEAM+"/deleteTeam", teamHandler.DeleteTeam)          // 删除团队
-			commonUserRouter.GET(enums.TEAM+"/getTeamList", teamHandler.GetTeamList)         // 获取团队列表
+			commonUserRouter.POST(enums.TEAM+"/getTeamList", teamHandler.GetTeamList)        // 获取团队列表
 			commonUserRouter.GET(enums.TEAM+"/getTeamInfo", teamHandler.GetTeamInfo)         // 获取团队详细
 			commonUserRouter.GET(enums.TEAM+"/getUserTeamList", teamHandler.GetUserTeamList) // 获取个人团队列表
 
 			commonUserRouter.GET(enums.TEAM+"/getTeamMemberList", teamHandler.GetTeamMemberList)        // 获取团队成员列表
 			commonUserRouter.POST(enums.TEAM+"/addTeamMember", teamHandler.AddTeamMember)               // 添加团队成员
+			commonUserRouter.POST(enums.TEAM+"/applyJoinTeam", teamHandler.ApplyJoinTeam)               //申请加入团队
 			commonUserRouter.POST(enums.TEAM+"/deleteTeamMember", teamHandler.DeleteTeamMember)         // 删除团队成员
 			commonUserRouter.POST(enums.TEAM+"/updateTeamMemberRole", teamHandler.UpdateTeamMemberRole) // 修改团队成员角色
 			commonUserRouter.POST(enums.TEAM+"/quitTeam", teamHandler.QuitTeam)                         // 退出团队

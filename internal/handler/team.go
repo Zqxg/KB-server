@@ -113,7 +113,7 @@ func (h *TeamHandler) DeleteTeam(ctx *gin.Context) {
 // @Security Bearer
 // @Param request body v1.GetTeamListReq true "params"
 // @Success 200 {object} v1.GetTeamListResp
-// @Router /v1/team/getTeamList [get]
+// @Router /v1/team/getTeamList [post]
 func (h *TeamHandler) GetTeamList(ctx *gin.Context) {
 	var req v1.GetTeamListReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
@@ -326,4 +326,32 @@ func (h *TeamHandler) QuitTeam(ctx *gin.Context) {
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
+}
+
+// ApplyJoinTeam godoc
+// @Summary 申请加入团队
+// @Schemes
+// @Description
+// @Tags 团队模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.ApplyJoinTeamReq true "params"
+// @Success 200 {object} v1.ApplyJoinTeamResp
+// @Router /v1/team/applyJoinTeam [post]
+func (h *TeamHandler) ApplyJoinTeam(ctx *gin.Context) {
+	var req v1.ApplyJoinTeamReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		return
+	}
+	userId := GetUserIdFromCtx(ctx)
+	applyId, err := h.teamService.ApplyJoinTeam(ctx, userId, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, v1.ApplyJoinTeamResp{
+		ApplyID: applyId,
+	})
 }

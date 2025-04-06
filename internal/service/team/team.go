@@ -24,6 +24,7 @@ type TeamService interface {
 	DeleteTeamMember(ctx *gin.Context, userID string, req *v1.DeleteTeamMemberReq) error
 	UpdateTeamMemberRole(ctx *gin.Context, userID string, req *v1.UpdateTeamMemberRoleReq) error
 	QuitTeam(ctx *gin.Context, userID string, teamId uint) error
+	ApplyJoinTeam(ctx *gin.Context, userID string, req *v1.ApplyJoinTeamReq) (uint, error)
 }
 
 func NewTeamService(
@@ -51,6 +52,10 @@ type teamService struct {
 }
 
 func (s *teamService) CreateTeam(ctx *gin.Context, userId string, req *v1.CreateTeamRequest) (uint, error) {
+	// 判断团队名称长度
+	if len(req.TeamName) < 2 {
+		return 0, v1.ErrTeamNameTooShort
+	}
 	// 构建 Team 结构体
 	team := &model.Team{
 		TeamName:    req.TeamName,
@@ -387,4 +392,29 @@ func (s *teamService) QuitTeam(ctx *gin.Context, userID string, teamId uint) err
 		return v1.ErrDeleteMemberFailed
 	}
 	return nil
+}
+
+func (s *teamService) ApplyJoinTeam(ctx *gin.Context, userID string, req *v1.ApplyJoinTeamReq) (uint, error) {
+	// 判断用户是否在团队中
+	_, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, req.TeamID, userID)
+	if err == nil {
+		return 0, v1.ErrMemberExist
+	}
+	// 判断用户是否已经提交过申请
+	_, err = s.teamRepository.GetApplyByTeamIDAndUserID(ctx, req.TeamID, userID)
+	if err == nil {
+		return 0, v1.ErrApplyExisted
+	}
+	// 构建申请表
+	apply := &model.TeamApplications{
+		TeamID:      req.TeamID,
+		ApplicantID: userID,
+		Status:      enums.WAITING,
+		Reason:      &req.Reason,
+	}
+	applyId, err := s.teamRepository.CreateTeamApply(ctx, apply)
+	if err != nil {
+		return 0, v1.ErrApplyFailed
+	}
+	return applyId, nil
 }

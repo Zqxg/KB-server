@@ -23,6 +23,9 @@ type TeamRepository interface {
 	GetTeamMemberListByUserID(ctx context.Context, userID string, pageIndex, pageSize int) ([]*model.Member, int64, error)
 	GetMemberByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.Member, error)
 	GetTeamIdsByUserID(ctx context.Context, userID string) ([]string, error)
+
+	GetApplyByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.TeamApplications, error)
+	CreateTeamApply(ctx context.Context, teamApply *model.TeamApplications) (uint, error)
 }
 
 func NewTeamRepository(
@@ -201,4 +204,20 @@ func (r *teamRepository) GetTeamIdsByUserID(ctx context.Context, userID string) 
 		return nil, err
 	}
 	return teamIDs, nil
+}
+
+func (r *teamRepository) GetApplyByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.TeamApplications, error) {
+	var teamApply model.TeamApplications
+	if err := r.DB(ctx).Table("sys_team_applications").Where("team_id =? and applicant_id =?", teamID, userID).First(&teamApply).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetApplyByTeamIDAndUserID error", zap.Error(err))
+		return nil, err
+	}
+	return &teamApply, nil
+}
+func (r *teamRepository) CreateTeamApply(ctx context.Context, teamApply *model.TeamApplications) (uint, error) {
+	if err := r.DB(ctx).Table("sys_team_applications").Create(&teamApply).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.CreateTeamApply error", zap.Error(err))
+		return 0, err
+	}
+	return teamApply.ApplicationID, nil
 }

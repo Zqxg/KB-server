@@ -253,7 +253,7 @@ func (h *ArticleHandler) GetArticleListByEs(ctx *gin.Context) {
 // @Accept json
 // @Produce json
 // @Security Bearer
-// @Param request body v1.GetArticleListByCID true "params"
+// @Param request body v1.GetArticleListByCategoryReq true "params"
 // @Success 200 {object} v1.ArticleList
 // @Router /article/getArticleListByCID [post]
 func (h *ArticleHandler) GetArticleListByCID(ctx *gin.Context) {
