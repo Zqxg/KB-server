@@ -371,10 +371,9 @@ func (s *articleService) GetArticleListByCategory(ctx context.Context, userID st
 	// 超级管理员可以查看所有文章
 	if role != enums.SUPER_ADMIN {
 		if kbView.KBType == enums.KBTypeTeam {
-			// 获取用户角色
-			member, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, kbView.TeamID, userID)
-			// 校验用户是否为团队leader或admin
-			if err != nil || member.Role != enums.LEADER && member.Role != enums.ADMIN {
+			// 校验用户是否在团队中
+			_, err := s.teamRepository.GetMemberByTeamIDAndUserID(ctx, kbView.TeamID, userID)
+			if err != nil {
 				return nil, v1.ErrPermissionDenied
 			}
 		}
