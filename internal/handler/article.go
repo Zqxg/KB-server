@@ -41,7 +41,8 @@ func (h *ArticleHandler) CreateArticle(ctx *gin.Context) {
 		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
-	articleId, err := h.articleService.CreateArticle(ctx, &req)
+	role := GetRoleTypeFromCtx(ctx)
+	articleId, err := h.articleService.CreateArticle(ctx, role, &req)
 	if articleId == -1 || err != nil {
 		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
