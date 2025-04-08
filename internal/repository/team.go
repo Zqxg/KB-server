@@ -26,6 +26,11 @@ type TeamRepository interface {
 
 	GetApplyByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.TeamApplications, error)
 	CreateTeamApply(ctx context.Context, teamApply *model.TeamApplications) (uint, error)
+	GetApplyByUserID(ctx context.Context, userID string, pageIndex, pageSize int) ([]*model.TeamApplications, int64, error)
+	GetApplyByTeamIDAndStatus(ctx context.Context, teamID uint, status int, pageIndex, pageSize int) ([]*model.TeamApplications, int64, error)
+	GetApplyByID(ctx context.Context, applyID uint) (*model.TeamApplications, error)
+	UpdateTeamApply(ctx context.Context, teamApply *model.TeamApplications) error
+	DeleteTeamApply(ctx context.Context, applyID uint) error
 }
 
 func NewTeamRepository(
@@ -213,6 +218,7 @@ func (r *teamRepository) GetApplyByTeamIDAndUserID(ctx context.Context, teamID u
 		return nil, err
 	}
 	return &teamApply, nil
+
 }
 func (r *teamRepository) CreateTeamApply(ctx context.Context, teamApply *model.TeamApplications) (uint, error) {
 	if err := r.DB(ctx).Table("sys_team_applications").Create(&teamApply).Error; err != nil {
@@ -220,4 +226,59 @@ func (r *teamRepository) CreateTeamApply(ctx context.Context, teamApply *model.T
 		return 0, err
 	}
 	return teamApply.ApplicationID, nil
+}
+func (r *teamRepository) GetApplyByUserID(ctx context.Context, userID string, pageIndex, pageSize int) ([]*model.TeamApplications, int64, error) {
+	var teamApplys []*model.TeamApplications
+	var totalCount int64
+	// 构建查询
+	db := r.DB(ctx).Table("sys_team_applications").Where("applicant_id =?", userID)
+	// 分页及数据查询
+	if err := db.Count(&totalCount).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetApplyByUserID count error", zap.Error(err))
+		return nil, 0, err
+	}
+	if err := db.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&teamApplys).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetApplyByUserID query error", zap.Error(err))
+		return nil, 0, err
+	}
+	return teamApplys, totalCount, nil
+}
+func (r *teamRepository) GetApplyByTeamIDAndStatus(ctx context.Context, teamID uint, status int, pageIndex, pageSize int) ([]*model.TeamApplications, int64, error) {
+	var teamApplys []*model.TeamApplications
+	var totalCount int64
+	// 构建查询
+	db := r.DB(ctx).Table("sys_team_applications").Where("status =? and  team_id =?", status, teamID)
+	// 分页及数据查询
+	if err := db.Count(&totalCount).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetApplyByUserIDAndStatus count error", zap.Error(err))
+		return nil, 0, err
+	}
+	if err := db.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&teamApplys).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetApplyByUserIDAndStatus query error", zap.Error(err))
+		return nil, 0, err
+	}
+	return teamApplys, totalCount, nil
+}
+
+func (r *teamRepository) GetApplyByID(ctx context.Context, applyID uint) (*model.TeamApplications, error) {
+	var teamApply model.TeamApplications
+	if err := r.DB(ctx).Table("sys_team_applications").Where("application_id =?", applyID).First(&teamApply).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.GetApplyByID error", zap.Error(err))
+		return nil, err
+	}
+	return &teamApply, nil
+}
+func (r *teamRepository) UpdateTeamApply(ctx context.Context, teamApply *model.TeamApplications) error {
+	if err := r.DB(ctx).Table("sys_team_applications").Where("application_id =?", teamApply.ApplicationID).Updates(&teamApply).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.UpdateTeamApply error", zap.Error(err))
+		return err
+	}
+	return nil
+}
+func (r *teamRepository) DeleteTeamApply(ctx context.Context, applyID uint) error {
+	if err := r.DB(ctx).Table("sys_team_applications").Where("application_id =?", applyID).Delete(&model.TeamApplications{}).Error; err != nil {
+		r.logger.WithContext(ctx).Error("TeamRepository.DeleteTeamApply error", zap.Error(err))
+		return err
+	}
+	return nil
 }

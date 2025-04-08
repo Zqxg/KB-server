@@ -64,6 +64,7 @@ var (
 	ErrUpdateTeamFailed  = newError(2209, "更新团队失败")
 	ErrGetTeamInfoFailed = newError(2210, "获取团队信息失败")
 	ErrGetTeamListFailed = newError(2211, "获取团队列表失败")
+	ErrTeamNameTooShort  = newError(2212, "团队名称过短")
 	// 2300 成员
 	ErrNoTeamAdminPermission   = newError(2304, "无团队管理员权限")
 	ErrMemberNotExist          = newError(2300, "成员不存在")
@@ -71,10 +72,17 @@ var (
 	ErrDeleteMemberFailed      = newError(2303, "删除成员失败")
 	ErrUpdateMemberFailed      = newError(2304, "更新成员失败")
 	ErrGetTeamMemberListFailed = newError(2305, "获取团队成员列表失败")
-	ErrTeamNameTooShort        = newError(2306, "添加团队成员失败")
+	ErrAddTeamMemberFailed     = newError(2306, "添加团队成员失败")
+
 	// 团队申请
-	ErrApplyExisted = newError(2400, "申请已存在")
-	ErrApplyFailed  = newError(2401, "申请失败")
+	ErrApplyExisted         = newError(2400, "申请已存在")
+	ErrApplyNotExist        = newError(2401, "申请不存在")
+	ErrApplyFailed          = newError(2402, "申请失败")
+	ErrGetApplyListFailed   = newError(2403, "获取申请列表失败")
+	ErrApplyStatusInvalid   = newError(2404, "申请状态无效")
+	ErrHandleApplyFailed    = newError(2405, "处理申请失败")
+	ErrInvalidHandleStatus  = newError(2406, "无效的处理状态")
+	ErrNoWithdrawPermission = newError(2407, "无撤回权限")
 
 	// 3000 数据库
 	ErrDatabase = newError(3000, "数据库错误")

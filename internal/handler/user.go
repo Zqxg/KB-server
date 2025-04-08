@@ -35,7 +35,7 @@ func (h *UserHandler) GetCaptcha(ctx *gin.Context) {
 	captchaData, err := h.captchaService.GenerateCaptcha()
 	if err != nil {
 		h.logger.WithContext(ctx).Error("userService.GetCaptcha error", zap.Error(err))
-		v1.HandleError(ctx, http.StatusInternalServerError, v1.ErrInternalServerError, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrInternalServerError, nil)
 		return
 	}
 	// todo：不返回验证码答案 CaptchaResponseData
@@ -55,13 +55,13 @@ func (h *UserHandler) GetCaptcha(ctx *gin.Context) {
 func (h *UserHandler) Register(ctx *gin.Context) {
 	req := new(v1.RegisterRequest)
 	if err := ctx.ShouldBindJSON(req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 
 	if err := h.userService.Register(ctx, req); err != nil {
 		h.logger.WithContext(ctx).Error("userService.Register error", zap.Error(err))
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 
@@ -81,13 +81,13 @@ func (h *UserHandler) Register(ctx *gin.Context) {
 func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
 	var req v1.PasswordLoginRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 
 	token, err := h.userService.PasswordLogin(ctx, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusUnauthorized, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, v1.LoginResponseData{
@@ -108,13 +108,13 @@ func (h *UserHandler) PasswordLogin(ctx *gin.Context) {
 func (h *UserHandler) GetUserInfo(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 	if userId == "" {
-		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrUnauthorized, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrUnauthorized, nil)
 		return
 	}
 
 	userData, err := h.userService.GetUserInfo(ctx, userId)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 
@@ -145,12 +145,12 @@ func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 
 	var req v1.UpdateProfileRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 
 	if err := h.userService.UpdateProfile(ctx, userId, &req); err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, v1.ErrInternalServerError, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrInternalServerError, nil)
 		return
 	}
 
@@ -170,7 +170,7 @@ func (h *UserHandler) UpdateProfile(ctx *gin.Context) {
 func (h *UserHandler) Logout(ctx *gin.Context) {
 	userId, roleTpye := GetUserIdAndRoleTypeFromCtx(ctx)
 	if err := h.userService.Logout(ctx, userId, roleTpye); err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -190,12 +190,12 @@ func (h *UserHandler) Cancel(ctx *gin.Context) {
 	userId, roleTpye := GetUserIdAndRoleTypeFromCtx(ctx)
 	// 退出
 	if err := h.userService.Logout(ctx, userId, roleTpye); err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	// 注销
 	if err := h.userService.Cancel(ctx, userId); err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -216,11 +216,11 @@ func (h *UserHandler) UserAuth(ctx *gin.Context) {
 	userId, roleTpye := GetUserIdAndRoleTypeFromCtx(ctx)
 	var req v1.UserAuthRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	if err := h.userService.UserAuth(ctx, &req, userId, roleTpye); err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)

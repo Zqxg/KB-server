@@ -13,7 +13,7 @@ type CreateArticleRequest struct {
 	KBID            uint         `json:"kb_id"`                        // 知识库ID
 	CategoryID      uint         `json:"category_id"`                  // 文章分类ID
 	Importance      int          `json:"importance"`                   // 文章重要性
-	Status          int          `json:"status" binding:"required"`    // 文章状态
+	Status          int          `json:"status" binding:"required"`    // 文章状态 0: 草稿 1: 发布
 	CommentDisabled bool         `json:"comment_disabled"`             // 是否禁用评论
 	SourceURI       string       `json:"source_uri"`                   // 文章外链
 	UploadedFiles   []FileUpload `json:"uploaded_files"`               // 上传的文件列表

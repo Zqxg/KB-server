@@ -93,3 +93,34 @@ type ApplyJoinTeamReq struct {
 type ApplyJoinTeamResp struct {
 	ApplyID uint `json:"apply_id"` // 申请ID
 }
+
+type GetTeamApplyListReq struct {
+	TeamID     uint `json:"team_id"`     // 团队ID
+	Status     int  `json:"status"`      // 申请状态
+	IsPersonal bool `json:"is_personal"` // 是否是个人申请
+	PageRequest
+}
+type TeamApplyData struct {
+	ApplyID       uint      `json:"apply_id"`       // 申请ID
+	TeamID        uint      `json:"team_id"`        // 团队ID
+	TeamName      string    `json:"team_name"`      // 团队名
+	ApplicantID   string    `json:"applicant_id"`   // 申请人ID
+	ApplicantName string    `json:"applicant_name"` // 用户昵称
+	ReviewerID    string    `json:"reviewer_id"`    // 审核人ID
+	ReviewerName  string    `json:"reviewer_name"`  // 审核人昵称
+	Reason        string    `json:"reason"`         // 申请理由
+	Status        int       `json:"status"`         // 申请状态
+	CreateTime    time.Time `json:"create_time"`    // 创建时间
+	UpdateTime    time.Time `json:"update_time"`    // 更新时间
+}
+
+type GetTeamApplyListResp struct {
+	ApplyList []*TeamApplyData `json:"apply_list"`
+	PageResponse
+}
+
+type HandleTeamApplyReq struct {
+	ApplyID uint `json:"apply_id"` // 申请ID
+	TeamID  uint `json:"team_id"`  // 团队ID
+	Status  int  `json:"status"`   // 申请状态
+}

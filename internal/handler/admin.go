@@ -41,16 +41,16 @@ func NewAdminHandler(
 func (h *AdminHandler) CreatePublicKB(ctx *gin.Context) {
 	var req v1.CreateKBRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
 	if role != enums.SUPER_ADMIN {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrPermissionDenied, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrPermissionDenied, nil)
 	}
 	kbId, err := h.kbService.CreatePublicKB(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, v1.CreateKBResp{
@@ -72,16 +72,16 @@ func (h *AdminHandler) CreatePublicKB(ctx *gin.Context) {
 func (h *AdminHandler) UpdatePublicKB(ctx *gin.Context) {
 	var req v1.UpdateKBNameReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	role := GetRoleTypeFromCtx(ctx)
 	if role != enums.SUPER_ADMIN {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrPermissionDenied, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrPermissionDenied, nil)
 	}
 	err := h.kbService.UpdatePublicKB(ctx, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -101,16 +101,16 @@ func (h *AdminHandler) UpdatePublicKB(ctx *gin.Context) {
 func (h *AdminHandler) DeletePublicKB(ctx *gin.Context) {
 	var req v1.DeleteKBReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	role := GetRoleTypeFromCtx(ctx)
 	if role != enums.SUPER_ADMIN {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrPermissionDenied, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrPermissionDenied, nil)
 	}
 	err := h.kbService.DeletePublicKB(ctx, req.KBID)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -130,16 +130,16 @@ func (h *AdminHandler) DeletePublicKB(ctx *gin.Context) {
 func (h *AdminHandler) CreatePublicCategory(ctx *gin.Context) {
 	var req v1.CreateCategoryReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	role := GetRoleTypeFromCtx(ctx)
 	if role != enums.SUPER_ADMIN {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrPermissionDenied, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrPermissionDenied, nil)
 	}
 	err := h.kbService.CreatePublicCategory(ctx, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -159,16 +159,16 @@ func (h *AdminHandler) CreatePublicCategory(ctx *gin.Context) {
 func (h *AdminHandler) UpdatePublicCategory(ctx *gin.Context) {
 	var req v1.UpdateCategoryReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	role := GetRoleTypeFromCtx(ctx)
 	if role != enums.SUPER_ADMIN {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrPermissionDenied, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrPermissionDenied, nil)
 	}
 	err := h.kbService.UpdatePublicCategory(ctx, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 	}
 	v1.HandleSuccess(ctx, nil)
 }
@@ -187,16 +187,16 @@ func (h *AdminHandler) UpdatePublicCategory(ctx *gin.Context) {
 func (h *AdminHandler) DeletePublicCategory(ctx *gin.Context) {
 	var req v1.DeleteCategoryReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	role := GetRoleTypeFromCtx(ctx)
 	if role != enums.SUPER_ADMIN {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrPermissionDenied, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrPermissionDenied, nil)
 	}
 	err := h.kbService.DeletePublicCategory(ctx, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)

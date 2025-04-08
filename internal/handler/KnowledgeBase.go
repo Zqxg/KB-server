@@ -37,13 +37,13 @@ func NewKnowledgeBaseHandler(
 func (h *KnowledgeBaseHandler) CreateKB(ctx *gin.Context) {
 	var req v1.CreateKBRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	kbId, err := h.knowledgeBaseService.CreateKnowledgeBase(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, v1.CreateKBResp{
@@ -66,13 +66,13 @@ func (h *KnowledgeBaseHandler) CreateKB(ctx *gin.Context) {
 func (h *KnowledgeBaseHandler) UpdateKBName(ctx *gin.Context) {
 	var req v1.UpdateKBNameReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
 	err := h.knowledgeBaseService.UpdateKBName(ctx, userId, role, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -92,13 +92,13 @@ func (h *KnowledgeBaseHandler) UpdateKBName(ctx *gin.Context) {
 func (h *KnowledgeBaseHandler) DeleteKB(ctx *gin.Context) {
 	var req v1.DeleteKBReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
 	err := h.knowledgeBaseService.DeleteKB(ctx, userId, role, req.KBID)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -118,17 +118,17 @@ func (h *KnowledgeBaseHandler) DeleteKB(ctx *gin.Context) {
 func (h *KnowledgeBaseHandler) GetKBInfo(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	if !utils.IsNumeric(ctx.Query("kb_id")) {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	kbId, _ := utils.ToUint(ctx.Query("kb_id")) // 获取 kb_id 参数
 	if kbId < 0 {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	kbInfo, err := h.knowledgeBaseService.GetKBInfo(ctx, kbId)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, kbInfo)
@@ -148,12 +148,12 @@ func (h *KnowledgeBaseHandler) GetKBInfo(ctx *gin.Context) {
 func (h *KnowledgeBaseHandler) GetKBListByTeamId(ctx *gin.Context) {
 	var req v1.GetKBListByTeamIdReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	kbList, err := h.knowledgeBaseService.GetKBListByTeamId(ctx, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, kbList)
@@ -173,13 +173,13 @@ func (h *KnowledgeBaseHandler) GetKBListByTeamId(ctx *gin.Context) {
 func (h *KnowledgeBaseHandler) CreateCategory(ctx *gin.Context) {
 	var req v1.CreateCategoryReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	err := h.knowledgeBaseService.CreateCategory(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -199,13 +199,13 @@ func (h *KnowledgeBaseHandler) CreateCategory(ctx *gin.Context) {
 func (h *KnowledgeBaseHandler) UpdateCategory(ctx *gin.Context) {
 	var req v1.UpdateCategoryReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	err := h.knowledgeBaseService.UpdateCategory(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -225,13 +225,13 @@ func (h *KnowledgeBaseHandler) UpdateCategory(ctx *gin.Context) {
 func (h *KnowledgeBaseHandler) DeleteCategory(ctx *gin.Context) {
 	var req v1.DeleteCategoryReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	err := h.knowledgeBaseService.DeleteCategory(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -251,12 +251,12 @@ func (h *KnowledgeBaseHandler) DeleteCategory(ctx *gin.Context) {
 func (h *KnowledgeBaseHandler) GetCategoryListByKB(ctx *gin.Context) {
 	kbId, _ := utils.ToUint(ctx.Query("kb_id")) // 获取 kb_id 参数
 	if kbId < 0 {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	categoryList, err := h.knowledgeBaseService.GetCategoryListByKB(ctx, kbId)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, categoryList)
@@ -276,13 +276,13 @@ func (h *KnowledgeBaseHandler) GetCategoryListByKB(ctx *gin.Context) {
 func (h *KnowledgeBaseHandler) GetKBListByType(ctx *gin.Context) {
 	var req v1.GetKBListByTypeReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	kbList, err := h.knowledgeBaseService.GetKBListByType(ctx, userId, req.KBType)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, &v1.KBList{

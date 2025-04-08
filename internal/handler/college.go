@@ -36,17 +36,17 @@ func NewCollegeHandler(
 func (h *CollegeHandler) GetCollege(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 	if userId == "" {
-		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrUnauthorized, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrUnauthorized, nil)
 		return
 	}
 	var req v1.GetCollegeRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	college, err := h.collegeService.GetCollege(ctx, req.CollegeId)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusUnauthorized, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	// 返回单个学院信息
@@ -70,12 +70,12 @@ func (h *CollegeHandler) GetCollege(ctx *gin.Context) {
 func (h *CollegeHandler) GetCollegeList(ctx *gin.Context) {
 	userId := GetUserIdFromCtx(ctx)
 	if userId == "" {
-		v1.HandleError(ctx, http.StatusUnauthorized, v1.ErrUnauthorized, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrUnauthorized, nil)
 		return
 	}
 	collegeList, err := h.collegeService.GetCollegeList(ctx)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusUnauthorized, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	// 格式化多个学院的信息

@@ -38,12 +38,12 @@ func (h *TeamHandler) CreateTeam(ctx *gin.Context) {
 	var req v1.CreateTeamRequest
 	userId := GetUserIdFromCtx(ctx)
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	teamId, err := h.teamService.CreateTeam(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, v1.CreateTeamResp{
@@ -65,13 +65,13 @@ func (h *TeamHandler) CreateTeam(ctx *gin.Context) {
 func (h *TeamHandler) UpdateTeam(ctx *gin.Context) {
 	var req v1.UpdateTeamRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	err := h.teamService.UpdateTeam(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -91,13 +91,13 @@ func (h *TeamHandler) UpdateTeam(ctx *gin.Context) {
 func (h *TeamHandler) DeleteTeam(ctx *gin.Context) {
 	var req v1.DeleteTeamRequest
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	err := h.teamService.DeleteTeam(ctx, userId, req.TeamID)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -117,12 +117,12 @@ func (h *TeamHandler) DeleteTeam(ctx *gin.Context) {
 func (h *TeamHandler) GetTeamList(ctx *gin.Context) {
 	var req v1.GetTeamListReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	teamListResp, err := h.teamService.GetTeamList(ctx, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, teamListResp)
@@ -142,17 +142,17 @@ func (h *TeamHandler) GetTeamList(ctx *gin.Context) {
 func (h *TeamHandler) GetTeamInfo(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	if !utils.IsNumeric(ctx.Query("id")) {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	teamID, _ := utils.ToInt(ctx.Query("id")) // 获取 teamID 参数
 	if teamID < 0 {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	teamInfoResp, err := h.teamService.GetTeamInfo(ctx, teamID)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, teamInfoResp)
@@ -173,19 +173,19 @@ func (h *TeamHandler) GetTeamInfo(ctx *gin.Context) {
 func (h *TeamHandler) GetUserTeamList(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	if !utils.IsNumeric(ctx.Query("page_index")) || !utils.IsNumeric(ctx.Query("page_size")) {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	pageIndex, _ := utils.ToInt(ctx.Query("page_index")) // 获取参数
 	pageSize, _ := utils.ToInt(ctx.Query("page_size"))   // 获取参数
 	if pageIndex < 0 || pageSize < 0 {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	teamListResp, err := h.teamService.GetUserTeamList(ctx, userId, pageIndex, pageSize)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, teamListResp)
@@ -205,17 +205,17 @@ func (h *TeamHandler) GetUserTeamList(ctx *gin.Context) {
 func (h *TeamHandler) GetTeamMemberList(ctx *gin.Context) {
 	// 从查询参数中获取参数
 	if !utils.IsNumeric(ctx.Query("id")) {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	teamID, _ := utils.ToInt(ctx.Query("id")) // 获取 teamID 参数
 	if teamID < 0 {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	teamMemberList, err := h.teamService.GetTeamMemberList(ctx, teamID)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, v1.GetTeamMemberListResp{
@@ -238,13 +238,13 @@ func (h *TeamHandler) GetTeamMemberList(ctx *gin.Context) {
 func (h *TeamHandler) AddTeamMember(ctx *gin.Context) {
 	var req v1.AddTeamMemberReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	err := h.teamService.AddTeamMember(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -264,13 +264,13 @@ func (h *TeamHandler) AddTeamMember(ctx *gin.Context) {
 func (h *TeamHandler) DeleteTeamMember(ctx *gin.Context) {
 	var req v1.DeleteTeamMemberReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	err := h.teamService.DeleteTeamMember(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -290,13 +290,13 @@ func (h *TeamHandler) DeleteTeamMember(ctx *gin.Context) {
 func (h *TeamHandler) UpdateTeamMemberRole(ctx *gin.Context) {
 	var req v1.UpdateTeamMemberRoleReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	err := h.teamService.UpdateTeamMemberRole(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -316,13 +316,13 @@ func (h *TeamHandler) UpdateTeamMemberRole(ctx *gin.Context) {
 func (h *TeamHandler) QuitTeam(ctx *gin.Context) {
 	var req v1.QuitTeamReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	err := h.teamService.QuitTeam(ctx, userId, req.TeamID)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, nil)
@@ -342,16 +342,67 @@ func (h *TeamHandler) QuitTeam(ctx *gin.Context) {
 func (h *TeamHandler) ApplyJoinTeam(ctx *gin.Context) {
 	var req v1.ApplyJoinTeamReq
 	if err := ctx.ShouldBindJSON(&req); err != nil {
-		v1.HandleError(ctx, http.StatusBadRequest, v1.ErrBadRequest, nil)
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
 		return
 	}
 	userId := GetUserIdFromCtx(ctx)
 	applyId, err := h.teamService.ApplyJoinTeam(ctx, userId, &req)
 	if err != nil {
-		v1.HandleError(ctx, http.StatusInternalServerError, err, nil)
+		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
 	v1.HandleSuccess(ctx, v1.ApplyJoinTeamResp{
 		ApplyID: applyId,
 	})
+}
+
+// GetTeamApplyList godoc
+// @Summary 获取团队申请列表（个人/管理）
+// @Schemes
+// @Description
+// @Tags 团队模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.GetTeamApplyListReq true "params"
+// @Success 200 {object} v1.GetTeamApplyListResp
+// @Router /v1/team/getTeamApplyList [post]
+func (h *TeamHandler) GetTeamApplyList(ctx *gin.Context) {
+	var req v1.GetTeamApplyListReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
+	}
+	userId := GetUserIdFromCtx(ctx)
+	teamApplyList, err := h.teamService.GetTeamApplyList(ctx, userId, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusOK, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, teamApplyList)
+}
+
+// HandleTeamApply godoc
+// @Summary 处理团队申请
+// @Schemes
+// @Description
+// @Tags 团队模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.HandleTeamApplyReq true "params"
+// @Success 200 {object} v1.Response
+// @Router /v1/team/handleTeamApply [post]
+func (h *TeamHandler) HandleTeamApply(ctx *gin.Context) {
+	var req v1.HandleTeamApplyReq
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
+		return
+	}
+	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
+	err := h.teamService.HandleTeamApply(ctx, userId, role, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusOK, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, nil)
 }

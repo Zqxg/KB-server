@@ -1210,6 +1210,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/team/getTeamApplyList": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "获取团队申请列表（个人/管理）",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetTeamApplyListReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetTeamApplyListResp"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/team/getTeamInfo": {
             "get": {
                 "security": [
@@ -1358,6 +1396,44 @@ const docTemplate = `{
                         "description": "OK",
                         "schema": {
                             "$ref": "#/definitions/v1.GetUserTeamListResp"
+                        }
+                    }
+                }
+            }
+        },
+        "/v1/team/handleTeamApply": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "处理团队申请",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.HandleTeamApplyReq"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.Response"
                         }
                     }
                 }
@@ -1969,7 +2045,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "description": "文章状态",
+                    "description": "文章状态 0: 草稿 1: 发布",
                     "type": "integer"
                 },
                 "title": {
@@ -2332,6 +2408,54 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.GetTeamApplyListReq": {
+            "type": "object",
+            "properties": {
+                "is_personal": {
+                    "description": "是否是个人申请",
+                    "type": "boolean"
+                },
+                "page_index": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "申请状态",
+                    "type": "integer"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.GetTeamApplyListResp": {
+            "type": "object",
+            "properties": {
+                "apply_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.TeamApplyData"
+                    }
+                },
+                "page_index": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "total_count": {
+                    "description": "总记录数",
+                    "type": "integer"
+                }
+            }
+        },
         "v1.GetTeamInfoResp": {
             "type": "object",
             "properties": {
@@ -2490,6 +2614,23 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.HandleTeamApplyReq": {
+            "type": "object",
+            "properties": {
+                "apply_id": {
+                    "description": "申请ID",
+                    "type": "integer"
+                },
+                "status": {
+                    "description": "申请状态",
+                    "type": "integer"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                }
+            }
+        },
         "v1.KBList": {
             "type": "object",
             "properties": {
@@ -2641,6 +2782,55 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.TeamApplyData": {
+            "type": "object",
+            "properties": {
+                "applicant_id": {
+                    "description": "申请人ID",
+                    "type": "string"
+                },
+                "applicant_name": {
+                    "description": "用户昵称",
+                    "type": "string"
+                },
+                "apply_id": {
+                    "description": "申请ID",
+                    "type": "integer"
+                },
+                "create_time": {
+                    "description": "创建时间",
+                    "type": "string"
+                },
+                "reason": {
+                    "description": "申请理由",
+                    "type": "string"
+                },
+                "reviewer_id": {
+                    "description": "审核人ID",
+                    "type": "string"
+                },
+                "reviewer_name": {
+                    "description": "审核人昵称",
+                    "type": "string"
+                },
+                "status": {
+                    "description": "申请状态",
+                    "type": "integer"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                },
+                "team_name": {
+                    "description": "团队名",
+                    "type": "string"
+                },
+                "update_time": {
+                    "description": "更新时间",
+                    "type": "string"
+                }
+            }
+        },
         "v1.TeamData": {
             "type": "object",
             "properties": {
@@ -2716,7 +2906,7 @@ const docTemplate = `{
                     "type": "string"
                 },
                 "status": {
-                    "description": "文章状态",
+                    "description": "文章状态 0: 草稿 1: 发布",
                     "type": "integer"
                 },
                 "title": {

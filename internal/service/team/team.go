@@ -25,6 +25,8 @@ type TeamService interface {
 	UpdateTeamMemberRole(ctx *gin.Context, userID string, req *v1.UpdateTeamMemberRoleReq) error
 	QuitTeam(ctx *gin.Context, userID string, teamId uint) error
 	ApplyJoinTeam(ctx *gin.Context, userID string, req *v1.ApplyJoinTeamReq) (uint, error)
+	GetTeamApplyList(ctx *gin.Context, userID string, req *v1.GetTeamApplyListReq) (*v1.GetTeamApplyListResp, error)
+	HandleTeamApply(ctx *gin.Context, userID string, role int, req *v1.HandleTeamApplyReq) error
 }
 
 func NewTeamService(
@@ -417,4 +419,175 @@ func (s *teamService) ApplyJoinTeam(ctx *gin.Context, userID string, req *v1.App
 		return 0, v1.ErrApplyFailed
 	}
 	return applyId, nil
+}
+
+func (s *teamService) GetTeamApplyList(ctx *gin.Context, userID string, req *v1.GetTeamApplyListReq) (*v1.GetTeamApplyListResp, error) {
+	pageIndex, pageSize := service.InitPage(req.PageIndex, req.PageSize)
+
+	var (
+		applyList []*model.TeamApplications
+		total     int64
+		err       error
+	)
+
+	if req.IsPersonal {
+		applyList, total, err = s.teamRepository.GetApplyByUserID(ctx, userID, pageIndex, pageSize)
+		if err != nil {
+			return nil, v1.ErrGetApplyListFailed
+		}
+	} else {
+		if !s.isTeamLeaderOrAdmin(ctx, req.TeamID, userID) {
+			return nil, v1.ErrNoTeamAdminPermission
+		}
+		applyList, total, err = s.teamRepository.GetApplyByTeamIDAndStatus(ctx, req.TeamID, req.Status, pageIndex, pageSize)
+		if err != nil {
+			return nil, v1.ErrGetApplyListFailed
+		}
+	}
+
+	applyDataList, err := s.buildTeamApplyDataList(ctx, applyList)
+	if err != nil {
+		return nil, err
+	}
+
+	return &v1.GetTeamApplyListResp{
+		ApplyList: applyDataList,
+		PageResponse: v1.PageResponse{
+			TotalCount: total,
+			PageIndex:  pageIndex,
+			PageSize:   pageSize,
+		},
+	}, nil
+}
+
+// 抽出的公用构建方法
+func (s *teamService) buildTeamApplyDataList(ctx *gin.Context, applyList []*model.TeamApplications) ([]*v1.TeamApplyData, error) {
+	var applyDataList []*v1.TeamApplyData
+	teamCache := make(map[string]*model.Team)
+
+	for _, apply := range applyList {
+		// 获取团队信息，缓存避免重复查
+		team, ok := teamCache[strconv.Itoa(int(apply.TeamID))]
+		if !ok {
+			var err error
+			team, err = s.teamRepository.GetTeamByID(ctx, apply.TeamID)
+			if err != nil {
+				return nil, v1.ErrGetTeamInfoFailed
+			}
+			teamCache[strconv.Itoa(int(apply.TeamID))] = team
+		}
+
+		// 获取申请人
+		applicantUser, _ := s.userRepository.GetByUserId(ctx, apply.ApplicantID)
+
+		// 获取审核人（可选）
+		var reviewerID, reviewerName string
+		if apply.ReviewerID != nil && *apply.ReviewerID != "" {
+			reviewerUser, err := s.userRepository.GetByUserId(ctx, *apply.ReviewerID)
+			if err == nil {
+				reviewerID = *apply.ReviewerID
+				reviewerName = reviewerUser.Nickname
+			}
+		}
+
+		// 构建响应结构
+		applyData := &v1.TeamApplyData{
+			ApplyID:       apply.ApplicationID,
+			TeamID:        apply.TeamID,
+			TeamName:      team.TeamName,
+			ApplicantID:   apply.ApplicantID,
+			ApplicantName: applicantUser.Nickname,
+			ReviewerID:    reviewerID,
+			ReviewerName:  reviewerName,
+			Status:        apply.Status,
+			Reason:        getOrEmpty(apply.Reason),
+			CreateTime:    apply.CreatedAt,
+			UpdateTime:    apply.UpdatedAt,
+		}
+		applyDataList = append(applyDataList, applyData)
+	}
+
+	return applyDataList, nil
+}
+
+// 辅助方法：避免 nil 指针 panic
+func getOrEmpty(strPtr *string) string {
+	if strPtr == nil {
+		return ""
+	}
+	return *strPtr
+}
+
+func (s *teamService) HandleTeamApply(ctx *gin.Context, userID string, role int, req *v1.HandleTeamApplyReq) error {
+	// 获取申请信息
+	apply, err := s.teamRepository.GetApplyByID(ctx, req.ApplyID)
+	if err != nil {
+		return v1.ErrApplyNotExist
+	}
+
+	// 判断申请状态是否为待处理
+	if apply.Status != enums.StatusPending {
+		return v1.ErrApplyStatusInvalid
+	}
+
+	// 是申请人自己
+	if userID == apply.ApplicantID {
+		if req.Status != enums.StatusWithdrawn {
+			return v1.ErrNoWithdrawPermission
+		}
+		// 删除申请记录
+		err := s.teamRepository.DeleteTeamApply(ctx, req.ApplyID)
+		if err != nil {
+			return v1.ErrHandleApplyFailed
+		}
+		return nil
+	}
+
+	// 系统管理员 或 团队负责人/管理员
+	isSysAdmin := role == enums.SUPER_ADMIN
+	isTeamAdmin := s.isTeamLeaderOrAdmin(ctx, req.TeamID, userID)
+
+	// 没有权限处理
+	if !isSysAdmin && !isTeamAdmin {
+		return v1.ErrNoTeamAdminPermission
+	}
+
+	// 只允许处理 通过 / 拒绝
+	if req.Status != enums.APPROVED && req.Status != enums.REJECTED {
+		return v1.ErrInvalidHandleStatus
+	}
+
+	// 更新申请状态
+	apply.Status = req.Status
+	apply.ReviewerID = &userID
+	err = s.teamRepository.UpdateTeamApply(ctx, apply)
+	if err != nil {
+		return v1.ErrHandleApplyFailed
+	}
+
+	// 如果是通过且是团队负责人/管理员，则添加成员
+	if req.Status == enums.APPROVED && isTeamAdmin {
+		// 判断是否已在团队中
+		_, err = s.teamRepository.GetMemberByTeamIDAndUserID(ctx, req.TeamID, apply.ApplicantID)
+		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
+			return err
+		}
+		if err == nil {
+			// 已在团队中
+			return v1.ErrMemberExist
+		}
+
+		// 添加新成员
+		member := &model.Member{
+			TeamID: req.TeamID,
+			UserID: apply.ApplicantID,
+			Role:   enums.MEMBER,
+		}
+		err = s.teamRepository.CreateTeamMember(ctx, member)
+		if err != nil {
+			return v1.ErrAddTeamMemberFailed
+		}
+	}
+
+	return nil
 }
