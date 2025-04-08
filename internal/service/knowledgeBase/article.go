@@ -17,7 +17,7 @@ import (
 type ArticleService interface {
 	GetArticleById(ctx context.Context, id uint) (*model.Article, error)
 	GetArticle(ctx context.Context, userId string, id uint) (*v1.ArticleData, error)
-	CreateArticle(ctx context.Context, req *v1.CreateArticleRequest) (int, error)
+	CreateArticle(ctx context.Context, role int, req *v1.CreateArticleRequest) (int, error)
 	UpdateArticle(ctx context.Context, req *v1.UpdateArticleRequest) (*v1.ArticleData, error)
 	DeleteArticle(ctx context.Context, id uint) (int, error)
 	DeleteArticleList(ctx context.Context, req *v1.DelArticleListReq) (int, error)
@@ -127,7 +127,7 @@ func (s *articleService) GetArticle(ctx context.Context, userId string, id uint)
 	return articleData, nil
 }
 
-func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticleRequest) (int, error) {
+func (s *articleService) CreateArticle(ctx context.Context, role int, req *v1.CreateArticleRequest) (int, error) {
 	// 判断是否有重复的文章标题&userId
 	article, _ := s.articleRepository.GetArticleByTitleAndUserId(ctx, req.Title, req.AuthorID)
 	if article != nil {
@@ -137,6 +137,28 @@ func (s *articleService) CreateArticle(ctx context.Context, req *v1.CreateArticl
 	kb, _ := s.kbRepository.GetKBViewById(ctx, req.KBID)
 	if kb == nil {
 		return -1, v1.ErrKnowledgeNotExist
+	}
+	// 判断知识库类型
+	if kb.KBType == enums.KBTypePrivate {
+		// 私人知识库，只能创建自己的文章
+		if req.AuthorID != kb.UserID {
+			return -1, v1.ErrPermissionDenied
+		}
+	}
+	if role != enums.SUPER_ADMIN && kb.KBType != enums.KBTypePrivate {
+		if kb.KBType == enums.KBTypeTeam {
+			// 团队知识库，只有团队成员可以创建文章
+			// 获取当前团队成员列表
+			teamMembers, err := s.teamRepository.GetTeamMemberListByTeamID(ctx, kb.TeamID)
+			if err != nil {
+				return -1, v1.ErrTeamNotExist
+			}
+			// 检查用户是否为团队成员
+			var userIds []string
+			for _, member := range teamMembers {
+				userIds = append(userIds, member.UserID)
+			}
+		}
 	}
 	// 判断分类是否存在
 	category, _ := s.kbRepository.GetCategoryById(ctx, req.CategoryID)
