@@ -37,6 +37,9 @@ type ArticleData struct {
 	Author          string       `json:"author" `          // 作者
 	Category        string       `json:"category"`         // 文章分类
 	CategoryID      uint         `json:"category_id"`      // 文章分类ID
+	TeamID          uint         `json:"team_id"`          // 团队ID
+	TeamName        string       `json:"team_name"`        // 团队名称
+	KBType          string       `json:"kb_type"`          // 知识库类型
 	KBID            uint         `json:"kb_id"`            // 知识库ID
 	KBName          string       `json:"kb_name"`          // 知识库名称
 	Importance      int          `json:"importance"`       // 文章重要性

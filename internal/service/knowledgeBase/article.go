@@ -114,7 +114,10 @@ func (s *articleService) GetArticle(ctx context.Context, userId string, id uint)
 		Author:          Author.Nickname,
 		Category:        category.CategoryName,
 		CategoryID:      article.CategoryID,
+		TeamID:          kb.TeamID,
+		TeamName:        kb.TeamName,
 		KBID:            article.KBID,
+		KBType:          kb.KBType,
 		KBName:          kb.KbName,
 		Importance:      article.Importance,
 		CommentDisabled: article.CommentDisabled,
@@ -281,6 +284,9 @@ func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticl
 		Author:          author.Nickname,
 		Category:        category.CategoryName,
 		CategoryID:      updatedArticle.CategoryID,
+		TeamID:          kb.TeamID,
+		TeamName:        kb.TeamName,
+		KBType:          kb.KBType,
 		Importance:      updatedArticle.Importance,
 		KBID:            updatedArticle.KBID,
 		KBName:          kb.KbName,
@@ -417,7 +423,7 @@ func (s *articleService) GetArticleListByCategory(ctx context.Context, userID st
 		Author, _ := s.userRepo.GetByUserId(ctx, article.UserID)
 		// 获取分类名称
 		category, _ := s.kbRepository.GetCategoryById(ctx, article.CategoryID)
-		kb, _ := s.kbRepository.GetKBById(ctx, article.KBID)
+		kb, _ := s.kbRepository.GetKBViewById(ctx, article.KBID)
 		// 反序列化上传的文件列表
 		var uploadedFiles []v1.FileUpload
 		if len(article.UploadedFiles) > 0 {
@@ -434,6 +440,9 @@ func (s *articleService) GetArticleListByCategory(ctx context.Context, userID st
 			Author:          Author.Nickname,
 			Category:        category.CategoryName,
 			CategoryID:      article.CategoryID,
+			TeamID:          kb.TeamID,
+			TeamName:        kb.TeamName,
+			KBType:          kb.KBType,
 			Importance:      article.Importance,
 			KBID:            article.KBID,
 			KBName:          kb.KbName,
@@ -474,7 +483,7 @@ func (s *articleService) GetUserArticleList(ctx context.Context, userId string, 
 	for _, article := range articles {
 		// 获取分类名称
 		category, _ := s.kbRepository.GetCategoryById(ctx, article.CategoryID)
-		kb, _ := s.kbRepository.GetKBById(ctx, article.KBID)
+		kb, _ := s.kbRepository.GetKBViewById(ctx, article.KBID)
 		// 反序列化上传的文件列表
 		var uploadedFiles []v1.FileUpload
 		if len(article.UploadedFiles) > 0 {
@@ -491,6 +500,9 @@ func (s *articleService) GetUserArticleList(ctx context.Context, userId string, 
 			Author:          Author.Nickname,
 			Category:        category.CategoryName,
 			CategoryID:      article.CategoryID,
+			TeamID:          kb.TeamID,
+			TeamName:        kb.TeamName,
+			KBType:          kb.KBType,
 			KBID:            article.KBID,
 			KBName:          kb.KbName,
 			Importance:      article.Importance,

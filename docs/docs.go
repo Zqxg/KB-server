@@ -1863,6 +1863,10 @@ const docTemplate = `{
                     "description": "知识库名称",
                     "type": "string"
                 },
+                "kb_type": {
+                    "description": "知识库类型",
+                    "type": "string"
+                },
                 "source_uri": {
                     "description": "文章外链",
                     "type": "string"
@@ -1870,6 +1874,14 @@ const docTemplate = `{
                 "status": {
                     "description": "文章状态",
                     "type": "integer"
+                },
+                "team_id": {
+                    "description": "团队ID",
+                    "type": "integer"
+                },
+                "team_name": {
+                    "description": "团队名称",
+                    "type": "string"
                 },
                 "title": {
                     "description": "文章标题",
