@@ -28,12 +28,13 @@ type GetTeamListReq struct {
 	PageRequest
 }
 type TeamData struct {
-	TeamID      uint      `json:"team_id"`     // 团队ID
-	TeamName    string    `json:"team_name"`   // 团队名
-	Description string    `json:"description"` // 描述
-	CreatedBy   string    `json:"created_by"`  // 创建者ID
-	CreatedAt   time.Time `json:"created_at"`  // 创建时间
-	UpdatedAt   time.Time `json:"updated_at"`  // 更新时间
+	TeamID      uint      `json:"team_id"`      // 团队ID
+	TeamName    string    `json:"team_name"`    // 团队名
+	Description string    `json:"description"`  // 描述
+	CreatedBy   string    `json:"created_by"`   // 创建者ID
+	CreatorName string    `json:"creator_name"` // 创建者昵称
+	CreatedAt   time.Time `json:"created_at"`   // 创建时间
+	UpdatedAt   time.Time `json:"updated_at"`   // 更新时间
 }
 
 type MemberData struct {

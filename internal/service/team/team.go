@@ -164,11 +164,16 @@ func (s *teamService) GetTeamList(ctx *gin.Context, req *v1.GetTeamListReq) (*v1
 	var teamList []v1.TeamData
 	// 转换团队信息
 	for _, team := range teams {
+		user, err := s.userRepository.GetByUserId(ctx, team.CreatedBy)
+		if err != nil {
+			return nil, v1.ErrMemberNotExist
+		}
 		teamList = append(teamList, v1.TeamData{
 			TeamID:      team.TeamID,
 			TeamName:    team.TeamName,
 			Description: team.Description,
 			CreatedBy:   team.CreatedBy,
+			CreatorName: user.Nickname,
 			CreatedAt:   team.CreatedAt,
 			UpdatedAt:   team.UpdatedAt,
 		})
@@ -189,6 +194,10 @@ func (s *teamService) GetTeamInfo(ctx *gin.Context, teamId int) (*v1.GetTeamInfo
 	if err != nil {
 		return nil, v1.ErrGetTeamInfoFailed
 	}
+	user, err := s.userRepository.GetByUserId(ctx, team.CreatedBy)
+	if err != nil {
+		return nil, v1.ErrMemberNotExist
+	}
 	members, err := s.teamRepository.GetTeamMemberListByTeamID(ctx, uint(teamId))
 	if err != nil {
 		return nil, v1.ErrGetTeamMemberListFailed
@@ -200,6 +209,7 @@ func (s *teamService) GetTeamInfo(ctx *gin.Context, teamId int) (*v1.GetTeamInfo
 		TeamName:    team.TeamName,
 		Description: team.Description,
 		CreatedBy:   team.CreatedBy,
+		CreatorName: user.Nickname,
 		CreatedAt:   team.CreatedAt,
 		UpdatedAt:   team.UpdatedAt,
 	}
@@ -245,11 +255,16 @@ func (s *teamService) GetUserTeamList(ctx *gin.Context, userId string, pageIndex
 	var teamList []v1.TeamData
 	// 转换团队信息
 	for _, team := range teams {
+		user, err := s.userRepository.GetByUserId(ctx, team.CreatedBy)
+		if err != nil {
+			return nil, v1.ErrMemberNotExist
+		}
 		teamList = append(teamList, v1.TeamData{
 			TeamID:      team.TeamID,
 			TeamName:    team.TeamName,
 			Description: team.Description,
 			CreatedBy:   team.CreatedBy,
+			CreatorName: user.Nickname,
 			CreatedAt:   team.CreatedAt,
 			UpdatedAt:   team.UpdatedAt,
 		})
