@@ -740,9 +740,6 @@ definitions:
       phone:
         example: "10012239028"
         type: string
-    required:
-    - nick_name
-    - phone
     type: object
   v1.SearchResponseData:
     properties:

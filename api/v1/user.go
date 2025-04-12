@@ -47,8 +47,8 @@ type UserAuthRequest struct {
 }
 
 type SearchRequest struct {
-	Nickname string `json:"nick_name" binding:"required" example:"alan"`
-	Phone    string `json:"phone" binding:"required" example:"10012239028"`
+	Nickname string `json:"nick_name"  example:"alan"`
+	Phone    string `json:"phone" example:"10012239028"`
 	PageRequest
 }
 

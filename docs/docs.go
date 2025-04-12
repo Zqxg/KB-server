@@ -2904,10 +2904,6 @@ const docTemplate = `{
         },
         "v1.SearchRequest": {
             "type": "object",
-            "required": [
-                "nick_name",
-                "phone"
-            ],
             "properties": {
                 "nick_name": {
                     "type": "string",

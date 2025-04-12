@@ -172,5 +172,9 @@ func (r *userRepository) SearchUsers(ctx context.Context, nickName, phone string
 		r.logger.WithContext(ctx).Error("userRepository.SearchUsers error", zap.Error(err))
 		return nil, 0, err
 	}
+	if err := query.Offset(-1).Limit(-1).Count(&total).Error; err != nil {
+		r.logger.WithContext(ctx).Error("userRepository.SearchUsers error", zap.Error(err))
+		return nil, 0, err
+	}
 	return users, total, nil
 }
