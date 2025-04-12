@@ -18,6 +18,7 @@ type UserRepository interface {
 	GetByEmail(ctx context.Context, email string) (*model.User, error)
 	GetByPhone(ctx context.Context, phone string) (*model.User, error)
 	DeleteByUserId(ctx context.Context, userId string) error
+	SearchUsers(ctx context.Context, nickName, phone string, pageIndex, pageSize int) ([]*model.User, int64, error)
 	// 表：sys_user_auths
 	CreateUserAuth(ctx context.Context, userAuth *model.UserAuth) error
 	GetUserAuthByUserId(ctx context.Context, userId string) (*model.UserAuth, error)
@@ -154,4 +155,22 @@ func (r *userRepository) UpdateUserAuth(ctx context.Context, userAuth *model.Use
 		return err
 	}
 	return nil
+}
+
+func (r *userRepository) SearchUsers(ctx context.Context, nickName, phone string, pageIndex, pageSize int) ([]*model.User, int64, error) {
+	var users []*model.User
+	var total int64
+	offset := (pageIndex - 1) * pageSize
+	query := r.DB(ctx).Table("sys_users").Where("is_deleted = 0")
+	if nickName != "" {
+		query = query.Where("nickname LIKE ?", "%"+nickName+"%")
+	}
+	if phone != "" {
+		query = query.Where("phone LIKE?", "%"+phone+"%")
+	}
+	if err := query.Offset(offset).Limit(pageSize).Find(&users).Error; err != nil {
+		r.logger.WithContext(ctx).Error("userRepository.SearchUsers error", zap.Error(err))
+		return nil, 0, err
+	}
+	return users, total, nil
 }

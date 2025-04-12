@@ -726,6 +726,40 @@ definitions:
         description: 总记录数
         type: integer
     type: object
+  v1.SearchRequest:
+    properties:
+      nick_name:
+        example: alan
+        type: string
+      page_index:
+        description: 当前页码
+        type: integer
+      page_size:
+        description: 每页大小
+        type: integer
+      phone:
+        example: "10012239028"
+        type: string
+    required:
+    - nick_name
+    - phone
+    type: object
+  v1.SearchResponseData:
+    properties:
+      page_index:
+        description: 当前页码
+        type: integer
+      page_size:
+        description: 每页大小
+        type: integer
+      total_count:
+        description: 总记录数
+        type: integer
+      user_list:
+        items:
+          $ref: '#/definitions/v1.GetUserInfoResponseData'
+        type: array
+    type: object
   v1.TeamApplyData:
     properties:
       applicant_id:
@@ -2004,6 +2038,29 @@ paths:
       security:
       - Bearer: []
       summary: 退出用户
+      tags:
+      - 用户模块
+  /v1/user/search:
+    post:
+      consumes:
+      - application/json
+      parameters:
+      - description: params
+        in: body
+        name: request
+        required: true
+        schema:
+          $ref: '#/definitions/v1.SearchRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.SearchResponseData'
+      security:
+      - Bearer: []
+      summary: 搜索用户
       tags:
       - 用户模块
   /v1/user/updateProfile:

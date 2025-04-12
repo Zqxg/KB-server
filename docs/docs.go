@@ -1742,6 +1742,44 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/user/search": {
+            "post": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "用户模块"
+                ],
+                "summary": "搜索用户",
+                "parameters": [
+                    {
+                        "description": "params",
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/v1.SearchRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.SearchResponseData"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/user/updateProfile": {
             "post": {
                 "security": [
@@ -2861,6 +2899,54 @@ const docTemplate = `{
                 "total_count": {
                     "description": "总记录数",
                     "type": "integer"
+                }
+            }
+        },
+        "v1.SearchRequest": {
+            "type": "object",
+            "required": [
+                "nick_name",
+                "phone"
+            ],
+            "properties": {
+                "nick_name": {
+                    "type": "string",
+                    "example": "alan"
+                },
+                "page_index": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "phone": {
+                    "type": "string",
+                    "example": "10012239028"
+                }
+            }
+        },
+        "v1.SearchResponseData": {
+            "type": "object",
+            "properties": {
+                "page_index": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "total_count": {
+                    "description": "总记录数",
+                    "type": "integer"
+                },
+                "user_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.GetUserInfoResponseData"
+                    }
                 }
             }
         },

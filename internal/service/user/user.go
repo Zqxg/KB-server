@@ -26,6 +26,7 @@ type UserService interface {
 	Logout(ctx context.Context, userId string, roleType int) error
 	Cancel(ctx context.Context, userId string) error
 	UserAuth(ctx context.Context, req *v1.UserAuthRequest, userId string, roleType int) error
+	Search(ctx context.Context, req *v1.SearchRequest) (*v1.SearchResponseData, error)
 }
 
 func NewUserService(
@@ -268,4 +269,35 @@ func (s *userService) UserAuth(ctx context.Context, req *v1.UserAuthRequest, use
 		}
 	}
 	return nil
+}
+
+func (s *userService) Search(ctx context.Context, req *v1.SearchRequest) (*v1.SearchResponseData, error) {
+	// 初始化
+	pageIndex, pageSize := service.InitPage(req.PageIndex, req.PageSize)
+	// 搜索
+	users, total, err := s.userRepo.SearchUsers(ctx, req.Nickname, req.Phone, pageIndex, pageSize)
+	if err != nil {
+		return nil, v1.ErrSearchFailed
+	}
+	// 转换
+	var userList []v1.GetUserInfoResponseData
+	for _, user := range users {
+		userList = append(userList, v1.GetUserInfoResponseData{
+			UserId:    user.UserId,
+			Nickname:  user.Nickname,
+			Phone:     user.Phone,
+			RoleType:  user.RoleType,
+			Email:     user.Email,
+			CollegeId: user.CollegeId,
+			StudentId: user.StudentId,
+		})
+	}
+	return &v1.SearchResponseData{
+		UserList: userList,
+		PageResponse: v1.PageResponse{
+			TotalCount: total,
+			PageIndex:  pageIndex,
+			PageSize:   pageSize,
+		},
+	}, nil
 }

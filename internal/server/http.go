@@ -71,10 +71,11 @@ func NewHTTPServer(
 		commonUserRouter := v1.Group("/").Use(middleware.StrictAuth(jwt, logger, enums.COMMON_USER))
 		{
 			// 用户模块
-			commonUserRouter.GET(enums.USER+"/logout", userHandler.Logout)                    // 退出
-			commonUserRouter.GET(enums.USER+"/cancel", userHandler.Cancel)                    // 注销
-			commonUserRouter.GET(enums.USER+"/getUserInfo", userHandler.GetUserInfo)          // 获取用户信息
-			commonUserRouter.POST(enums.USER+"/updateProfile", userHandler.UpdateProfile)     // 修改用户信息
+			commonUserRouter.GET(enums.USER+"/logout", userHandler.Logout)                // 退出
+			commonUserRouter.GET(enums.USER+"/cancel", userHandler.Cancel)                // 注销
+			commonUserRouter.GET(enums.USER+"/getUserInfo", userHandler.GetUserInfo)      // 获取用户信息
+			commonUserRouter.POST(enums.USER+"/updateProfile", userHandler.UpdateProfile) // 修改用户信息
+			commonUserRouter.POST(enums.USER+"/search", userHandler.Search)
 			commonUserRouter.GET(enums.USER+"/getCollege", collegeHandler.GetCollege)         // 获取学院信息
 			commonUserRouter.GET(enums.USER+"/getCollegeList", collegeHandler.GetCollegeList) // 获取学院信息列表
 			commonUserRouter.POST(enums.USER+"/userAuth", userHandler.UserAuth)

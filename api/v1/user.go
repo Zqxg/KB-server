@@ -45,3 +45,14 @@ type UserAuthRequest struct {
 	StudentId string `json:"student_id"`
 	Remarks   string `json:"remarks"`
 }
+
+type SearchRequest struct {
+	Nickname string `json:"nick_name" binding:"required" example:"alan"`
+	Phone    string `json:"phone" binding:"required" example:"10012239028"`
+	PageRequest
+}
+
+type SearchResponseData struct {
+	UserList []GetUserInfoResponseData `json:"user_list"`
+	PageResponse
+}

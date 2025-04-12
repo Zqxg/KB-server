@@ -19,6 +19,7 @@ var (
 	ErrUserNotExist    = newError(1007, "用户不存在")
 	ErrLogoutFail      = newError(1008, "用户退出失败")
 	ErrCancelFail      = newError(1009, "用户注销失败")
+	ErrSearchFailed    = newError(1010, "搜索失败")
 	//ErrEmailFormat     = newError(1010, "邮箱格式错误")
 
 	ErrArticleNotExist     = newError(1101, "文章不存在")

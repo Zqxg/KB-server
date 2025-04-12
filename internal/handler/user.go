@@ -225,3 +225,28 @@ func (h *UserHandler) UserAuth(ctx *gin.Context) {
 	}
 	v1.HandleSuccess(ctx, nil)
 }
+
+// Search godoc
+// @Summary 搜索用户
+// @Schemes
+// @Description
+// @Tags 用户模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param request body v1.SearchRequest true "params"
+// @Success 200 {object} v1.SearchResponseData
+// @Router /v1/user/search [post]
+func (h *UserHandler) Search(ctx *gin.Context) {
+	var req v1.SearchRequest
+	if err := ctx.ShouldBindJSON(&req); err != nil {
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
+		return
+	}
+	userList, err := h.userService.Search(ctx, &req)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusOK, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, userList)
+}
