@@ -65,7 +65,7 @@ func (s *articleService) GetArticle(ctx context.Context, userId string, id uint)
 	if err != nil {
 		return nil, v1.ErrArticleNotExist
 	}
-	if article.Status != enums.StatusPublished && article.Status != enums.StatusPendingReview {
+	if article.Status == enums.StatusDeleted {
 		return nil, v1.ErrArticleStatusError
 	}
 	// 获取知识库类型
