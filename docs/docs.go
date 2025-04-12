@@ -1401,6 +1401,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/team/getUserTeamMemberList": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "获取用户的团队成员列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page Index",
+                        "name": "pageIndex",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page Size",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetUserTeamMemberListResp"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/team/handleTeamApply": {
             "post": {
                 "security": [
@@ -2626,6 +2669,29 @@ const docTemplate = `{
                 }
             }
         },
+        "v1.GetUserTeamMemberListResp": {
+            "type": "object",
+            "properties": {
+                "member_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.MemberData"
+                    }
+                },
+                "page_index": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "total_count": {
+                    "description": "总记录数",
+                    "type": "integer"
+                }
+            }
+        },
         "v1.HandleTeamApplyReq": {
             "type": "object",
             "properties": {
@@ -2688,6 +2754,10 @@ const docTemplate = `{
                 "team_id": {
                     "description": "团队ID",
                     "type": "integer"
+                },
+                "team_name": {
+                    "description": "团队名",
+                    "type": "string"
                 },
                 "update_time": {
                     "description": "更新时间",
@@ -2852,6 +2922,10 @@ const docTemplate = `{
                 },
                 "created_by": {
                     "description": "创建者ID",
+                    "type": "string"
+                },
+                "creator_name": {
+                    "description": "创建者昵称",
                     "type": "string"
                 },
                 "description": {

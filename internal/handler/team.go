@@ -406,3 +406,36 @@ func (h *TeamHandler) HandleTeamApply(ctx *gin.Context) {
 	}
 	v1.HandleSuccess(ctx, nil)
 }
+
+// GetUserTeamMemberList godoc
+// @Summary 获取用户的团队成员列表
+// @Schemes
+// @Description
+// @Tags 团队模块
+// @Accept json
+// @Produce json
+// @Security Bearer
+// @Param pageIndex query int true "Page Index"
+// @Param pageSize query int true "Page Size"
+// @Success 200 {object} v1.GetUserTeamMemberListResp
+// @Router /v1/team/getUserTeamMemberList [get]
+func (h *TeamHandler) GetUserTeamMemberList(ctx *gin.Context) {
+	// 从查询参数中获取参数
+	if !utils.IsNumeric(ctx.Query("page_index")) || !utils.IsNumeric(ctx.Query("page_size")) {
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
+		return
+	}
+	pageIndex, _ := utils.ToInt(ctx.Query("page_index")) // 获取参数
+	pageSize, _ := utils.ToInt(ctx.Query("page_size"))   // 获取参数
+	if pageIndex < 0 || pageSize < 0 {
+		v1.HandleError(ctx, http.StatusOK, v1.ErrBadRequest, nil)
+		return
+	}
+	userId := GetUserIdFromCtx(ctx)
+	teamMemberList, err := h.teamService.GetUserTeamMemberList(ctx, userId, pageIndex, pageSize)
+	if err != nil {
+		v1.HandleError(ctx, http.StatusOK, err, nil)
+		return
+	}
+	v1.HandleSuccess(ctx, teamMemberList)
+}

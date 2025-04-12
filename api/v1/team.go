@@ -40,6 +40,7 @@ type TeamData struct {
 type MemberData struct {
 	MemberID   uint      `json:"member_id"`   // 成员ID
 	TeamID     uint      `json:"team_id"`     // 团队ID
+	TeamName   string    `json:"team_name"`   // 团队名
 	UserID     string    `json:"member_name"` // 成员ID
 	NickName   string    `json:"nick_name"`   // 成员昵称
 	RoleType   string    `json:"role_type"`   // 角色类型
@@ -124,4 +125,9 @@ type HandleTeamApplyReq struct {
 	ApplyID uint `json:"apply_id"` // 申请ID
 	TeamID  uint `json:"team_id"`  // 团队ID
 	Status  int  `json:"status"`   // 申请状态
+}
+
+type GetUserTeamMemberListResp struct {
+	MemberList []MemberData `json:"member_list"`
+	PageResponse
 }

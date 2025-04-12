@@ -27,6 +27,7 @@ type TeamService interface {
 	ApplyJoinTeam(ctx *gin.Context, userID string, req *v1.ApplyJoinTeamReq) (uint, error)
 	GetTeamApplyList(ctx *gin.Context, userID string, req *v1.GetTeamApplyListReq) (*v1.GetTeamApplyListResp, error)
 	HandleTeamApply(ctx *gin.Context, userID string, role int, req *v1.HandleTeamApplyReq) error
+	GetUserTeamMemberList(ctx *gin.Context, userID string, pageIndex, pageSize int) (*v1.GetUserTeamMemberListResp, error)
 }
 
 func NewTeamService(
@@ -223,6 +224,8 @@ func (s *teamService) GetTeamInfo(ctx *gin.Context, teamId int) (*v1.GetTeamInfo
 			MemberID:   member.MemberID,
 			UserID:     member.UserID,
 			RoleType:   member.Role,
+			TeamID:     member.TeamID,
+			TeamName:   team.TeamName,
 			JoinTime:   member.CreatedAt,
 			UpdateTime: member.UpdatedAt,
 			NickName:   user.Nickname,
@@ -300,6 +303,8 @@ func (s *teamService) GetTeamMemberList(ctx *gin.Context, teamId int) ([]*v1.Mem
 			MemberID:   member.MemberID,
 			UserID:     member.UserID,
 			RoleType:   member.Role,
+			TeamID:     member.TeamID,
+			TeamName:   team.TeamName,
 			JoinTime:   member.CreatedAt,
 			UpdateTime: member.UpdatedAt,
 			NickName:   user.Nickname,
@@ -605,4 +610,44 @@ func (s *teamService) HandleTeamApply(ctx *gin.Context, userID string, role int,
 	}
 
 	return nil
+}
+
+func (s *teamService) GetUserTeamMemberList(ctx *gin.Context, userID string, pageIndex, pageSize int) (*v1.GetUserTeamMemberListResp, error) {
+	// 初始化
+	index, size := service.InitPage(pageIndex, pageSize)
+	// 获取用户的团队ID列表
+	teamMenbers, total, err := s.teamRepository.GetTeamMemberListByUserID(ctx, userID, index, size)
+	if err != nil {
+		return nil, v1.ErrGetTeamMemberListFailed
+	}
+	// 构建团队成员列表
+	var memberDataList []v1.MemberData
+	for _, member := range teamMenbers {
+		user, err := s.userRepository.GetByUserId(ctx, member.UserID)
+		if err != nil {
+			return nil, v1.ErrMemberNotExist
+		}
+		team, err := s.teamRepository.GetTeamByID(ctx, member.TeamID)
+		if err != nil {
+			return nil, v1.ErrTeamNotExist
+		}
+		memberDataList = append(memberDataList, v1.MemberData{
+			MemberID:   member.MemberID,
+			UserID:     member.UserID,
+			TeamID:     member.TeamID,
+			TeamName:   team.TeamName,
+			RoleType:   member.Role,
+			JoinTime:   member.CreatedAt,
+			UpdateTime: member.UpdatedAt,
+			NickName:   user.Nickname,
+		})
+	}
+	return &v1.GetUserTeamMemberListResp{
+		MemberList: memberDataList,
+		PageResponse: v1.PageResponse{
+			TotalCount: total,
+			PageIndex:  index,
+			PageSize:   size,
+		},
+	}, nil
 }
