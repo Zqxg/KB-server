@@ -3,6 +3,7 @@ package repository
 import (
 	"context"
 	"go.uber.org/zap"
+	"gorm.io/gorm"
 	"projectName/internal/model"
 )
 
@@ -26,7 +27,7 @@ type TeamRepository interface {
 
 	GetApplyByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.TeamApplications, error)
 	CreateTeamApply(ctx context.Context, teamApply *model.TeamApplications) (uint, error)
-	GetApplyByUserID(ctx context.Context, userID string, pageIndex, pageSize int) ([]*model.TeamApplications, int64, error)
+	GetApplyByUserIDAndStatus(ctx context.Context, userID string, status int, pageIndex, pageSize int) ([]*model.TeamApplications, int64, error)
 	GetApplyByTeamIDAndStatus(ctx context.Context, teamID uint, status int, pageIndex, pageSize int) ([]*model.TeamApplications, int64, error)
 	GetApplyByID(ctx context.Context, applyID uint) (*model.TeamApplications, error)
 	UpdateTeamApply(ctx context.Context, teamApply *model.TeamApplications) error
@@ -213,7 +214,7 @@ func (r *teamRepository) GetTeamIdsByUserID(ctx context.Context, userID string) 
 
 func (r *teamRepository) GetApplyByTeamIDAndUserID(ctx context.Context, teamID uint, userID string) (*model.TeamApplications, error) {
 	var teamApply model.TeamApplications
-	if err := r.DB(ctx).Table("sys_team_applications").Where("team_id =? and applicant_id =?", teamID, userID).First(&teamApply).Error; err != nil {
+	if err := r.DB(ctx).Table("sys_team_applications").Where("team_id =? and applicant_id =? and  deleted_at IS NULL", teamID, userID).First(&teamApply).Error; err != nil {
 		r.logger.WithContext(ctx).Error("TeamRepository.GetApplyByTeamIDAndUserID error", zap.Error(err))
 		return nil, err
 	}
@@ -227,11 +228,11 @@ func (r *teamRepository) CreateTeamApply(ctx context.Context, teamApply *model.T
 	}
 	return teamApply.ApplicationID, nil
 }
-func (r *teamRepository) GetApplyByUserID(ctx context.Context, userID string, pageIndex, pageSize int) ([]*model.TeamApplications, int64, error) {
+func (r *teamRepository) GetApplyByUserIDAndStatus(ctx context.Context, userID string, status int, pageIndex, pageSize int) ([]*model.TeamApplications, int64, error) {
 	var teamApplys []*model.TeamApplications
 	var totalCount int64
 	// 构建查询
-	db := r.DB(ctx).Table("sys_team_applications").Where("applicant_id =?", userID)
+	db := r.DB(ctx).Table("sys_team_applications").Where("applicant_id =? and status =? AND deleted_at IS NULL", userID, status)
 	// 分页及数据查询
 	if err := db.Count(&totalCount).Error; err != nil {
 		r.logger.WithContext(ctx).Error("TeamRepository.GetApplyByUserID count error", zap.Error(err))
@@ -246,17 +247,32 @@ func (r *teamRepository) GetApplyByUserID(ctx context.Context, userID string, pa
 func (r *teamRepository) GetApplyByTeamIDAndStatus(ctx context.Context, teamID uint, status int, pageIndex, pageSize int) ([]*model.TeamApplications, int64, error) {
 	var teamApplys []*model.TeamApplications
 	var totalCount int64
-	// 构建查询
-	db := r.DB(ctx).Table("sys_team_applications").Where("status =? and  team_id =?", status, teamID)
-	// 分页及数据查询
+	var db *gorm.DB
+	// 构建查询，添加未删除的条件
+	if teamID == 0 {
+		// 只查询状态的记录
+		db = r.DB(ctx).Table("sys_team_applications").
+			Where("status =? AND deleted_at IS NULL", status)
+	} else {
+		// 只查询状态和团队ID的记录
+		db = r.DB(ctx).Table("sys_team_applications").
+			Where("status =? AND team_id =? AND deleted_at IS NULL", status, teamID)
+	}
+
+	// 计算总数（不包含已删除的记录）
 	if err := db.Count(&totalCount).Error; err != nil {
 		r.logger.WithContext(ctx).Error("TeamRepository.GetApplyByUserIDAndStatus count error", zap.Error(err))
 		return nil, 0, err
 	}
-	if err := db.Offset((pageIndex - 1) * pageSize).Limit(pageSize).Find(&teamApplys).Error; err != nil {
+
+	// 查询数据（不包含已删除的记录）
+	if err := db.Offset((pageIndex - 1) * pageSize).
+		Limit(pageSize).
+		Find(&teamApplys).Error; err != nil {
 		r.logger.WithContext(ctx).Error("TeamRepository.GetApplyByUserIDAndStatus query error", zap.Error(err))
 		return nil, 0, err
 	}
+
 	return teamApplys, totalCount, nil
 }
 

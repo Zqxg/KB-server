@@ -120,7 +120,7 @@ func NewHTTPServer(
 			commonUserRouter.POST(enums.TEAM+"/deleteTeamMember", teamHandler.DeleteTeamMember)          // 删除团队成员
 			commonUserRouter.POST(enums.TEAM+"/updateTeamMemberRole", teamHandler.UpdateTeamMemberRole)  // 修改团队成员角色
 			commonUserRouter.POST(enums.TEAM+"/quitTeam", teamHandler.QuitTeam)                          // 退出团队
-			commonUserRouter.POST(enums.TEAM+"/applyJoinTeam", teamHandler.ApplyJoinTeam)                //申请加入团队
+			commonUserRouter.POST(enums.TEAM+"/applyJoinTeam", teamHandler.ApplyJoinTeam)                // 申请加入团队
 			commonUserRouter.POST(enums.TEAM+"/getTeamApplyList", teamHandler.GetTeamApplyList)          // 获取团队申请列表
 			commonUserRouter.POST(enums.TEAM+"/handleTeamApply", teamHandler.HandleTeamApply)            // 处理团队申请
 

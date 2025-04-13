@@ -423,12 +423,14 @@ func (s *teamService) ApplyJoinTeam(ctx *gin.Context, userID string, req *v1.App
 		return 0, v1.ErrMemberExist
 	}
 	// 判断用户是否已经提交过申请
-	_, err = s.teamRepository.GetApplyByTeamIDAndUserID(ctx, req.TeamID, userID)
+	apply, err := s.teamRepository.GetApplyByTeamIDAndUserID(ctx, req.TeamID, userID)
 	if err == nil {
-		return 0, v1.ErrApplyExisted
+		if apply.Status == enums.StatusApproved || apply.Status == enums.StatusPending {
+			return 0, v1.ErrApplyExisted
+		}
 	}
 	// 构建申请表
-	apply := &model.TeamApplications{
+	apply = &model.TeamApplications{
 		TeamID:      req.TeamID,
 		ApplicantID: userID,
 		Status:      enums.WAITING,
@@ -451,7 +453,7 @@ func (s *teamService) GetTeamApplyList(ctx *gin.Context, userID string, req *v1.
 	)
 
 	if req.IsPersonal {
-		applyList, total, err = s.teamRepository.GetApplyByUserID(ctx, userID, pageIndex, pageSize)
+		applyList, total, err = s.teamRepository.GetApplyByUserIDAndStatus(ctx, userID, req.Status, pageIndex, pageSize)
 		if err != nil {
 			return nil, v1.ErrGetApplyListFailed
 		}
@@ -550,13 +552,14 @@ func (s *teamService) HandleTeamApply(ctx *gin.Context, userID string, role int,
 		return v1.ErrApplyStatusInvalid
 	}
 
-	// 是申请人自己
+	// 是申请人自己 撤回申请
 	if userID == apply.ApplicantID {
 		if req.Status != enums.StatusWithdrawn {
 			return v1.ErrNoWithdrawPermission
 		}
-		// 删除申请记录
-		err := s.teamRepository.DeleteTeamApply(ctx, req.ApplyID)
+		apply.Status = req.Status
+		apply.ReviewerID = &userID
+		err := s.teamRepository.UpdateTeamApply(ctx, apply)
 		if err != nil {
 			return v1.ErrHandleApplyFailed
 		}
@@ -573,7 +576,7 @@ func (s *teamService) HandleTeamApply(ctx *gin.Context, userID string, role int,
 	}
 
 	// 只允许处理 通过 / 拒绝
-	if req.Status != enums.APPROVED && req.Status != enums.REJECTED {
+	if req.Status != enums.StatusApproved && req.Status != enums.StatusRejected {
 		return v1.ErrInvalidHandleStatus
 	}
 
@@ -586,7 +589,7 @@ func (s *teamService) HandleTeamApply(ctx *gin.Context, userID string, role int,
 	}
 
 	// 如果是通过且是团队负责人/管理员，则添加成员
-	if req.Status == enums.APPROVED && isTeamAdmin {
+	if req.Status == enums.StatusApproved && isTeamAdmin {
 		// 判断是否已在团队中
 		_, err = s.teamRepository.GetMemberByTeamIDAndUserID(ctx, req.TeamID, apply.ApplicantID)
 		if err != nil && !errors.Is(err, gorm.ErrRecordNotFound) {
