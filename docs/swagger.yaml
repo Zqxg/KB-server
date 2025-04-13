@@ -588,6 +588,22 @@ definitions:
         description: 总记录数
         type: integer
     type: object
+  v1.GetUserTeamManageListResp:
+    properties:
+      page_index:
+        description: 当前页码
+        type: integer
+      page_size:
+        description: 每页大小
+        type: integer
+      team_list:
+        items:
+          $ref: '#/definitions/v1.TeamData'
+        type: array
+      total_count:
+        description: 总记录数
+        type: integer
+    type: object
   v1.GetUserTeamMemberListResp:
     properties:
       member_list:
@@ -1829,6 +1845,33 @@ paths:
       security:
       - Bearer: []
       summary: 获取个人团队列表
+      tags:
+      - 团队模块
+  /v1/team/getUserTeamManageList:
+    get:
+      consumes:
+      - application/json
+      parameters:
+      - description: Page Index
+        in: query
+        name: pageIndex
+        required: true
+        type: integer
+      - description: Page Size
+        in: query
+        name: pageSize
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/v1.GetUserTeamManageListResp'
+      security:
+      - Bearer: []
+      summary: 获取用户的团队管理列表
       tags:
       - 团队模块
   /v1/team/getUserTeamMemberList:

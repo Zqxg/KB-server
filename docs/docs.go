@@ -1401,6 +1401,49 @@ const docTemplate = `{
                 }
             }
         },
+        "/v1/team/getUserTeamManageList": {
+            "get": {
+                "security": [
+                    {
+                        "Bearer": []
+                    }
+                ],
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "团队模块"
+                ],
+                "summary": "获取用户的团队管理列表",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Page Index",
+                        "name": "pageIndex",
+                        "in": "query",
+                        "required": true
+                    },
+                    {
+                        "type": "integer",
+                        "description": "Page Size",
+                        "name": "pageSize",
+                        "in": "query",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/v1.GetUserTeamManageListResp"
+                        }
+                    }
+                }
+            }
+        },
         "/v1/team/getUserTeamMemberList": {
             "get": {
                 "security": [
@@ -2685,6 +2728,29 @@ const docTemplate = `{
             }
         },
         "v1.GetUserTeamListResp": {
+            "type": "object",
+            "properties": {
+                "page_index": {
+                    "description": "当前页码",
+                    "type": "integer"
+                },
+                "page_size": {
+                    "description": "每页大小",
+                    "type": "integer"
+                },
+                "team_list": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/v1.TeamData"
+                    }
+                },
+                "total_count": {
+                    "description": "总记录数",
+                    "type": "integer"
+                }
+            }
+        },
+        "v1.GetUserTeamManageListResp": {
             "type": "object",
             "properties": {
                 "page_index": {

@@ -106,12 +106,13 @@ func NewHTTPServer(
 			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getArticleListByCategory", knowledgeBaseHandler.GetCategoryList) // 多种查询分类
 
 			// 团队模块
-			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)          // 新建团队
-			commonUserRouter.POST(enums.TEAM+"/updateTeam", teamHandler.UpdateTeam)          // 修改团队
-			commonUserRouter.POST(enums.TEAM+"/deleteTeam", teamHandler.DeleteTeam)          // 删除团队
-			commonUserRouter.POST(enums.TEAM+"/getTeamList", teamHandler.GetTeamList)        // 获取团队列表
-			commonUserRouter.GET(enums.TEAM+"/getTeamInfo", teamHandler.GetTeamInfo)         // 获取团队详细
-			commonUserRouter.GET(enums.TEAM+"/getUserTeamList", teamHandler.GetUserTeamList) // 获取个人团队列表
+			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)                      // 新建团队
+			commonUserRouter.POST(enums.TEAM+"/updateTeam", teamHandler.UpdateTeam)                      // 修改团队
+			commonUserRouter.POST(enums.TEAM+"/deleteTeam", teamHandler.DeleteTeam)                      // 删除团队
+			commonUserRouter.POST(enums.TEAM+"/getTeamList", teamHandler.GetTeamList)                    // 获取团队列表
+			commonUserRouter.GET(enums.TEAM+"/getTeamInfo", teamHandler.GetTeamInfo)                     // 获取团队详细
+			commonUserRouter.GET(enums.TEAM+"/getUserTeamList", teamHandler.GetUserTeamList)             // 获取个人团队列表
+			commonUserRouter.GET(enums.TEAM+"/getUserTeamManageList", teamHandler.GetUserTeamManageList) // 获取个人团队管理列表
 
 			// 团队成员模块
 			commonUserRouter.GET(enums.TEAM+"/getUserTeamMemberList", teamHandler.GetUserTeamMemberList) // 获取个人团队成员列表

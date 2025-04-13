@@ -28,6 +28,7 @@ type TeamService interface {
 	GetTeamApplyList(ctx *gin.Context, userID string, req *v1.GetTeamApplyListReq) (*v1.GetTeamApplyListResp, error)
 	HandleTeamApply(ctx *gin.Context, userID string, role int, req *v1.HandleTeamApplyReq) error
 	GetUserTeamMemberList(ctx *gin.Context, userID string, pageIndex, pageSize int) (*v1.GetUserTeamMemberListResp, error)
+	GetUserTeamManageList(ctx *gin.Context, userID string, pageIndex, pageSize int) (*v1.GetUserTeamManageListResp, error)
 }
 
 func NewTeamService(
@@ -647,6 +648,49 @@ func (s *teamService) GetUserTeamMemberList(ctx *gin.Context, userID string, pag
 	}
 	return &v1.GetUserTeamMemberListResp{
 		MemberList: memberDataList,
+		PageResponse: v1.PageResponse{
+			TotalCount: total,
+			PageIndex:  index,
+			PageSize:   size,
+		},
+	}, nil
+}
+
+func (s *teamService) GetUserTeamManageList(ctx *gin.Context, userID string, pageIndex, pageSize int) (*v1.GetUserTeamManageListResp, error) {
+	// 初始化
+	index, size := service.InitPage(pageIndex, pageSize)
+	// 获取用户的团队ID列表
+	teamMenbers, total, err := s.teamRepository.GetTeamMemberListByUserID(ctx, userID, index, size)
+	if err != nil {
+		return nil, v1.ErrGetTeamMemberListFailed
+	}
+	// 判断用户是否为团队负责人或者管理员
+	var teamList []v1.TeamData
+	for _, member := range teamMenbers {
+		if member.Role == enums.LEADER || member.Role == enums.ADMIN {
+			team, err := s.teamRepository.GetTeamByID(ctx, member.TeamID)
+			if err != nil {
+				return nil, v1.ErrTeamNotExist
+			}
+			user, err := s.userRepository.GetByUserId(ctx, team.CreatedBy)
+			if err != nil {
+				return nil, v1.ErrMemberNotExist
+			}
+			teamList = append(teamList, v1.TeamData{
+				TeamID:      team.TeamID,
+				TeamName:    team.TeamName,
+				Description: team.Description,
+				CreatedBy:   team.CreatedBy,
+				CreatorName: user.Nickname,
+				CreatedAt:   team.CreatedAt,
+				UpdatedAt:   team.UpdatedAt,
+			})
+		} else {
+			total--
+		}
+	}
+	return &v1.GetUserTeamManageListResp{
+		TeamList: teamList,
 		PageResponse: v1.PageResponse{
 			TotalCount: total,
 			PageIndex:  index,

@@ -131,3 +131,8 @@ type GetUserTeamMemberListResp struct {
 	MemberList []MemberData `json:"member_list"`
 	PageResponse
 }
+
+type GetUserTeamManageListResp struct {
+	TeamList []TeamData `json:"team_list"`
+	PageResponse
+}
