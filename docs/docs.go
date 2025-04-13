@@ -2462,7 +2462,16 @@ const docTemplate = `{
         "v1.GetKBInfoResp": {
             "type": "object",
             "properties": {
+                "article_count": {
+                    "type": "integer"
+                },
+                "category_count": {
+                    "type": "integer"
+                },
                 "created_at": {
+                    "type": "string"
+                },
+                "created_by": {
                     "type": "string"
                 },
                 "is_public": {

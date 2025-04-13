@@ -22,12 +22,12 @@ var (
 	ErrSearchFailed    = newError(1010, "搜索失败")
 	//ErrEmailFormat     = newError(1010, "邮箱格式错误")
 
-	ErrArticleNotExist     = newError(1101, "文章不存在")
-	ErrUpdateArticleFailed = newError(1102, "修改文章失败")
-	ErrArticleStatusError  = newError(1103, "文章状态异常")
-
-	ErrUploadFileFailed      = newError(1104, "上传文件序列化失败")
-	ErrDeserializeFileFailed = newError(1105, "上传文件反序列化失败")
+	ErrArticleNotExist       = newError(1101, "文章不存在")
+	ErrUpdateArticleFailed   = newError(1102, "修改文章失败")
+	ErrArticleStatusError    = newError(1103, "文章状态异常")
+	ErrGetArticleCountFailed = newError(1104, "获取文章数量失败")
+	ErrUploadFileFailed      = newError(1105, "上传文件序列化失败")
+	ErrDeserializeFileFailed = newError(1106, "上传文件反序列化失败")
 
 	// 2000 错误码
 	ErrInvalidCaptcha = newError(2000, "验证码错误")
@@ -49,12 +49,13 @@ var (
 	//ErrUpdateKnowledgePublic = newError(2110, "公共知识库不能更新")
 	ErrNotPublicKnowledge = newError(2110, "非公共知识库")
 	// 2111 知识库分类
-	ErrCategoryNotExist      = newError(2111, "分类不存在")
-	ErrUpdateCategoryFailed  = newError(2112, "更新分类失败")
-	ErrCreateCategoryFailed  = newError(2113, "创建分类失败")
-	ErrDeleteCategoryFailed  = newError(2114, "删除分类失败")
-	ErrGetCategoryListFailed = newError(2115, "获取分类列表失败")
-	ErrCategoryNotMatchKB    = newError(2116, "分类不属于该知识库")
+	ErrCategoryNotExist       = newError(2111, "分类不存在")
+	ErrUpdateCategoryFailed   = newError(2112, "更新分类失败")
+	ErrCreateCategoryFailed   = newError(2113, "创建分类失败")
+	ErrDeleteCategoryFailed   = newError(2114, "删除分类失败")
+	ErrGetCategoryListFailed  = newError(2115, "获取分类列表失败")
+	ErrCategoryNotMatchKB     = newError(2116, "分类不属于该知识库")
+	ErrGetCategoryCountFailed = newError(2117, "获取分类数量失败")
 
 	// 2200 team
 	ErrTeamNotExist = newError(2200, "团队不存在")

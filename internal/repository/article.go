@@ -22,6 +22,8 @@ type ArticleRepository interface {
 	DeleteArticleList(ctx context.Context, ids []uint) (int, error)
 	GetArticleListByCategory(ctx context.Context, categoryId uint, pageNum int, pageSize int) ([]model.Article, int64, error)
 	GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq, pageNum int, pageSize int) ([]model.Article, int64, error)
+	GetArticleCountByKBID(ctx context.Context, kbId uint) (int64, error)
+
 	GetArticleListByEs(ctx context.Context, indices []string, query *elastic.BoolQuery, highlight *elastic.Highlight, from, size int) (*elastic.SearchResult, error)
 	CreateEsArticle(ctx context.Context, index string, article *model.EsArticle) error
 	UpdateEsArticle(ctx context.Context, index string, article *model.EsArticle) error
@@ -297,4 +299,14 @@ func (r *Repository) DeleteEsIndex(ctx context.Context, index string) error {
 		return fmt.Errorf("failed to delete Elasticsearch index: %w", err)
 	}
 	return nil
+}
+
+func (r *articleRepository) GetArticleCountByKBID(ctx context.Context, kbId uint) (int64, error) {
+	var count int64
+	if err := r.DB(ctx).Table("kb_article").
+		Where("kb_id =? AND status =?", kbId, enums.StatusPublished).
+		Count(&count).Error; err != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.GetArticleCountByKBID error", zap.Error(err))
+	}
+	return count, nil
 }

@@ -141,19 +141,32 @@ func (s *knowledgeBaseService) GetKBInfo(ctx *gin.Context, kbId uint) (*v1.GetKB
 	if err != nil {
 		return nil, v1.ErrKnowledgeNotExist
 	}
+	// 分类数量
+	categoryCount, err := s.kbRepository.GetCategoryCountByKBID(ctx, kbId)
+	if err != nil {
+		return nil, v1.ErrGetCategoryCountFailed
+	}
+	// 文章数量
+	articleCount, err := s.articleRepository.GetArticleCountByKBID(ctx, kbId)
+	if err != nil {
+		return nil, v1.ErrGetArticleCountFailed
+	}
 
 	// 获取知识库信息
 	kbInfo := &v1.GetKBInfoResp{
-		KBID:      kb.KBID,
-		KbName:    kb.KbName,
-		TeamID:    kb.TeamID,
-		TeamName:  kb.TeamName,
-		IsPublic:  kb.IsPublic,
-		UserID:    kb.CreatedBy,
-		UserName:  kb.UserName,
-		KBType:    kb.KBType,
-		CreatedAt: kb.CreatedAt,
-		UpdatedAt: kb.UpdatedAt,
+		KBID:          kb.KBID,
+		KbName:        kb.KbName,
+		TeamID:        kb.TeamID,
+		TeamName:      kb.TeamName,
+		IsPublic:      kb.IsPublic,
+		UserID:        kb.CreatedBy,
+		UserName:      kb.UserName,
+		KBType:        kb.KBType,
+		CreatedAt:     kb.CreatedAt,
+		UpdatedAt:     kb.UpdatedAt,
+		CreatedBy:     kb.CreatedBy,
+		ArticleCount:  articleCount,
+		CategoryCount: categoryCount,
 	}
 	return kbInfo, nil
 }
@@ -171,17 +184,30 @@ func (s *knowledgeBaseService) GetKBListByTeamId(ctx *gin.Context, req *v1.GetKB
 	// 组装返回数据
 	var kbInfoList []v1.GetKBInfoResp
 	for _, kb := range kbList {
+		// 获取文章数量
+		articleCount, err := s.articleRepository.GetArticleCountByKBID(ctx, kb.KBID)
+		if err != nil {
+			return nil, v1.ErrGetArticleCountFailed
+		}
+		// 获取分类数量
+		categoryCount, err := s.kbRepository.GetCategoryCountByKBID(ctx, kb.KBID)
+		if err != nil {
+			return nil, v1.ErrGetCategoryCountFailed
+		}
 		kbInfoList = append(kbInfoList, v1.GetKBInfoResp{
-			KBID:      kb.KBID,
-			KbName:    kb.KbName,
-			TeamID:    kb.TeamID,
-			UserID:    kb.UserID,
-			TeamName:  kb.TeamName, // 这里假设 `team` 结构体有 `Name` 字段
-			UserName:  kb.UserName,
-			IsPublic:  kb.IsPublic,
-			KBType:    kb.KBType,
-			CreatedAt: kb.CreatedAt,
-			UpdatedAt: kb.UpdatedAt,
+			KBID:          kb.KBID,
+			KbName:        kb.KbName,
+			TeamID:        kb.TeamID,
+			UserID:        kb.UserID,
+			TeamName:      kb.TeamName, // 这里假设 `team` 结构体有 `Name` 字段
+			UserName:      kb.UserName,
+			IsPublic:      kb.IsPublic,
+			KBType:        kb.KBType,
+			CreatedAt:     kb.CreatedAt,
+			UpdatedAt:     kb.UpdatedAt,
+			CreatedBy:     kb.CreatedBy,
+			ArticleCount:  articleCount,
+			CategoryCount: categoryCount,
 		})
 	}
 

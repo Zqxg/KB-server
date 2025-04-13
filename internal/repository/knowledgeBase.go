@@ -28,6 +28,7 @@ type KBRepository interface {
 	GetCategoryList(ctx context.Context, kbId uint) ([]*model.Category, error)
 	GetCategoryById(ctx context.Context, id uint) (*model.Category, error)
 	GetCategoryTreeByKB(ctx context.Context, kbId uint) ([]vo.CategoryView, error)
+	GetCategoryCountByKBID(ctx context.Context, kbID uint) (int64, error)
 }
 
 func NewKBRepository(
@@ -253,4 +254,13 @@ func (r *kbRepository) GetKBListByTypeAndUserId(ctx context.Context, userId, kbT
 		return nil, err
 	}
 	return kbList, nil
+}
+
+func (r *kbRepository) GetCategoryCountByKBID(ctx context.Context, kbID uint) (int64, error) {
+	var count int64
+	if err := r.DB(ctx).Table("kb_category").Where("kb_id =?", kbID).Count(&count).Error; err != nil {
+		r.logger.WithContext(ctx).Error("KBRepository.GetCategoryCountByKBID error", zap.Error(err))
+		return 0, err
+	}
+	return count, nil
 }
