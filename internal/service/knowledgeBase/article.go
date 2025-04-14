@@ -19,7 +19,7 @@ type ArticleService interface {
 	GetArticle(ctx context.Context, userId string, id uint) (*v1.ArticleData, error)
 	CreateArticle(ctx context.Context, role int, req *v1.CreateArticleRequest) (int, error)
 	UpdateArticle(ctx context.Context, userID string, req *v1.UpdateArticleRequest) (*v1.ArticleData, error)
-	DeleteArticle(ctx context.Context, id uint) (int, error)
+	DeleteArticle(ctx context.Context, userId string, role int, id uint) (int, error)
 	DeleteArticleList(ctx context.Context, req *v1.DelArticleListReq) (int, error)
 	GetArticleListByCategory(ctx context.Context, userID string, role int, req *v1.GetArticleListByCategoryReq) (*v1.ArticleList, error)
 	GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq) (*v1.ArticleList, error)
@@ -348,11 +348,33 @@ func (s *articleService) UpdateArticle(ctx context.Context, userID string, req *
 	return articleData, nil
 }
 
-func (s *articleService) DeleteArticle(ctx context.Context, id uint) (int, error) {
+func (s *articleService) DeleteArticle(ctx context.Context, userId string, role int, id uint) (int, error) {
 	// 判断文章是否存在
 	article, err := s.articleRepository.GetArticle(ctx, id)
 	if err != nil {
 		return -1, v1.ErrArticleNotExist
+	}
+	if role != enums.SUPER_ADMIN && userId != article.UserID {
+		return -1, v1.ErrPermissionDenied
+	}
+	// 获取文章知识库所属团队
+	kb, _ := s.kbRepository.GetKBViewById(ctx, article.KBID)
+	// 判断当前用户是否为团队管理员或文章作者
+	if kb.KBType == enums.KBTypeTeam {
+		// 获取当前团队成员列表
+		teamMembers, err := s.teamRepository.GetTeamMemberListByTeamID(ctx, kb.TeamID)
+		if err != nil {
+			return -1, v1.ErrTeamNotExist
+		}
+		// 检查用户是否为团队成员
+		var userIds []string
+		for _, member := range teamMembers {
+			userIds = append(userIds, member.UserID)
+		}
+		// 判断当前用户是否在团队成员列表中
+		if !utils.ContainsString(userIds, userId) {
+			return -1, v1.ErrPermissionDenied
+		}
 	}
 	// 判断文章状态
 	if article.Status == enums.StatusPublished {

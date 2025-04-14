@@ -166,24 +166,15 @@ func (h *ArticleHandler) DeleteArticle(ctx *gin.Context) {
 		return
 	}
 	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
-	articleData, err := h.articleService.GetArticleById(ctx, req.ArticleID)
+	deletedCount, err := h.articleService.DeleteArticle(ctx, userId, role, req.ArticleID)
 	if err != nil {
 		v1.HandleError(ctx, http.StatusOK, err, nil)
 		return
 	}
-	if articleData.UserID == userId || role == enums.SUPER_ADMIN {
-		deletedCount, err := h.articleService.DeleteArticle(ctx, req.ArticleID)
-		if err != nil {
-			v1.HandleError(ctx, http.StatusOK, err, nil)
-			return
-		}
-		v1.HandleSuccess(ctx, v1.DeleteArticleResponseData{
-			DeletedCount: deletedCount,
-		})
-	} else {
-		v1.HandleError(ctx, http.StatusOK, v1.ErrPermissionDenied, nil)
-		return
-	}
+	v1.HandleSuccess(ctx, v1.DeleteArticleResponseData{
+		DeletedCount: deletedCount,
+	})
+
 }
 
 // GetUserArticleList godoc

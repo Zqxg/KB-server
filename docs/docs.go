@@ -2015,6 +2015,10 @@ const docTemplate = `{
                     "description": "文章更新时间",
                     "type": "string"
                 },
+                "updated_by": {
+                    "description": "最后更新人",
+                    "type": "string"
+                },
                 "uploaded_files": {
                     "description": "上传的文件列表",
                     "type": "array",
