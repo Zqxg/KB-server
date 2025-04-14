@@ -18,7 +18,7 @@ type ArticleService interface {
 	GetArticleById(ctx context.Context, id uint) (*model.Article, error)
 	GetArticle(ctx context.Context, userId string, id uint) (*v1.ArticleData, error)
 	CreateArticle(ctx context.Context, role int, req *v1.CreateArticleRequest) (int, error)
-	UpdateArticle(ctx context.Context, req *v1.UpdateArticleRequest) (*v1.ArticleData, error)
+	UpdateArticle(ctx context.Context, userID string, req *v1.UpdateArticleRequest) (*v1.ArticleData, error)
 	DeleteArticle(ctx context.Context, id uint) (int, error)
 	DeleteArticleList(ctx context.Context, req *v1.DelArticleListReq) (int, error)
 	GetArticleListByCategory(ctx context.Context, userID string, role int, req *v1.GetArticleListByCategoryReq) (*v1.ArticleList, error)
@@ -194,6 +194,7 @@ func (s *articleService) CreateArticle(ctx context.Context, role int, req *v1.Cr
 		SourceURI:       req.SourceURI,
 		UploadedFiles:   uploadedFilesData,
 		Status:          req.Status,
+		UpdatedBy:       req.AuthorID,
 	}
 	// 创建新文章
 	articleId, err := s.articleRepository.CreateArticle(ctx, article)
@@ -236,7 +237,7 @@ func (s *articleService) CreateArticle(ctx context.Context, role int, req *v1.Cr
 	return articleId, nil
 }
 
-func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticleRequest) (*v1.ArticleData, error) {
+func (s *articleService) UpdateArticle(ctx context.Context, userID string, req *v1.UpdateArticleRequest) (*v1.ArticleData, error) {
 	// 查询旧文章（获取原 KBID）
 	oldArticle, err := s.articleRepository.GetArticle(ctx, req.ArticleID)
 	if err != nil {
@@ -255,6 +256,7 @@ func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticl
 	oldArticle.CommentDisabled = req.CommentDisabled
 	oldArticle.SourceURI = req.SourceURI
 	oldArticle.Status = req.Status
+	oldArticle.UpdatedBy = userID
 
 	// 更新数据库
 	updatedArticle, err := s.articleRepository.UpdateArticle(ctx, oldArticle)
@@ -264,6 +266,7 @@ func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticl
 
 	// 查询作者信息 & 分类
 	author, _ := s.userRepo.GetByUserId(ctx, updatedArticle.UserID)
+	updatedAuthor, _ := s.userRepo.GetByUserId(ctx, updatedArticle.UpdatedBy)
 	category, _ := s.kbRepository.GetCategoryById(ctx, updatedArticle.CategoryID)
 	kb, _ := s.kbRepository.GetKBViewById(ctx, updatedArticle.KBID)
 
@@ -294,6 +297,7 @@ func (s *articleService) UpdateArticle(ctx context.Context, req *v1.UpdateArticl
 		SourceURI:       updatedArticle.SourceURI,
 		UploadedFiles:   uploadedFiles,
 		Status:          updatedArticle.Status,
+		UpdatedBy:       updatedAuthor.Nickname,
 		CreatedAt:       utils.TimeFormat(updatedArticle.CreatedAt, utils.FormatDateTime),
 		UpdatedAt:       utils.TimeFormat(updatedArticle.UpdatedAt, utils.FormatDateTime),
 	}
@@ -421,6 +425,7 @@ func (s *articleService) GetArticleListByCategory(ctx context.Context, userID st
 	for _, article := range articles {
 		// 获取作者昵称
 		Author, _ := s.userRepo.GetByUserId(ctx, article.UserID)
+		updatedBy, _ := s.userRepo.GetByUserId(ctx, article.UpdatedBy)
 		// 获取分类名称
 		category, _ := s.kbRepository.GetCategoryById(ctx, article.CategoryID)
 		kb, _ := s.kbRepository.GetKBViewById(ctx, article.KBID)
@@ -450,6 +455,7 @@ func (s *articleService) GetArticleListByCategory(ctx context.Context, userID st
 			SourceURI:       article.SourceURI,
 			UploadedFiles:   uploadedFiles,
 			Status:          article.Status,
+			UpdatedBy:       updatedBy.Nickname,
 			CreatedAt:       utils.TimeFormat(article.CreatedAt, utils.FormatDateTime),
 			UpdatedAt:       utils.TimeFormat(article.UpdatedAt, utils.FormatDateTime),
 		}
@@ -484,6 +490,7 @@ func (s *articleService) GetUserArticleList(ctx context.Context, userId string, 
 		// 获取分类名称
 		category, _ := s.kbRepository.GetCategoryById(ctx, article.CategoryID)
 		kb, _ := s.kbRepository.GetKBViewById(ctx, article.KBID)
+		updatedBy, _ := s.userRepo.GetByUserId(ctx, article.UpdatedBy)
 		// 反序列化上传的文件列表
 		var uploadedFiles []v1.FileUpload
 		if len(article.UploadedFiles) > 0 {
@@ -510,6 +517,7 @@ func (s *articleService) GetUserArticleList(ctx context.Context, userId string, 
 			SourceURI:       article.SourceURI,
 			UploadedFiles:   uploadedFiles,
 			Status:          article.Status,
+			UpdatedBy:       updatedBy.Nickname,
 			CreatedAt:       utils.TimeFormat(article.CreatedAt, utils.FormatDateTime),
 			UpdatedAt:       utils.TimeFormat(article.UpdatedAt, utils.FormatDateTime),
 		}

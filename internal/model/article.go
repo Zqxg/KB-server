@@ -21,6 +21,7 @@ type Article struct {
 	UploadedFiles   []byte         `gorm:"type:json"`                  // 上传的文件列表
 	CreatedAt       time.Time      `gorm:"autoCreateTime" `            // 文章创建时间
 	UpdatedAt       time.Time      `gorm:"autoUpdateTime" `            // 文章更新时间
+	UpdatedBy       string         `gorm:"type:varchar(255)"`          // 最后更新人
 	DeletedAt       gorm.DeletedAt `gorm:"index"`
 }
 

@@ -103,7 +103,7 @@ func (h *ArticleHandler) UpdateArticle(ctx *gin.Context) {
 	}
 	userId, role := GetUserIdAndRoleTypeFromCtx(ctx)
 	if req.AuthorID == userId || role == enums.SUPER_ADMIN {
-		articleData, err := h.articleService.UpdateArticle(ctx, &req)
+		articleData, err := h.articleService.UpdateArticle(ctx, userId, &req)
 		if err != nil {
 			v1.HandleError(ctx, http.StatusOK, err, nil)
 			return

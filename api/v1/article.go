@@ -49,6 +49,7 @@ type ArticleData struct {
 	Status          int          `json:"status"`           // 文章状态
 	CreatedAt       string       `json:"created_at"`       // 文章创建时间
 	UpdatedAt       string       `json:"updated_at"`       // 文章更新时间
+	UpdatedBy       string       `json:"updated_by"`       // 最后更新人
 	//Tags            []Tags       `json:"tags"`            //todo：文章标签
 }
 
