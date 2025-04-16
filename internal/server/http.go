@@ -76,12 +76,11 @@ func NewHTTPServer(
 			commonUserRouter.GET(enums.USER+"/getUserInfo", userHandler.GetUserInfo)      // 获取用户信息
 			commonUserRouter.POST(enums.USER+"/updateProfile", userHandler.UpdateProfile) // 修改用户信息
 			commonUserRouter.POST(enums.USER+"/search", userHandler.Search)
-			commonUserRouter.GET(enums.USER+"/getCollege", collegeHandler.GetCollege)         // 获取学院信息
-			commonUserRouter.GET(enums.USER+"/getCollegeList", collegeHandler.GetCollegeList) // 获取学院信息列表
-			commonUserRouter.POST(enums.USER+"/userAuth", userHandler.UserAuth)
+			//commonUserRouter.GET(enums.USER+"/getCollege", collegeHandler.GetCollege)         // 获取学院信息
+			//commonUserRouter.GET(enums.USER+"/getCollegeList", collegeHandler.GetCollegeList) // 获取学院信息列表
+			//commonUserRouter.POST(enums.USER+"/userAuth", userHandler.UserAuth)
 
 			// 文章模块
-			//commonUserRouter.GET(enums.ARTICLE+"/getArticleCategory", articleHandler.GetArticleCategory)             // 获取文章分组
 			commonUserRouter.GET(enums.ARTICLE+"/getArticle", articleHandler.GetArticle)                    // 获取文章详细
 			commonUserRouter.POST(enums.ARTICLE+"/getArticleListByCID", articleHandler.GetArticleListByCID) // 分类获取公开文章列表
 			commonUserRouter.POST(enums.ARTICLE+"/getArticleListByEs", articleHandler.GetArticleListByEs)   // es文章查询
@@ -103,7 +102,6 @@ func NewHTTPServer(
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/createCategory", knowledgeBaseHandler.CreateCategory)          // 新建知识库分类（私人/团队）
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/updateCategory", knowledgeBaseHandler.UpdateCategory)          // 修改知识库分类（私人/团队）
 			commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/deleteCategory", knowledgeBaseHandler.DeleteCategory)          // 删除知识库分类（私人/团队）
-			//commonUserRouter.POST(enums.KNOWLEDGE_BASE+"/getArticleListByCategory", knowledgeBaseHandler.GetCategoryList) // 多种查询分类
 
 			// 团队模块
 			commonUserRouter.POST(enums.TEAM+"/createTeam", teamHandler.CreateTeam)                      // 新建团队

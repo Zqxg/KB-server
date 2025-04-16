@@ -20,7 +20,7 @@ type ArticleRepository interface {
 	UpdateArticle(ctx context.Context, article *model.Article) (*model.Article, error)
 	DeleteArticle(ctx context.Context, id uint) (int, error)
 	DeleteArticleList(ctx context.Context, ids []uint) (int, error)
-	GetArticleListByCategory(ctx context.Context, categoryId uint, pageNum int, pageSize int) ([]model.Article, int64, error)
+	GetArticleListByCategory(ctx context.Context, categoryId uint, status int, pageNum int, pageSize int) ([]model.Article, int64, error)
 	GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq, pageNum int, pageSize int) ([]model.Article, int64, error)
 	GetArticleCountByKBID(ctx context.Context, kbId uint) (int64, error)
 
@@ -90,10 +90,11 @@ func (r *articleRepository) UpdateArticle(ctx context.Context, article *model.Ar
 }
 
 func (r *articleRepository) DeleteArticle(ctx context.Context, id uint) (int, error) {
-	// 更新文章的 status 字段为已删除状态
+	// 更新文章的 status 字段为已删除状态，并记录删除时间
+	now := time.Now()
 	result := r.DB(ctx).Table("kb_article").
 		Where("article_id = ?", id).
-		Updates(map[string]interface{}{"status": enums.StatusDeleted})
+		Updates(map[string]interface{}{"status": enums.StatusDeleted, "deleted_at": now})
 	if result.Error != nil {
 		r.logger.WithContext(ctx).Error("ArticleRepository.DeleteArticle error", zap.Error(result.Error))
 		return 0, result.Error
@@ -115,20 +116,25 @@ func (r *articleRepository) DeleteArticleList(ctx context.Context, ids []uint) (
 	return int(updateResult.RowsAffected), nil
 }
 
-func (r *articleRepository) GetArticleListByCategory(ctx context.Context, categoryId uint, pageNum int, pageSize int) ([]model.Article, int64, error) {
+func (r *articleRepository) GetArticleListByCategory(ctx context.Context, categoryId uint, status int, pageNum int, pageSize int) ([]model.Article, int64, error) {
 	var articles []model.Article
 	var total int64
 
 	// 计算偏移量
 	offset := (pageNum - 1) * pageSize
 
+	// 构建查询对象
+	db := r.DB(ctx).Table("kb_article").Where("category_id = ?", categoryId)
+
+	// 如果指定了具体的状态（status != -1），添加状态过滤
+	if status != -1 {
+		db = db.Where("status = ?", status)
+	}
+
 	// 查询总数
-	countResult := r.DB(ctx).Table("kb_article").
-		Where("category_id = ? AND status = ?", categoryId, enums.StatusPublished).
-		Count(&total)
-	if countResult.Error != nil {
-		r.logger.WithContext(ctx).Error("ArticleRepository.GetArticleListByCategory Count error", zap.Error(countResult.Error))
-		return nil, 0, countResult.Error
+	if err := db.Count(&total).Error; err != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.GetArticleListByCategory Count error", zap.Error(err))
+		return nil, 0, err
 	}
 
 	// 如果没有数据，直接返回空
@@ -137,22 +143,18 @@ func (r *articleRepository) GetArticleListByCategory(ctx context.Context, catego
 		return []model.Article{}, 0, nil
 	}
 
-	// 查询文章列表
-	result := r.DB(ctx).Table("kb_article").
-		Where("category_id = ? AND status = ?", categoryId, enums.StatusPublished).
-		Offset(offset).
-		Limit(pageSize).
-		Find(&articles)
-	if result.Error != nil {
-		r.logger.WithContext(ctx).Error("ArticleRepository.GetArticleListByCategory Find error", zap.Error(result.Error))
-		return nil, 0, result.Error
+	// 分页查询列表
+	if err := db.Offset(offset).Limit(pageSize).Find(&articles).Error; err != nil {
+		r.logger.WithContext(ctx).Error("ArticleRepository.GetArticleListByCategory Find error", zap.Error(err))
+		return nil, 0, err
 	}
 
 	// 打印成功日志
-	r.logger.WithContext(ctx).Info("Successfully fetched knowledgeBase list", zap.Int("articleCount", len(articles)))
+	r.logger.WithContext(ctx).Info("Successfully fetched article list", zap.Int("articleCount", len(articles)))
 
 	return articles, total, nil
 }
+
 func (r *articleRepository) GetUserArticleList(ctx context.Context, userId string, req *v1.GetUserArticleListReq, pageNum int, pageSize int) ([]model.Article, int64, error) {
 	// 使用 GORM 获取数据库连接
 	db := r.db.WithContext(ctx)

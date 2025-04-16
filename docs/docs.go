@@ -2374,6 +2374,10 @@ const docTemplate = `{
                 "page_size": {
                     "description": "每页大小",
                     "type": "integer"
+                },
+                "status": {
+                    "description": "文章状态",
+                    "type": "integer"
                 }
             }
         },

@@ -437,7 +437,8 @@ func (s *articleService) GetArticleListByCategory(ctx context.Context, userID st
 			}
 		}
 	}
-	articles, total, err := s.articleRepository.GetArticleListByCategory(ctx, req.CategoryID, pageIndex, pageSize)
+	status := enums.GetStatus(req.Status)
+	articles, total, err := s.articleRepository.GetArticleListByCategory(ctx, req.CategoryID, status, pageIndex, pageSize)
 	if err != nil {
 		return nil, v1.ErrQueryFailed
 	}

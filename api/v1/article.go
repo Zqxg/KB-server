@@ -76,6 +76,7 @@ type DeleteArticleRequest struct {
 
 type GetArticleListByCategoryReq struct {
 	CategoryID uint `json:"category_id"` // 文章分类ID
+	Status     int  `json:"status"`      // 文章状态
 	PageRequest
 }
 
