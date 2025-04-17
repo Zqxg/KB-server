@@ -46,10 +46,11 @@ func NewUserService(
 }
 
 type userService struct {
-	userRepo       repository.UserRepository
-	kbRepo         repository.KBRepository
-	captchaService CaptchaService // 新增验证码服务
-	articleRepo    repository.ArticleRepository
+	userRepo          repository.UserRepository
+	kbRepo            repository.KBRepository
+	captchaService    CaptchaService // 新增验证码服务
+	articleRepo       repository.ArticleRepository
+	collegeRepository repository.CollegeRepository
 	*service.Service
 }
 
@@ -160,14 +161,21 @@ func (s *userService) GetUserInfo(ctx context.Context, userId string) (*v1.GetUs
 		return nil, v1.ErrUserNotExist
 	}
 
+	collegeName := "暂无"
+	if user.CollegeId != 0 {
+		college, err := s.collegeRepository.GetCollegeByCollegeId(ctx, int64(user.CollegeId))
+		if err == nil && college != nil {
+			collegeName = college.CollegeName
+		}
+	}
+
 	return &v1.GetUserInfoResponseData{
-		UserId:    user.UserId,
-		Nickname:  user.Nickname,
-		Phone:     user.Phone,
-		RoleType:  user.RoleType,
-		Email:     user.Email,
-		CollegeId: user.CollegeId,
-		StudentId: user.StudentId,
+		UserId:      user.UserId,
+		Nickname:    user.Nickname,
+		Phone:       user.Phone,
+		RoleType:    user.RoleType,
+		Email:       user.Email,
+		CollegeName: collegeName,
 	}, nil
 }
 
@@ -176,14 +184,14 @@ func (s *userService) UpdateProfile(ctx context.Context, userId string, req *v1.
 	if err != nil {
 		return v1.ErrUserNotExist
 	}
-	if utils.IsEmpty(req.Email) && utils.IsEmpty(req.Nickname) {
-		return v1.ErrParamEmpty
-	}
 	if utils.IsNotEmpty(req.Email) && utils.IsEmail(req.Email) {
 		user.Email = req.Email
 	}
 	if utils.IsNotEmpty(req.Nickname) {
 		user.Nickname = req.Nickname
+	}
+	if req.CollegeId > 0 {
+		user.CollegeId = req.CollegeId
 	}
 	if err = s.userRepo.Update(ctx, user); err != nil {
 		return v1.ErrUpdateFailed
@@ -272,26 +280,36 @@ func (s *userService) UserAuth(ctx context.Context, req *v1.UserAuthRequest, use
 }
 
 func (s *userService) Search(ctx context.Context, req *v1.SearchRequest) (*v1.SearchResponseData, error) {
-	// 初始化
+	// 初始化分页
 	pageIndex, pageSize := service.InitPage(req.PageIndex, req.PageSize)
-	// 搜索
+
+	// 搜索用户
 	users, total, err := s.userRepo.SearchUsers(ctx, req.Nickname, req.Phone, pageIndex, pageSize)
 	if err != nil {
 		return nil, v1.ErrSearchFailed
 	}
-	// 转换
+
+	// 构造响应数据
 	var userList []v1.GetUserInfoResponseData
 	for _, user := range users {
+		collegeName := "暂无"
+		if user.CollegeId != 0 {
+			college, err := s.collegeRepository.GetCollegeByCollegeId(ctx, int64(user.CollegeId))
+			if err == nil && college != nil {
+				collegeName = college.CollegeName
+			}
+		}
+
 		userList = append(userList, v1.GetUserInfoResponseData{
-			UserId:    user.UserId,
-			Nickname:  user.Nickname,
-			Phone:     user.Phone,
-			RoleType:  user.RoleType,
-			Email:     user.Email,
-			CollegeId: user.CollegeId,
-			StudentId: user.StudentId,
+			UserId:      user.UserId,
+			Nickname:    user.Nickname,
+			Phone:       user.Phone,
+			RoleType:    user.RoleType,
+			Email:       user.Email,
+			CollegeName: collegeName,
 		})
 	}
+
 	return &v1.SearchResponseData{
 		UserList: userList,
 		PageResponse: v1.PageResponse{

@@ -28,17 +28,18 @@ type LoginResponseData struct {
 }
 
 type UpdateProfileRequest struct {
-	Nickname string `json:"nick_name" example:"alan"`
-	Email    string `json:"email" binding:"email" example:"1234@gmail.com"`
+	Nickname  string `json:"nick_name" example:"alan"`
+	Email     string `json:"email" binding:"email" example:"1234@gmail.com"`
+	CollegeId uint   `json:"college_id" example:"1"`
 }
 type GetUserInfoResponseData struct {
-	UserId    string `json:"user_id"`
-	Phone     string `json:"phone" example:"10012239028"`
-	Nickname  string `json:"nick_name" example:"alan"`
-	RoleType  int    `json:"role_type" example:"0"`
-	Email     string `json:"email"`
-	CollegeId uint   `json:"college_id"`
-	StudentId string `json:"student_id"`
+	UserId      string `json:"user_id"`
+	Phone       string `json:"phone" example:"10012239028"`
+	Nickname    string `json:"nick_name" example:"alan"`
+	RoleType    int    `json:"role_type" example:"0"`
+	Email       string `json:"email"`
+	CollegeName string `json:"college_name"`
+	//StudentId string `json:"student_id"`
 }
 type UserAuthRequest struct {
 	CollegeId uint   `json:"college_id"`

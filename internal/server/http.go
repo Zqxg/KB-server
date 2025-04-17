@@ -76,8 +76,8 @@ func NewHTTPServer(
 			commonUserRouter.GET(enums.USER+"/getUserInfo", userHandler.GetUserInfo)      // 获取用户信息
 			commonUserRouter.POST(enums.USER+"/updateProfile", userHandler.UpdateProfile) // 修改用户信息
 			commonUserRouter.POST(enums.USER+"/search", userHandler.Search)
-			//commonUserRouter.GET(enums.USER+"/getCollege", collegeHandler.GetCollege)         // 获取学院信息
-			//commonUserRouter.GET(enums.USER+"/getCollegeList", collegeHandler.GetCollegeList) // 获取学院信息列表
+			commonUserRouter.GET(enums.USER+"/getCollege", collegeHandler.GetCollege)         // 获取学院信息
+			commonUserRouter.GET(enums.USER+"/getCollegeList", collegeHandler.GetCollegeList) // 获取学院信息列表
 			//commonUserRouter.POST(enums.USER+"/userAuth", userHandler.UserAuth)
 
 			// 文章模块

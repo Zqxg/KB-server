@@ -2132,10 +2132,10 @@ const docTemplate = `{
         "v1.CollegeResponseData": {
             "type": "object",
             "properties": {
-                "collegeId": {
+                "college_id": {
                     "type": "integer"
                 },
-                "collegeName": {
+                "college_name": {
                     "type": "string"
                 },
                 "description": {
@@ -2451,7 +2451,7 @@ const docTemplate = `{
         "v1.GetCollegeListDataResponse": {
             "type": "object",
             "properties": {
-                "collegeList": {
+                "college_list": {
                     "type": "array",
                     "items": {
                         "$ref": "#/definitions/v1.CollegeResponseData"
@@ -2462,7 +2462,7 @@ const docTemplate = `{
         "v1.GetCollegeRequest": {
             "type": "object",
             "properties": {
-                "collegeId": {
+                "college_id": {
                     "type": "integer"
                 }
             }
@@ -2718,8 +2718,8 @@ const docTemplate = `{
         "v1.GetUserInfoResponseData": {
             "type": "object",
             "properties": {
-                "college_id": {
-                    "type": "integer"
+                "college_name": {
+                    "type": "string"
                 },
                 "email": {
                     "type": "string"
@@ -2735,9 +2735,6 @@ const docTemplate = `{
                 "role_type": {
                     "type": "integer",
                     "example": 0
-                },
-                "student_id": {
-                    "type": "string"
                 },
                 "user_id": {
                     "type": "string"
@@ -3206,6 +3203,10 @@ const docTemplate = `{
         "v1.UpdateProfileRequest": {
             "type": "object",
             "properties": {
+                "college_id": {
+                    "type": "integer",
+                    "example": 1
+                },
                 "email": {
                     "type": "string",
                     "example": "1234@gmail.com"

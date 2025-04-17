@@ -161,9 +161,9 @@ definitions:
     type: object
   v1.CollegeResponseData:
     properties:
-      collegeId:
+      college_id:
         type: integer
-      collegeName:
+      college_name:
         type: string
       description:
         type: string
@@ -383,14 +383,14 @@ definitions:
     type: object
   v1.GetCollegeListDataResponse:
     properties:
-      collegeList:
+      college_list:
         items:
           $ref: '#/definitions/v1.CollegeResponseData'
         type: array
     type: object
   v1.GetCollegeRequest:
     properties:
-      collegeId:
+      college_id:
         type: integer
     type: object
   v1.GetKBInfoResp:
@@ -566,8 +566,8 @@ definitions:
     type: object
   v1.GetUserInfoResponseData:
     properties:
-      college_id:
-        type: integer
+      college_name:
+        type: string
       email:
         type: string
       nick_name:
@@ -579,8 +579,6 @@ definitions:
       role_type:
         example: 0
         type: integer
-      student_id:
-        type: string
       user_id:
         type: string
     type: object
@@ -913,6 +911,9 @@ definitions:
     type: object
   v1.UpdateProfileRequest:
     properties:
+      college_id:
+        example: 1
+        type: integer
       email:
         example: 1234@gmail.com
         type: string
