@@ -1,7 +1,7 @@
 package v1
 
 type GetCollegeRequest struct {
-	CollegeId int64 `json:"college_id"`
+	CollegeId uint `json:"college_id"`
 }
 
 type CollegeResponseData struct {

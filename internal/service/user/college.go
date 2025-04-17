@@ -8,7 +8,7 @@ import (
 )
 
 type CollegeService interface {
-	GetCollege(ctx context.Context, id int64) (*model.College, error)
+	GetCollege(ctx context.Context, id uint) (*model.College, error)
 	GetCollegeList(ctx context.Context) ([]*model.College, error)
 }
 
@@ -27,8 +27,8 @@ type collegeService struct {
 	collegeRepository repository.CollegeRepository
 }
 
-func (s *collegeService) GetCollege(ctx context.Context, college_id int64) (*model.College, error) {
-	return s.collegeRepository.GetCollegeByCollegeId(ctx, college_id)
+func (s *collegeService) GetCollege(ctx context.Context, collegeId uint) (*model.College, error) {
+	return s.collegeRepository.GetCollegeByCollegeId(ctx, collegeId)
 }
 
 func (s *collegeService) GetCollegeList(ctx context.Context) ([]*model.College, error) {

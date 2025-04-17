@@ -11,7 +11,7 @@ import (
 
 type CollegeRepository interface {
 	// db
-	GetCollegeByCollegeId(ctx context.Context, id int64) (*model.College, error)
+	GetCollegeByCollegeId(ctx context.Context, collegeId uint) (*model.College, error)
 	GetCollegeList(ctx context.Context) ([]*model.College, error)
 }
 
@@ -28,10 +28,10 @@ type collegeRepository struct {
 }
 
 // GetCollege 根据ID获取单个学院的信息
-func (r *collegeRepository) GetCollegeByCollegeId(ctx context.Context, college_id int64) (*model.College, error) {
-	var college model.College
+func (r *collegeRepository) GetCollegeByCollegeId(ctx context.Context, collegeId uint) (*model.College, error) {
+	var college *model.College
 	// 查询单个学院
-	if err := r.DB(ctx).Table("sys_colleges").Where("college_id = ?", college_id).First(&college).Error; err != nil {
+	if err := r.DB(ctx).Table("sys_colleges").Where("college_id = ?", collegeId).First(&college).Error; err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			// 如果未找到学院，返回未找到错误
 			return nil, v1.ErrNotFound
@@ -41,7 +41,7 @@ func (r *collegeRepository) GetCollegeByCollegeId(ctx context.Context, college_i
 		return nil, err
 	}
 	// 返回查询到的学院信息
-	return &college, nil
+	return college, nil
 }
 
 // GetCollegeList 获取多个学院的信息，支持通过条件过滤

@@ -33,6 +33,7 @@ func NewUserService(
 	service *service.Service,
 	userRepo repository.UserRepository,
 	kbRepo repository.KBRepository,
+	collegeRepo repository.CollegeRepository,
 	articleRepo repository.ArticleRepository,
 	captchaService CaptchaService, // 在构造函数中传入验证码服务
 ) UserService {
@@ -41,16 +42,17 @@ func NewUserService(
 		kbRepo:         kbRepo,
 		captchaService: captchaService, // 注入验证码服务
 		articleRepo:    articleRepo,
+		collegeRepo:    collegeRepo,
 		Service:        service,
 	}
 }
 
 type userService struct {
-	userRepo          repository.UserRepository
-	kbRepo            repository.KBRepository
-	captchaService    CaptchaService // 新增验证码服务
-	articleRepo       repository.ArticleRepository
-	collegeRepository repository.CollegeRepository
+	userRepo       repository.UserRepository
+	kbRepo         repository.KBRepository
+	captchaService CaptchaService // 新增验证码服务
+	articleRepo    repository.ArticleRepository
+	collegeRepo    repository.CollegeRepository
 	*service.Service
 }
 
@@ -162,8 +164,9 @@ func (s *userService) GetUserInfo(ctx context.Context, userId string) (*v1.GetUs
 	}
 
 	collegeName := "暂无"
-	if user.CollegeId != 0 {
-		college, err := s.collegeRepository.GetCollegeByCollegeId(ctx, int64(user.CollegeId))
+	if user.CollegeId > 0 {
+		college, err := s.collegeRepo.GetCollegeByCollegeId(ctx, user.CollegeId)
+		fmt.Println("GetCollegeByCollegeId college", college)
 		if err == nil && college != nil {
 			collegeName = college.CollegeName
 		}
@@ -294,7 +297,7 @@ func (s *userService) Search(ctx context.Context, req *v1.SearchRequest) (*v1.Se
 	for _, user := range users {
 		collegeName := "暂无"
 		if user.CollegeId != 0 {
-			college, err := s.collegeRepository.GetCollegeByCollegeId(ctx, int64(user.CollegeId))
+			college, err := s.collegeRepo.GetCollegeByCollegeId(ctx, user.CollegeId)
 			if err == nil && college != nil {
 				collegeName = college.CollegeName
 			}
