@@ -170,7 +170,7 @@ func (r *teamRepository) GetTeamMemberListByUserID(ctx context.Context, userID s
 	var total int64
 
 	// 计算总数
-	if err := r.DB(ctx).Table("sys_member").Where("user_id = ?", userID).Count(&total).Error; err != nil {
+	if err := r.DB(ctx).Table("sys_member").Where("user_id = ? and deleted_at IS NULL", userID).Count(&total).Error; err != nil {
 		r.logger.WithContext(ctx).Error("TeamRepository.GetTeamMemberListByUserID count error", zap.Error(err))
 		return nil, 0, err
 	}
